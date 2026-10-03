@@ -325,3 +325,12 @@ input, select { color: #44392e; background: #faf7f0; border: 1px solid #dfd4c5; 
 .chart-footer { border-top: 1px solid #e2d6c2; padding-top: 13px; margin: 9px 0 0; text-align: center; color: #a18b6d; font-size: 9px; }
 .chart-footer span { padding: 0 5px; }
 @media (max-width: 380px) { .leaderboard { padding: 18px; } .chart-record { width: 35px; height: 35px; flex-basis: 35px; } }
+
+/* Answer artwork shares the fixed display with the result text. */
+.radio-round-result:has(.radio-answer-thumbnail) { display: grid; grid-template-columns: 56px minmax(0, 1fr); column-gap: 8px; row-gap: 4px; text-align: left; align-items: center; }
+.radio-answer-thumbnail { width: 56px; height: 56px; object-fit: cover; border-radius: 6px; border: 1px solid #cbb894; grid-column: 1; grid-row: 1 / 5; }
+.radio-round-result:has(.radio-answer-thumbnail) > :not(img):not(button) { grid-column: 2; }
+.radio-round-result:has(.radio-answer-thumbnail) > button { grid-column: 1 / -1; }
+.radio-round-result:has(.radio-answer-thumbnail) strong { font-size: 11px; }
+.radio-round-result:has(.radio-answer-thumbnail) .radio-result-movie { font-size: 9px; }
+@media (max-width: 380px) { .radio-round-result:has(.radio-answer-thumbnail) { grid-template-columns: 38px minmax(0, 1fr); column-gap: 5px; } .radio-answer-thumbnail { width: 38px; height: 48px; } }

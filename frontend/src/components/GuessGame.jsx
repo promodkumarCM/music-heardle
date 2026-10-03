@@ -179,6 +179,13 @@ export default function GuessGame({ onScoreSaved }) {
           </>
         ) : nameSet ? (
           <div className="radio-round-result" role="status">
+            <img
+              key={song.youtubeId}
+              className="radio-answer-thumbnail"
+              src={`https://i.ytimg.com/vi/${song.youtubeId}/mqdefault.jpg`}
+              alt={`${song.movie} — ${song.title}`}
+              onError={(event) => { event.currentTarget.style.display = 'none' }}
+            />
             <span className="radio-result-label">{status === 'correct' ? '✓ Correct!' : 'The answer'}</span>
             <strong>{song.title}</strong>
             <span className="radio-result-movie">{song.movie}</span>
