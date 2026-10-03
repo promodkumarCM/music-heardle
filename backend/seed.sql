@@ -17,7 +17,7 @@ INSERT IGNORE INTO songs (id, title, movie, youtube_id) VALUES
 (14, 'Maaran', 'Kudukku 2025', '1kcrqTs7mO4'),
 (15, 'Poove', 'Kudukku 2025', 'Gi9HSj2yyUE');
 
--- 250 additional songs; source and verification in data/imported-songs.json.
+-- 250 additional songs.
 INSERT INTO songs (title, movie, youtube_id) SELECT 'Thiruvaavaniraavu', 'Jacobinte Swargarajyam', 'VrrnflVEiMg' WHERE NOT EXISTS (SELECT 1 FROM songs WHERE youtube_id = 'VrrnflVEiMg' OR LOWER(title) = LOWER('Thiruvaavaniraavu'));
 INSERT INTO songs (title, movie, youtube_id) SELECT 'Oru Kari Mukilinu', 'Charlie', 'ArYW9uI-_LI' WHERE NOT EXISTS (SELECT 1 FROM songs WHERE youtube_id = 'ArYW9uI-_LI' OR LOWER(title) = LOWER('Oru Kari Mukilinu'));
 INSERT INTO songs (title, movie, youtube_id) SELECT 'Thaane Pookum', 'Sapthamashree Thaskaraha', 'HcxY6M8yj2c' WHERE NOT EXISTS (SELECT 1 FROM songs WHERE youtube_id = 'HcxY6M8yj2c' OR LOWER(title) = LOWER('Thaane Pookum'));

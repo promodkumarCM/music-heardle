@@ -38,10 +38,7 @@ The queue holds five upcoming songs. The player cues the next video between
 rounds; YouTube controls buffering and regional playback availability.
 Answers and score calculation currently run in the browser.
 
-The seed contains 264 songs. Source and verification records for the 250-song
-expansion are in `backend/data/imported-songs.json`. 226 additions passed
-YouTube playback metadata and embedding checks; 24 passed oEmbed metadata
-checks only. Availability can change.
+The seed contains 264 songs. YouTube availability can change.
 
 ## Build
 
