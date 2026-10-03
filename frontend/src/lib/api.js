@@ -21,3 +21,18 @@ export async function fetchLeaderboard(level) {
   if (!res.ok) throw new Error('Failed to fetch leaderboard')
   return res.json()
 }
+
+export async function fetchDialogues(signal) {
+  const response = await fetch(`${BASE}/dialogues`, { signal })
+  if (!response.ok) throw new Error('Could not load dialogue clues. Please try again.')
+  return response.json()
+}
+
+export async function guessDialogue(id, guess, reveal = false) {
+  const response = await fetch(`${BASE}/dialogues/${id}/guess`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ guess, reveal }),
+  })
+  if (!response.ok) throw new Error('Could not check the answer. Please try again.')
+  return response.json()
+}

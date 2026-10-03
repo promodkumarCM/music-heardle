@@ -16,3 +16,12 @@ CREATE TABLE IF NOT EXISTS scores (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   INDEX idx_level_time (level, time_ms)
 );
+
+CREATE TABLE IF NOT EXISTS dialogues (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  dialogue TEXT NOT NULL,
+  movie VARCHAR(255) NOT NULL,
+  aliases JSON NOT NULL,
+  source_url VARCHAR(600) NOT NULL,
+  UNIQUE KEY unique_dialogue_movie (movie)
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

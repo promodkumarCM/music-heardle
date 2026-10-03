@@ -268,3 +268,10 @@ INSERT INTO songs (title, movie, youtube_id) SELECT 'Kodamanjin Thaazhvarayil', 
 INSERT INTO songs (title, movie, youtube_id) SELECT 'Manjil Kulikkum', 'Veruthe Oru Bharya', 'Lpr-4JxnCis' WHERE NOT EXISTS (SELECT 1 FROM songs WHERE youtube_id = 'Lpr-4JxnCis' OR LOWER(title) = LOWER('Manjil Kulikkum'));
 INSERT INTO songs (title, movie, youtube_id) SELECT 'Maattupetti Koyilile', 'Mayilattam', 'u8y_BEx-ffA' WHERE NOT EXISTS (SELECT 1 FROM songs WHERE youtube_id = 'u8y_BEx-ffA' OR LOWER(title) = LOWER('Maattupetti Koyilile'));
 INSERT INTO songs (title, movie, youtube_id) SELECT 'Melleyonnu Paadi', 'Manasinakkare', 'VK5mUPx9iNM' WHERE NOT EXISTS (SELECT 1 FROM songs WHERE youtube_id = 'VK5mUPx9iNM' OR LOWER(title) = LOWER('Melleyonnu Paadi'));
+
+-- Short dialogue clues; aliases accept common English spellings and Malayalam titles.
+INSERT IGNORE INTO dialogues (dialogue, movie, aliases, source_url) VALUES
+('Nee po mone Dinesha!', 'Narasimham', JSON_ARRAY('Narasimham', 'നരസിംഹം'), 'https://www.cinemaexpress.com/malayalam/news/2026/Mar/12/mohanlal-philosophises-po-mone-dinesha-line-from-narasimham'),
+('Shammi hero aada, hero!', 'Kumbalangi Nights', JSON_ARRAY('Kumbalangi Nights', 'Kumbalangi Night', 'കുമ്പളങ്ങി നൈറ്റ്സ്'), 'https://www.thenewsminute.com/article/shammi-hero-da-hero-mohammed-shami-uses-kumbalangi-nights-dialogue-viral-video-117211'),
+('Polandine patti oraksharam mindaruthu!', 'Sandesham', JSON_ARRAY('Sandesham', 'Sandhesham', 'സന്ദേശം'), 'https://www.reddit.com/r/MalayalamMovies/comments/ting1a/'),
+('Lelu allu, lelu allu!', 'Thenmavin Kombath', JSON_ARRAY('Thenmavin Kombath', 'Thenmavin Kombathu', 'Thenmaavin Kombathu', 'Thenmaavin Kombath', 'തേന്മാവിൻ കൊമ്പത്ത്'), 'https://www.reddit.com/r/Kerala/comments/xc85gr/');
