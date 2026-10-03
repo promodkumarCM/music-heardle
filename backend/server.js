@@ -6,6 +6,16 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
+app.get('/songs', async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT id, title, movie, youtube_id AS youtubeId FROM songs ORDER BY id')
+    res.set('Cache-Control', 'no-store').json(rows)
+  } catch (error) {
+    console.error('Could not load songs:', error.message)
+    res.status(503).json({ error: 'Song catalog unavailable' })
+  }
+})
+
 app.post('/scores', async (req, res) => {
   const { playerName, level, timeMs } = req.body || {}
   if (!playerName || !Number.isInteger(level) || !Number.isInteger(timeMs)) {
