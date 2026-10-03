@@ -1,0 +1,327 @@
+body {
+  font-family: system-ui, sans-serif;
+  background: #0f172a;
+  color: #f1f5f9;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+}
+.app {
+  max-width: 480px;
+  width: 100%;
+  padding: 2rem 1rem;
+}
+.card {
+  background: #1e293b;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+}
+nav button {
+  margin-right: 0.5rem;
+}
+.stats {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+input, select, button {
+  font-size: 1rem;
+  padding: 0.5rem;
+  margin: 0.25rem 0;
+}
+button {
+  cursor: pointer;
+}
+
+.game .pills {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+.pill {
+  border: none;
+  border-radius: 999px;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #0f172a;
+  background: var(--pill-color);
+}
+
+.progress-track {
+  position: relative;
+  height: 6px;
+  border-radius: 999px;
+  background: #334155;
+  margin-bottom: 0.75rem;
+}
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: #f97316;
+  transition: width 0.2s ease, background 0.2s ease;
+}
+.progress-tick {
+  position: absolute;
+  top: 50%;
+  width: 2px;
+  height: 10px;
+  background: #0f172a;
+  border-radius: 2px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.score-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.play-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1rem 0;
+}
+.play-btn {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: none;
+  background: #f97316;
+  color: #0f172a;
+  font-size: 1.5rem;
+}
+.play-btn:disabled {
+  opacity: 0.6;
+}
+.load-error {
+  color: #eab308;
+  font-size: 0.85rem;
+  text-align: center;
+  margin: 0.5rem 0 0;
+}
+.snippet-len {
+  color: #f97316;
+  font-weight: 700;
+  font-family: monospace;
+}
+
+.guess-row {
+  display: flex;
+  gap: 0.5rem;
+}
+.guess-row input {
+  flex: 1;
+}
+
+.result {
+  text-align: center;
+  padding: 1rem 0;
+}
+.result-art {
+  font-size: 3rem;
+}
+.result-title {
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-top: 0.5rem;
+}
+.result-sub {
+  color: #94a3b8;
+}
+.result-badge {
+  display: inline-block;
+  margin: 0.75rem 0;
+  padding: 0.3rem 0.9rem;
+  border-radius: 999px;
+  background: rgba(74, 222, 128, 0.15);
+  color: #4ade80;
+  border: 1px solid #4ade80;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+/* A warm, tactile radio above the game. Drawn in CSS so it stays crisp. */
+* { box-sizing: border-box; }
+body { background: #f7f2e9; color: #44392e; background-image: radial-gradient(ellipse at 50% 30%, #fffcf6 0%, transparent 65%); }
+.app { max-width: 540px; margin: auto; padding: 2.2rem 1.25rem 3rem; }
+.masthead { text-align: center; }
+.masthead .eyebrow { color: #90714b; font-size: 10px; letter-spacing: 3px; font-weight: 700; margin: 0 0 14px; }
+h1 { font-family: Georgia, serif; font-size: clamp(30px, 7vw, 40px); font-weight: 400; line-height: 1.15; letter-spacing: -1px; margin: 0; }
+h1 em { color: #967049; font-weight: 400; }
+.masthead > p:last-child { font-size: 13px; color: #87796a; margin: 14px 0 25px; }
+.radio { position: relative; width: min(100%, 340px); margin: 0 auto 27px; padding: 17px 16px 13px; border-radius: 53px 53px 39px 39px; border: 1px solid #dfc08c; background: linear-gradient(105deg, #f1d29c, #fff0c8 17%, #e8c58a 85%, #cba56b); box-shadow: inset 0 5px 4px #fff9df, inset 4px 0 7px #fff1c6, inset -4px -7px 9px #b79058, 0 17px 23px -15px #65462b99, 0 3px 4px #8a6a4040; }
+.radio-grille { height: 196px; position: relative; overflow: hidden; border-radius: 36px 36px 28px 28px; border: 5px solid #a18a70; background: #594b3e; box-shadow: 0 2px 2px #fff5d8, 0 -2px 2px #82654c, inset 0 4px 9px #251c17; }
+.radio-grille::after { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(to bottom, transparent 0 5px, #3c2d2499 5px 7px, #b4a28f 7px 10px, #d2bc9f 10px 11px, #6e5b49 11px 14px); box-shadow: inset 0 0 10px 3px #30231da6; }
+.radio-speaker { position: absolute; width: 153px; height: 153px; border-radius: 50%; background: radial-gradient(circle, #191b18 45%, #292b24 69%, #1b1d19 70%); left: 21px; top: 17px; }
+.radio-brand { position: absolute; z-index: 1; right: 15px; bottom: 27px; font-family: Georgia, serif; font-style: italic; font-size: 21px; color: #f6e2be; text-shadow: 0 2px 2px #221a15; transform: rotate(-6deg); }
+.radio-brand span { display: block; font: 7px system-ui, sans-serif; letter-spacing: 2px; text-align: right; margin-top: 4px; }
+.radio-console { display: flex; align-items: center; justify-content: space-between; gap: 13px; padding: 19px 8px 0; }
+.radio-control { text-align: center; flex-shrink: 0; }
+.radio-control > span { font-size: 7px; letter-spacing: 1px; color: #806642; display: block; margin-top: 6px; }
+.radio-knob { width: 53px; height: 53px; border-radius: 50%; background: conic-gradient(from 25deg, #b3b4ad, #eceee9 12%, #9b9f9a 25%, #e3e4dc 40%, #a3a7a4 56%, #f5f5ee 73%, #989b96 88%, #b3b4ad); border: 1px solid #b4b4a5; box-shadow: inset 0 0 0 3px #ffffff26, 1px 4px 5px #72553566; }
+.radio-tuner { position: relative; flex: 1; height: 47px; align-self: flex-start; margin-top: 3px; border: 3px solid #b3966c; border-radius: 6px; background: linear-gradient(#c7d1ca, #f5f5dc 52%, #fffbea); box-shadow: inset 0 2px 4px #5a594b66, 0 1px 1px #fff5ce; padding: 5px 7px; }
+.radio-frequencies { display: flex; justify-content: space-between; font: 6px monospace; color: #696b60; }
+.radio-scale { height: 13px; margin-top: 3px; background: repeating-linear-gradient(90deg, #8c9384 0 1px, transparent 1px 9px); }
+.radio-tuner i { position: absolute; top: 1px; bottom: 2px; left: 37%; width: 2px; background: #b24e35; box-shadow: 1px 0 2px #a7463355; }
+.radio-fm { display: block; text-align: center; color: #7e7e69; font-size: 5px; letter-spacing: 2px; margin-top: 2px; }
+nav { display: flex; justify-content: center; gap: 4px; padding: 4px; width: fit-content; margin: auto; border: 1px solid #e1d6c7; border-radius: 30px; background: #eee7dc; }
+button { color: #5d4935; background: #efe5d7; border: 1px solid #dac9b2; border-radius: 10px; padding: 10px 14px; transition: background .15s, box-shadow .15s; }
+button:hover:not(:disabled) { background: #e4d4bd; }
+button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid #ad8051; outline-offset: 3px; }
+nav button { border: 0; border-radius: 24px; font-size: 12px; padding: 9px 25px; margin: 0; background: transparent; }
+nav button:disabled { background: #fffcf7; color: #443426; box-shadow: 0 2px 5px #5c44251a; }
+.card { background: #fffdf8; border: 1px solid #e8dfd1; border-radius: 20px; box-shadow: 0 8px 25px #6f4e2410; padding: 24px; margin-top: 19px; }
+input, select { color: #44392e; background: #faf7f0; border: 1px solid #dfd4c5; border-radius: 10px; min-width: 0; padding: 11px; font-size: 14px; }
+.game .pills { justify-content: center; gap: 6px; }
+.pill { font-size: 10px; padding: 7px 10px; border-radius: 7px; }
+.progress-track { background: #eee6d9; margin: 16px 0; }
+.progress-tick { background: #fffdf8; }
+.score-row { font-size: 12px; color: #867059; }
+.play-btn { color: #fff9ee; background: #92693e; box-shadow: 0 4px 0 #6f4d2b, 0 7px 15px #76532926; }
+.play-btn:hover:not(:disabled) { background: #a67a49; }
+.snippet-len { color: #967049; }
+.guess-row { margin-top: 12px; }
+.guess-row button { white-space: nowrap; font-size: 12px; }
+.result-sub { color: #897664; }
+.result-badge { color: #4d7350; border-color: #b4c6a7; background: #edf2e5; }
+.load-error { color: #976526; }
+@media (max-width: 380px) { .app { padding: 24px 12px; } .card { padding: 17px; } .pill { padding: 7px 8px; } .radio { max-width: 300px; } .radio-console { gap: 9px; padding-left: 2px; padding-right: 2px; } }
+.radio { margin-top: 24px; }
+.radio-play { display: grid; place-items: center; padding: 0; margin: 0; color: #645e51; font-size: 18px; }
+.radio-play:hover:not(:disabled) { background: conic-gradient(from 45deg, #b3b4ad, #fffef5, #999e98, #e3e4dc, #a3a7a4, #f5f5ee, #989b96, #b3b4ad); }
+.radio-play:active:not(:disabled) { box-shadow: inset 0 2px 5px #5e554e66; }
+.radio-play:disabled { cursor: default; opacity: .5; }
+.radio-volume { position: relative; width: 57px; }
+.radio-volume .radio-knob { margin: auto; }
+.radio-volume b { display: block; position: absolute; top: 5px; left: 24px; height: 9px; width: 3px; background: #686b63; border-radius: 2px; }
+.radio-volume input { display: block; width: 57px; height: 12px; padding: 0; margin: 5px 0 0; accent-color: #967049; cursor: pointer; }
+.radio-volume > span { margin-top: 2px; }
+.radio-hint { text-align: center; color: #897664; font-size: 12px; margin: 18px 0; }
+
+/* Game controls sit on the grille, above its decorative slats. */
+.radio { width: min(100%, 450px); }
+.radio-grille::after { pointer-events: none; }
+.radio-game-panel { position: relative; z-index: 2; margin: 25px 12px 0; padding: 14px 12px 10px; border: 1px solid #e4d3b8; border-radius: 14px; background: #fffaf0f5; box-shadow: 0 3px 12px #241b1766, inset 0 1px 0 #fff; }
+.radio-game-panel .pills { display: flex; justify-content: space-between; gap: 5px; }
+.radio-game-panel .pill { flex: 1; padding: 8px 5px; font-size: 11px; }
+.radio-game-panel .progress-track { margin: 15px 0; }
+.radio-game-panel .score-row { margin: 0; font-size: 12px; }
+.radio:has(.radio-game-panel) .radio-brand { bottom: 9px; right: 19px; font-size: 14px; transform: none; }
+.radio:has(.radio-game-panel) .radio-brand span { display: none; }
+@media (max-width: 380px) {
+  .radio { max-width: 100%; padding-left: 10px; padding-right: 10px; }
+  .radio-game-panel { margin: 24px 5px 0; padding: 12px 7px; }
+  .radio-game-panel .pills { gap: 3px; }
+  .radio-game-panel .pill { font-size: 9px; padding: 9px 3px; }
+}
+
+.radio-tuner-search { min-width: 0; height: auto; align-self: center; margin-top: 0; padding: 9px; background: linear-gradient(#e8e9d8, #fffbeb); }
+.radio-tuner-search .radio-hint { font-size: 10px; line-height: 1.4; margin: 0 0 7px; color: #77674e; }
+.radio-tuner-search .guess-row { margin: 0; gap: 4px; flex-wrap: wrap; }
+.radio-tuner-search input { width: 100%; flex-basis: 100%; padding: 8px; font-size: 12px; margin: 0; background: #fffdf5; border-radius: 5px; }
+.radio-tuner-search button { width: 100%; font-size: 10px; padding: 5px; margin: 0; border-radius: 5px; }
+.radio-console:has(.radio-tuner-search) { align-items: center; padding-bottom: 5px; }
+@media (max-width: 380px) { .radio-tuner-search { padding: 6px; } .radio-tuner-search input { font-size: 11px; padding: 7px 4px; } }
+
+.radio-tuner-search { min-height: 150px; display: flex; flex-direction: column; justify-content: center; }
+.radio-round-result { display: flex; flex-direction: column; align-items: center; gap: 5px; text-align: center; min-width: 0; }
+.radio-result-label { font-size: 11px; font-weight: 700; color: #4d7350; }
+.radio-round-result strong { font-size: 13px; line-height: 1.25; overflow-wrap: anywhere; }
+.radio-result-movie { font-size: 10px; color: #897664; }
+.radio-result-time { font-size: 10px; color: #4d7350; }
+.radio-round-result button { margin-top: 3px; }
+.radio-tuner-search .guess-row { position: relative; }
+.song-suggestions { position: absolute; z-index: 5; top: 35px; left: 0; right: 0; max-height: 170px; overflow-y: auto; background: #fffdf5; border: 1px solid #d6c6ad; border-radius: 7px; box-shadow: 0 5px 15px #49331f30; }
+.radio-tuner-search .song-suggestions button { display: block; text-align: left; border: 0; border-radius: 0; padding: 9px; line-height: 1.3; background: transparent; }
+.radio-tuner-search .song-suggestions button:hover, .radio-tuner-search .song-suggestions button:focus-visible { background: #ede1ca; }
+
+/* Keep every round state the same size; content must not size the flex root. */
+#root { width: 100%; min-width: 0; }
+.app { width: 100%; }
+.radio { flex-shrink: 0; }
+.radio-console { display: grid; grid-template-columns: 57px minmax(0, 1fr) 57px; }
+.radio-tuner-search { height: 150px; min-height: 150px; max-height: 150px; width: 100%; }
+.radio-round-result { max-height: 126px; overflow-y: auto; width: 100%; flex-shrink: 0; }
+
+/* Mechanical station presets, matched to the radio's cream and brass case. */
+.radio-game-panel { background: linear-gradient(110deg, #f7e7c7, #e8d2aa); border-color: #b69a70; box-shadow: 0 3px 9px #241b1755, inset 0 2px 2px #fff9e6; }
+.radio-game-panel .pills { gap: 5px; padding: 4px; border-radius: 7px; background: #6b5843; box-shadow: inset 0 2px 4px #30221980, 0 1px 0 #fff3d7; }
+.radio-game-panel .pill { position: relative; opacity: 1 !important; min-width: 0; border: 1px solid #a48c67; border-radius: 3px 3px 5px 5px; color: #65543e; background: linear-gradient(#fff6df 0%, #ead5ae 74%, #c4a371 75%, #d4b786 100%); box-shadow: inset 0 1px 1px #ffffffb3, 0 3px 2px #30251a80; font-family: inherit; font-weight: 600; font-size: 10px; padding: 12px 3px 15px; margin: 0; transition: box-shadow .15s, background .15s, color .15s; }
+.radio-game-panel .pill::before { content: ''; display: block; width: 11px; height: 3px; margin: 0 auto 7px; border-radius: 3px; background: #9c8b6d; box-shadow: inset 0 1px 2px #51402a66; }
+.radio-game-panel .pill:hover:not(:disabled) { background: linear-gradient(#fffbea, #efdfbf 74%, #c9ac7b 75%, #ddc397); color: #382b1c; }
+.radio-game-panel .pill[aria-pressed="true"] { background: linear-gradient(#b99460, #d9b77e 15%, #e3c58f 85%, #c7a472); border-color: #866b45; box-shadow: inset 0 3px 5px #63472880, inset 0 -1px 1px #ffefc466; color: #392b1c; }
+.radio-game-panel .pill[aria-pressed="true"]::before { background: #a84925; box-shadow: 0 0 4px #b8562f66, inset 0 1px 1px #ffce91; }
+.radio-game-panel .progress-track { background: #b7a080; box-shadow: inset 0 1px 3px #68533880, 0 1px 0 #fff3d7; }
+.radio-game-panel .progress-fill { background: linear-gradient(90deg, #966336, #c48a45) !important; }
+.radio-game-panel .progress-tick { background: #f9e8c9; }
+.radio-game-panel .score-row { color: #6b5335; font-family: 'Courier New', monospace; font-size: 11px; }
+@media (max-width: 380px) { .radio-game-panel .pill { font-size: 9px; padding-left: 2px; padding-right: 2px; } }
+
+/* Slim ivory presets with a quiet amber selection light. */
+.radio-game-panel { background: linear-gradient(120deg, #fffaf0, #f0e5d2); border: 1px solid #dfcfb4; border-radius: 12px; padding: 16px 12px 12px; box-shadow: 0 2px 7px #32251a30, inset 0 1px 0 #fff; }
+.radio-game-panel .pills { gap: 6px; padding: 0; background: none; border-radius: 0; box-shadow: none; }
+.radio-game-panel .pill { border: 1px solid #d1c0a5; border-radius: 7px; background: linear-gradient(#fffcf5, #ede2ce); color: #85715a; padding: 10px 3px; font-size: 10px; font-weight: 500; box-shadow: 0 2px 2px #785b3120, inset 0 1px 0 #fff; }
+.radio-game-panel .pill::before { width: 13px; height: 2px; margin-bottom: 7px; background: #d9cdb9; box-shadow: none; }
+.radio-game-panel .pill:hover:not(:disabled) { background: #fffaf0; color: #55412b; }
+.radio-game-panel .pill[aria-pressed="true"] { color: #4e3821; border-color: #b99b70; background: linear-gradient(#eee0c5, #f5e9d2); box-shadow: inset 0 1px 3px #795b3126; font-weight: 700; }
+.radio-game-panel .pill[aria-pressed="true"]::before { background: #c18438; box-shadow: 0 0 5px #dca55366; }
+.radio-game-panel .progress-track { height: 4px; margin: 17px 0 14px; background: #e5dac7; box-shadow: inset 0 1px 2px #9c815526; }
+.radio-game-panel .progress-fill { background: #b9925b !important; }
+.radio-game-panel .progress-tick { height: 7px; width: 1px; background: #fffaf0; }
+.radio-game-panel .score-row { font-family: inherit; font-size: 11px; color: #8b775d; font-weight: 500; }
+@media (max-width: 380px) { .radio-game-panel .pills { gap: 4px; } .radio-game-panel .pill { font-size: 9px; } }
+
+/* Soft taupe presets: a gentle step darker than ivory. */
+.radio-game-panel .pill { background: linear-gradient(#e2d7c5, #cdbda5); border-color: #baa78b; color: #62513e; box-shadow: inset 0 1px 0 #fff8ea80, 0 2px 2px #785b3120; }
+.radio-game-panel .pill::before { background: #b3a087; }
+.radio-game-panel .pill:hover:not(:disabled) { background: linear-gradient(#ece2d1, #d9c9b1); color: #4e3c28; }
+.radio-game-panel .pill[aria-pressed="true"] { background: linear-gradient(#c6b294, #d8c4a3); border-color: #a38963; color: #463420; box-shadow: inset 0 2px 3px #795b3126; }
+.radio-game-panel .pill[aria-pressed="true"]::before { background: #bd8339; box-shadow: 0 0 5px #dca55366; }
+
+.leaderboard { width: min(100%, 450px); margin: 24px auto 0; }
+.leaderboard h2 { margin: 0 0 16px; font: 24px Georgia, serif; color: #685035; }
+.leaderboard label { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 13px; color: #89745a; }
+.leaderboard ol { padding-left: 24px; margin-bottom: 0; }
+.leaderboard li { padding: 10px 0; border-bottom: 1px solid #eee5d7; font-size: 13px; }
+.leaderboard li:last-child { border-bottom: 0; }
+
+/* Listener chart: warm paper, engraved labels, and aligned score rows. */
+.leaderboard { padding: 23px; border-radius: 18px; border: 1px solid #dfcfb6; background: linear-gradient(135deg, #fffcf5, #f6eedf); box-shadow: inset 0 1px 0 #fff, 0 8px 22px #70532c0c; }
+.chart-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.chart-eyebrow { font-size: 8px; font-weight: 700; letter-spacing: 2px; color: #a08764; margin: 0 0 9px; }
+.leaderboard h2 { font-size: clamp(21px, 5vw, 26px); margin: 0; color: #54412e; line-height: 1.15; }
+.chart-subtitle { font-size: 11px; color: #9a866c; margin: 9px 0 0; }
+.chart-record { width: 44px; height: 44px; flex: 0 0 44px; display: grid; place-items: center; border-radius: 50%; background: repeating-radial-gradient(circle, #685640 0 1px, #574834 2px 3px); box-shadow: 0 2px 3px #60462333; }
+.chart-record i { width: 15px; height: 15px; background: #d5b67c; border-radius: 50%; border: 5px solid #bb955a; }
+.chart-filter { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 22px 0 17px; }
+.chart-filter label { font-size: 12px; color: #7b6448; font-weight: 600; }
+.chart-filter select { padding: 7px 25px 7px 11px; margin: 0; font-size: 11px; border-color: #d9c8aa; color: #6d5437; background: #f1e7d6; border-radius: 7px; }
+.chart-columns { display: flex; justify-content: space-between; font-size: 8px; letter-spacing: 1.3px; color: #a08d72; padding: 0 3px 10px; border-bottom: 1px solid #ded2bd; }
+.chart-content { min-height: 125px; }
+.leaderboard .chart-list { padding: 0; margin: 8px 0 0; list-style: none; }
+.leaderboard .chart-list li { display: flex; gap: 12px; align-items: center; padding: 13px 8px; border-bottom: 1px solid #e7ddcc; }
+.leaderboard .chart-list li:last-child { border: 0; }
+.leaderboard .chart-list .chart-winner { background: #e9d6ae40; border-radius: 8px; }
+.chart-rank { font: 15px Georgia, serif; color: #a58c66; width: 22px; flex-shrink: 0; }
+.chart-winner .chart-rank { color: #9c6c2a; }
+.chart-player { flex: 1; min-width: 0; }
+.chart-player strong { display: block; font-size: 12px; color: #5d4c37; font-weight: 600; overflow-wrap: anywhere; }
+.chart-player > span { display: block; color: #af8b50; font-size: 7px; letter-spacing: 1.1px; margin-top: 4px; }
+.chart-time { flex-shrink: 0; font-size: 16px; color: #70583b; font-variant-numeric: tabular-nums; }
+.chart-time small { font-size: 9px; color: #a28c70; }
+.chart-empty { text-align: center; padding: 25px 4px; color: #978369; font-size: 12px; }
+.chart-empty > span { display: block; color: #b79866; font-size: 25px; margin-bottom: 7px; }
+.chart-empty strong { font: 18px Georgia, serif; display: block; color: #7b6345; }
+.chart-empty p { font-size: 11px; margin-bottom: 0; line-height: 1.5; }
+.chart-footer { border-top: 1px solid #e2d6c2; padding-top: 13px; margin: 9px 0 0; text-align: center; color: #a18b6d; font-size: 9px; }
+.chart-footer span { padding: 0 5px; }
+@media (max-width: 380px) { .leaderboard { padding: 18px; } .chart-record { width: 35px; height: 35px; flex-basis: 35px; } }
