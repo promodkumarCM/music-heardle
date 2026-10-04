@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import ClueGame from './components/ClueGame'
 import DialogueGame from './components/DialogueGame'
 import GuessGame from './components/GuessGame'
 import Leaderboard from './components/Leaderboard'
@@ -43,6 +44,7 @@ function CinemaHome() {
             <div className="dialogue-card-art" aria-hidden="true"><span>“</span><p>FAMOUS LINES.<br /><em>Unforgettable films.</em></p></div>
             <div className="dialogue-card-copy"><span className="cinema-eyebrow">GAME 02 · THE DIALOGUE ROUND</span><h3>Guess the Movie</h3><p>One familiar dialogue. Which Malayalam film comes to mind?</p><span className="dialogue-card-play">Take your cue ↗</span></div>
           </a>
+          <a className="dialogue-game-card" href="#clue-game" aria-label="Play Five Clues"><div className="dialogue-card-art" aria-hidden="true"><span>05</span><p>FOLLOW THE CLUES.<br/><em>Name the film.</em></p></div><div className="dialogue-card-copy"><span className="cinema-eyebrow">GAME 03 · THE MOVIE MYSTERY</span><h3>Five Clues</h3><p>One movie, five hints. Solve it early for more points, or reveal the answer after clue five.</p><span className="dialogue-card-play">Open the case ↗</span></div></a>
           <div className="coming-attractions"><span aria-hidden="true">✧</span><div><h3>More stories. More games.</h3><p>The next attraction is still in the making. Enjoy the music while you wait.</p></div><span className="coming-label">COMING SOON</span></div>
         </section>
         <footer className="cinema-footer"><span>PADAM / THE FILM PLAYHOUSE</span><span>For the fans. For the fun.</span></footer>
@@ -52,16 +54,17 @@ function CinemaHome() {
 }
 
 export default function App() {
-  const [page, setPage] = useState(() => window.location.hash === '#dialogue-game' ? 'dialogue' : window.location.hash === '#song-game' ? 'song' : 'home')
+  const [page, setPage] = useState(() => window.location.hash === '#clue-game' ? 'clue' : window.location.hash === '#dialogue-game' ? 'dialogue' : window.location.hash === '#song-game' ? 'song' : 'home')
   const [scoreVersion, setScoreVersion] = useState(0)
   useEffect(() => {
     const updatePage = () => {
-      setPage(window.location.hash === '#dialogue-game' ? 'dialogue' : window.location.hash === '#song-game' ? 'song' : 'home')
+      setPage(window.location.hash === '#clue-game' ? 'clue' : window.location.hash === '#dialogue-game' ? 'dialogue' : window.location.hash === '#song-game' ? 'song' : 'home')
       if (window.location.hash !== '#now-showing') window.scrollTo(0, 0)
     }
     window.addEventListener('hashchange', updatePage)
     return () => window.removeEventListener('hashchange', updatePage)
   }, [])
+  if (page === 'clue') return <ClueGame />
   if (page === 'dialogue') return <DialogueGame />
   if (page === 'home') return <CinemaHome />
   return (

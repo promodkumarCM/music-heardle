@@ -120,3 +120,29 @@
 @keyframes script-page-turn { 0% { transform: rotateY(0deg); opacity: 1; } 30% { transform: rotateY(-30deg) rotateZ(-.5deg); opacity: 1; } 75% { opacity: 1; } 100% { transform: rotateY(-105deg) rotateZ(-1deg); opacity: 0; } }
 @keyframes script-page-shadow { 0% { opacity: 0; } 45% { opacity: .9; } 100% { opacity: .3; } }
 @media (prefers-reduced-motion: reduce) { .dialogue-page .script-turning-page, .dialogue-page .script-turning-page::after { animation: none; display: none; } }
+
+.clue-page { background: radial-gradient(ellipse at top right,#3b413344,transparent 65%),#171e1b; }
+.clue-score { display:flex;justify-content:space-between;gap:15px;padding:18px 0;color:#a5ad97;font-size:9px;letter-spacing:1px; }
+.clue-score strong { display:block;color:#e5c58c;font:26px Georgia,serif;margin-top:5px;letter-spacing:0; }
+.clue-case { border:1px solid #b399643d;background:#242c23;border-radius:12px;padding:22px; }
+.clue-steps { display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px; }
+.clue-steps span { text-align:center;font-size:8px;letter-spacing:1px;border-bottom:2px solid #56604b;padding:10px 2px;color:#9da88e; }
+.clue-steps b { display:block;font-size:12px;margin-top:6px;letter-spacing:0; }
+.clue-steps .current { color:#edca89;border-color:#edca89;background:#d7b7760a; }
+.clue-list { list-style:none;padding:0;margin:20px 0 0; }
+.clue-list li { display:flex;align-items:center;gap:15px;padding:14px 0;min-height:68px;border-bottom:1px solid #89966d26; }
+.clue-list li:last-child { border:0; }.clue-number { font:18px Georgia,serif;color:#b39561;flex-shrink:0; }.clue-list p { margin:0;font-size:14px;line-height:1.65;color:#e5dfcc; }.clue-list .locked p { color:#849078;font-size:12px;font-style:italic; }.clue-list .locked .clue-number { color:#69735e; }
+.clue-actions { display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:12px; }.clue-actions > span { font-size:10px;color:#95a088;line-height:1.5; }.clue-page .clue-actions button { background:transparent;color:#d8be8d;border-color:#96815988;font-size:11px; }.clue-page .clue-actions button:hover:not(:disabled) { background:#3b4533; }.clue-wait { padding:30px;text-align:center;color:#b8c1a5; }
+@media(max-width:640px) { .clue-case { padding:14px; }.clue-list p { font-size:13px; }.clue-actions { flex-direction:column;align-items:stretch; }.clue-actions button { width:100%; } }
+
+.clue-timer-settings { display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px;border:1px solid #b399643d;border-radius:8px;padding:14px 16px;background:#242c23; }
+.clue-timer-settings label { color:#dcc9a1;font-size:12px; }.clue-timer-settings select { background:#30392b;color:#eed6a7;border-color:#726448;font-size:12px;margin:0; }.clue-timer-settings p { flex-basis:100%;font-size:11px;line-height:1.5;color:#9eaa90;margin:0; }
+.clue-countdown { display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin-top:16px;color:#dac18e; }.clue-countdown > span { font-size:9px;letter-spacing:1px; }.clue-countdown strong { font:24px monospace;font-variant-numeric:tabular-nums; }.clue-clock-track { flex-basis:100%;height:4px;background:#38412f;border-radius:4px;overflow:hidden; }.clue-clock-track > div { height:100%;background:#c9ad70;transition:width .2s linear; }.clue-countdown.urgent { color:#efae86; }.clue-countdown.urgent .clue-clock-track > div { background:#d68d64; }
+@media(prefers-reduced-motion:reduce) { .clue-clock-track > div { transition:none; } }
+
+/* Newly mounted covers slide off once; countdown updates don't replay them. */
+.clue-list li { position: relative; overflow: hidden; isolation: isolate; }
+.clue-reveal-cover { position: absolute; inset: 0; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 0 20px; pointer-events: none; border: 1px solid #7c79584d; border-radius: 5px; background: repeating-linear-gradient(135deg, #c3ac7410 0 1px, transparent 1px 6px), linear-gradient(110deg, #3c4635, #303a2d); color: #d4ba84; box-shadow: 5px 0 15px #0005; font: 10px monospace; letter-spacing: 3px; transform-origin: right center; animation: clue-unveil 850ms cubic-bezier(.22,.7,.24,1) forwards; }
+.clue-cover-seal { display: grid; place-items: center; width: 28px; height: 28px; border: 1px solid #b69c6255; border-radius: 50%; font-size: 16px; letter-spacing: 0; }
+@keyframes clue-unveil { 0%, 12% { transform: translateX(0); opacity: 1; } 85% { opacity: 1; } 100% { transform: translateX(103%); opacity: 0; visibility: hidden; } }
+@media (prefers-reduced-motion: reduce) { .clue-reveal-cover { display: none; animation: none; } }

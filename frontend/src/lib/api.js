@@ -36,3 +36,13 @@ export async function guessDialogue(id, guess, reveal = false) {
   if (!response.ok) throw new Error('Could not check the answer. Please try again.')
   return response.json()
 }
+
+export async function clueGameRequest(action, body = {}, signal) {
+  const response = await fetch(`${BASE}/clue-game/${action}`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body), signal,
+  })
+  const data = await response.json()
+  if (!response.ok) { const error = new Error(data.error || 'Please try again.'); error.expired = response.status === 410; throw error }
+  return data
+}
