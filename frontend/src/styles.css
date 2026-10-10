@@ -334,3 +334,194 @@ input, select { color: #44392e; background: #faf7f0; border: 1px solid #dfd4c5; 
 .radio-round-result:has(.radio-answer-thumbnail) strong { font-size: 11px; }
 .radio-round-result:has(.radio-answer-thumbnail) .radio-result-movie { font-size: 9px; }
 @media (max-width: 380px) { .radio-round-result:has(.radio-answer-thumbnail) { grid-template-columns: 38px minmax(0, 1fr); column-gap: 5px; } .radio-answer-thumbnail { width: 38px; height: 48px; } }
+
+/* Brass year dial stays the same size throughout every round. */
+.radio-year-tuner { margin: 15px 8px 0; padding: 10px 9px 8px; border: 2px solid #b3966c; border-radius: 7px; background: linear-gradient(#e1ddc6, #fff7dc); box-shadow: inset 0 2px 4px #68533840; }
+.radio-year-tuner label { display: flex; justify-content: space-between; gap: 8px; font: 9px 'Courier New', monospace; letter-spacing: 1px; color: #715637; }
+.radio-year-tuner input { display: block; width: 100%; height: 18px; margin: 7px 0 2px; padding: 0; accent-color: #a45430; cursor: pointer; }
+.radio-year-stations { display: flex; justify-content: space-between; gap: 0; }
+.radio-year-stations button { min-width: 0; padding: 5px 0; border: 0; border-radius: 3px; background: transparent; font: 9px 'Courier New', monospace; color: #76664b; }
+.radio-year-stations button[aria-pressed="true"] { color: #8f391f; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.radio-guess-actions { display: flex; width: 100%; gap: 4px; }
+.radio-result-wrong { color: #9a422e; }
+@media (max-width: 380px) { .radio-year-tuner { margin-left: 0; margin-right: 0; padding-inline: 5px; } .radio-year-stations button { font-size: 8px; } }
+/* Glass frequency scale and machined brass tuning control. */
+.radio-year-tuner { display: grid; grid-template-columns: minmax(0, 1fr) 58px; align-items: center; gap: 10px; margin: 15px 3px 0; padding: 10px 9px; border: 3px double #b28f4d; border-radius: 5px; background: repeating-linear-gradient(0deg, #2d271c 0 1px, #11120f 1px 4px); box-shadow: inset 0 2px 5px #000, 0 1px 0 #fff1c0; }
+.year-dial-glass { min-width: 0; padding: 8px 6px 6px; border: 1px solid #564b31; background: linear-gradient(160deg, #ffffff0b, transparent 40%), #0a1719; box-shadow: inset 0 2px 7px #000; }
+.year-dial-heading { display: flex; align-items: center; justify-content: space-between; gap: 4px; font: 8px 'Courier New', monospace; letter-spacing: 1px; color: #65b7c8; text-shadow: 0 0 4px #49b6d16b; }
+.year-dial-heading strong { color: #e5c888; font-weight: 400; letter-spacing: 0; }
+.year-dial-scale { position: relative; margin-top: 6px; padding-bottom: 5px; }
+.radio-year-stations { display: flex; justify-content: space-between; position: relative; z-index: 2; }
+.radio-year-stations button { flex: 1; padding: 4px 0; color: #73bdd0; font: bold 8px 'Courier New', monospace; text-shadow: 0 0 4px #5acbe04d; border-radius: 0; }
+.radio-year-stations button:hover:not(:disabled) { background: #62bfd21a; color: #d4f8ff; }
+.radio-year-stations button[aria-pressed="true"] { color: #ffe3a5; text-decoration: none; text-shadow: 0 0 6px #ffcc6980; }
+.year-dial-ticks { height: 12px; margin: 0 5%; border-top: 1px solid #5996a3; border-bottom: 1px solid #5996a3; background: repeating-linear-gradient(90deg, #66afbd 0 1px, transparent 1px 4.15%); opacity: .8; }
+.year-dial-ticks-small { height: 7px; margin-top: 7px; opacity: .4; }
+.radio-year-tuner .year-dial-slider { appearance: none; -webkit-appearance: none; position: absolute; z-index: 1; left: 0; top: 15px; width: 100%; height: 30px; margin: 0; padding: 0 5%; border: 0; border-radius: 0; background: transparent; cursor: ew-resize; box-shadow: none; }
+.year-dial-slider::-webkit-slider-runnable-track { background: transparent; height: 30px; }
+.year-dial-slider::-webkit-slider-thumb { appearance: none; -webkit-appearance: none; height: 30px; width: 2px; border: 0; border-radius: 0; background: #f06b47; box-shadow: 0 0 5px #ff604e; }
+.year-dial-slider::-moz-range-track { background: transparent; }
+.year-dial-slider::-moz-range-thumb { height: 30px; width: 2px; border: 0; border-radius: 0; background: #f06b47; box-shadow: 0 0 5px #ff604e; }
+.year-dial-caption { display: block; margin-top: 3px; color: #5e919b; font: 6px 'Courier New', monospace; letter-spacing: 1.5px; }
+.radio-year-tuner .year-knob-control { display: flex; flex-direction: column; align-items: center; gap: 5px; color: #c5ad79; font: 7px 'Courier New', monospace; letter-spacing: 1px; }
+.year-brass-knob { position: relative; width: 54px; height: 54px; border: 3px double #f1d08a; border-radius: 50%; background: conic-gradient(from 25deg, #957034, #f6d991 13%, #b68a40 27%, #ead28a 42%, #a37a37 56%, #ffdf96 75%, #a77d3a 90%, #957034); box-shadow: 0 3px 5px #000, 0 0 0 2px #665025, inset 0 0 0 3px #bb954e, inset 0 0 0 4px #ffe5a178; }
+.year-brass-knob i { position: absolute; inset: 6px; transform: rotate(var(--knob-angle)); pointer-events: none; }
+.year-brass-knob i::before { content: ''; position: absolute; top: 1px; left: calc(50% - 1px); width: 2px; height: 8px; background: #6c481c; box-shadow: 1px 0 #f7dfa6; }
+.radio-year-tuner .year-brass-knob input { position: absolute; inset: 0; width: 100%; height: 100%; padding: 0; margin: 0; opacity: 0; cursor: ew-resize; }
+.year-brass-knob:focus-within { outline: 2px solid #86d6e6; outline-offset: 4px; }
+.year-knob-help { font-size: 5px; letter-spacing: .4px; }
+@media (max-width: 380px) { .radio-year-tuner { grid-template-columns: minmax(0, 1fr) 44px; gap: 5px; margin-inline: 0; padding: 8px 5px; } .year-brass-knob { width: 42px; height: 42px; } .year-dial-glass { padding-inline: 3px; } .radio-year-stations button { font-size: 7px; } .year-dial-heading { font-size: 7px; letter-spacing: .4px; } }
+
+/* Ivory glass and warm brass integrate the top dial with the radio cabinet. */
+.radio-year-tuner { margin: 0 3px 16px; border: 2px solid #b99c6e; border-radius: 24px 24px 8px 8px; padding: 12px 10px 10px; background: linear-gradient(125deg, #fff1ce, #ead0a0); box-shadow: inset 0 1px 2px #fff9e7, 0 2px 4px #8c6b3b30; }
+.year-dial-glass { border-color: #b5a37b; border-radius: 12px 5px 5px 5px; background: linear-gradient(155deg, #fffef178, transparent 50%), linear-gradient(#dedfc9, #fff9e5); box-shadow: inset 0 2px 4px #746c4940, 0 1px 0 #fff8dc; }
+.year-dial-heading { color: #7d6d4f; text-shadow: none; }
+.year-dial-heading strong { color: #85552f; }
+.radio-year-stations button { color: #796d51; text-shadow: none; }
+.radio-year-stations button:hover:not(:disabled) { color: #533e24; background: #ba92552b; }
+.radio-year-stations button[aria-pressed="true"] { color: #9d482b; text-shadow: none; }
+.year-dial-ticks { border-color: #9b9475; background: repeating-linear-gradient(90deg, #8d896c 0 1px, transparent 1px 4.15%); }
+.year-dial-slider::-webkit-slider-thumb { background: #b34e32; box-shadow: 1px 0 2px #a7463355; }
+.year-dial-slider::-moz-range-thumb { background: #b34e32; box-shadow: 1px 0 2px #a7463355; }
+.year-dial-caption { color: #8c8061; }
+.radio-year-tuner .year-knob-control { color: #806642; }
+.year-brass-knob { box-shadow: 0 3px 5px #72553555, 0 0 0 2px #b59762, inset 0 0 0 3px #c8a669, inset 0 0 0 4px #ffe5a178; }
+.year-brass-knob:focus-within { outline-color: #ad8051; }
+@media (max-width: 380px) { .radio-year-tuner { margin-inline: 0; padding: 10px 5px 8px; } }
+
+/* Stack the year dial and difficulty presets inside the speaker grille. */
+.radio-grille:has(.radio-year-tuner) { height: 280px; }
+.radio-grille > .radio-year-tuner { position: relative; z-index: 2; margin: 15px 12px 0; padding: 7px 8px; border-radius: 12px; grid-template-columns: minmax(0, 1fr) 46px; gap: 7px; }
+.radio-grille .year-dial-glass { padding: 6px 4px 4px; border-radius: 6px; }
+.radio-grille .year-brass-knob { width: 42px; height: 42px; }
+.radio-grille .year-knob-control { gap: 4px; }
+.radio-grille:has(.radio-year-tuner) .radio-game-panel { margin: 9px 12px 0; padding: 10px 10px 9px; }
+.radio-grille:has(.radio-year-tuner) .pill { padding: 8px 3px; }
+.radio-grille:has(.radio-year-tuner) .progress-track { margin: 12px 0 10px; }
+@media (max-width: 380px) {
+  .radio-grille > .radio-year-tuner { margin-inline: 5px; padding-inline: 5px; gap: 4px; grid-template-columns: minmax(0, 1fr) 40px; }
+  .radio-grille .year-brass-knob { width: 36px; height: 36px; }
+  .radio-grille:has(.radio-year-tuner) .radio-game-panel { margin-inline: 5px; padding-inline: 7px; }
+}
+
+/* One-shot round feedback is clipped to the cabinet and never moves its layout. */
+.radio-feedback { position: absolute; inset: 0; z-index: 8; overflow: hidden; border-radius: inherit; pointer-events: none; }
+.radio-confetti { position: absolute; left: var(--origin); top: 74%; width: 6px; height: 10px; opacity: 0; background: var(--confetti-color); border-radius: 1px; animation: radio-confetti-burst 1400ms var(--delay) ease-out both; }
+.radio-confetti:nth-child(3n) { width: 5px; height: 5px; border-radius: 50%; }
+.radio-feedback-wrong { background: #c9573e; animation: radio-wrong-glow 650ms ease-out both; }
+.radio-answer-shake { animation: radio-wrong-shake 380ms ease-out; }
+@keyframes radio-confetti-burst {
+  0% { opacity: 0; transform: translate(0, 0) rotate(0); }
+  12% { opacity: 1; }
+  55% { opacity: 1; transform: translate(calc(var(--drift) * .75), var(--rise)) rotate(var(--spin)); }
+  100% { opacity: 0; transform: translate(var(--drift), calc(var(--rise) + 110px)) rotate(calc(var(--spin) + 160deg)); }
+}
+@keyframes radio-wrong-glow { 0%, 100% { opacity: 0; } 25% { opacity: .13; } }
+@keyframes radio-wrong-shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-3px); } 40%, 80% { transform: translateX(3px); } }
+@media (prefers-reduced-motion: reduce) {
+  .radio-feedback { display: none; }
+  .radio-confetti, .radio-feedback-wrong, .radio-answer-shake { animation: none; }
+}
+
+/* Phone layout: give the answer its own full-width display above the knobs. */
+@media (max-width: 480px) {
+  .radio { padding: 14px 10px 12px; border-radius: 38px 38px 30px 30px; }
+  .radio-grille { border-width: 4px; border-radius: 27px 27px 21px 21px; }
+  .radio-grille > .radio-year-tuner { margin-inline: 6px; padding-inline: 5px; gap: 4px; grid-template-columns: minmax(0, 1fr) 36px; }
+  .radio-grille .year-brass-knob { width: 34px; height: 34px; }
+  .radio-grille:has(.radio-year-tuner) .radio-game-panel { margin-inline: 6px; padding-inline: 6px; }
+  .radio-game-panel .pills { gap: 4px; }
+  .radio-grille:has(.radio-year-tuner) .pill { flex: 1 1 0; padding: 9px 1px; font-size: 10px; }
+  .radio-grille:has(.radio-year-tuner) .pill:first-child { flex-grow: 1.45; }
+  .radio-grille:has(.radio-year-tuner) .pill:nth-child(4) { flex-grow: 1.2; }
+  .radio-console, .radio-console:has(.radio-tuner-search) { grid-template-columns: 1fr 1fr; gap: 12px; padding: 15px 8px 0; }
+  .radio-console > .radio-tuner { grid-column: 1 / -1; grid-row: 1; }
+  .radio-console > .radio-control { grid-row: 2; justify-self: center; }
+  .radio-console > .radio-volume { grid-column: 2; }
+  .radio-tuner-search { height: 164px; min-height: 164px; max-height: 164px; padding: 10px; }
+  .radio-tuner-search input { font-size: 16px; padding: 9px; }
+  .radio-tuner-search button { min-height: 32px; font-size: 12px; }
+  .radio-tuner-search .radio-hint { font-size: 11px; }
+  .radio-round-result { max-height: 138px; }
+  .radio-round-result:has(.radio-answer-thumbnail) { grid-template-columns: 60px minmax(0, 1fr); gap: 5px 10px; }
+  .radio-answer-thumbnail { width: 60px; height: 60px; }
+  .radio-round-result:has(.radio-answer-thumbnail) strong { font-size: 13px; }
+  .radio-round-result:has(.radio-answer-thumbnail) .radio-result-movie { font-size: 11px; }
+  .song-suggestions { top: 40px; }
+}
+@media (max-width: 360px) {
+  .radio-grille:has(.radio-year-tuner) .pill { font-size: 9px; }
+  .radio-grille > .radio-year-tuner { grid-template-columns: minmax(0, 1fr) 30px; gap: 3px; margin-inline: 4px; }
+  .radio-grille .year-brass-knob { width: 29px; height: 29px; }
+  .radio-year-stations button { font-size: 7px; }
+  .year-dial-caption { letter-spacing: .6px; }
+}
+
+/* Keep the classic knob–display–knob arrangement on phones too. */
+@media (max-width: 480px) {
+  .radio-console, .radio-console:has(.radio-tuner-search) { grid-template-columns: 40px minmax(0, 1fr) 40px; gap: 7px; padding: 15px 0 3px; }
+  .radio-console > .radio-control { grid-row: 1; grid-column: 1; }
+  .radio-console > .radio-tuner { grid-row: 1; grid-column: 2; }
+  .radio-console > .radio-volume { grid-row: 1; grid-column: 3; }
+  .radio-console .radio-knob { width: 38px; height: 38px; }
+  .radio-console .radio-volume, .radio-console .radio-volume input { width: 40px; }
+  .radio-console .radio-volume b { left: 17px; top: 4px; height: 7px; }
+  .radio-console .radio-control > span { font-size: 6px; letter-spacing: .4px; }
+  .radio-tuner-search { height: 172px; min-height: 172px; max-height: 172px; padding: 7px; }
+  .radio-round-result { max-height: 152px; }
+  .radio-round-result:has(.radio-answer-thumbnail) { grid-template-columns: 38px minmax(0, 1fr); gap: 4px 6px; }
+  .radio-answer-thumbnail { width: 38px; height: 48px; }
+  .radio-round-result:has(.radio-answer-thumbnail) strong { font-size: 11px; }
+  .radio-round-result:has(.radio-answer-thumbnail) .radio-result-movie { font-size: 10px; }
+  .radio-result-label { font-size: 10px; }
+  .radio-tuner-search button { font-size: 10px; }
+  .radio-grille:has(.radio-year-tuner) { height: 280px; }
+}
+@media (max-width: 360px) {
+  .radio-console, .radio-console:has(.radio-tuner-search) { grid-template-columns: 32px minmax(0, 1fr) 32px; gap: 5px; }
+  .radio-console .radio-knob { width: 31px; height: 31px; }
+  .radio-console .radio-volume, .radio-console .radio-volume input { width: 32px; }
+  .radio-console .radio-volume b { left: 13px; }
+  .radio-console .radio-control > span { font-size: 5px; letter-spacing: 0; }
+}
+
+
+/* Compact square cabinet on phones, rather than a tall desktop stack. */
+@media (max-width: 480px) {
+  .radio { padding: 10px 9px; border-radius: 30px; }
+  .radio-grille { border-radius: 22px 22px 15px 15px; }
+  .radio-grille:has(.radio-year-tuner) { height: 190px; }
+  .radio-grille > .radio-year-tuner { margin-top: 8px; padding: 4px 5px; border-radius: 9px; }
+  .radio-grille .year-dial-glass { padding: 4px 3px; }
+  .radio-grille .year-dial-scale { margin-top: 2px; padding-bottom: 0; }
+  .radio-grille .year-dial-ticks-small, .radio-grille .year-dial-caption, .radio-grille .year-knob-help { display: none; }
+  .radio-grille .year-dial-ticks { height: 12px; }
+  .radio-grille .year-dial-slider, .radio-grille .year-dial-slider::-webkit-slider-runnable-track { height: 20px; }
+  .radio-grille .year-dial-slider::-webkit-slider-thumb { height: 20px; }
+  .radio-grille .year-dial-slider::-moz-range-thumb { height: 20px; }
+  .radio-grille:has(.radio-year-tuner) .radio-game-panel { margin-top: 6px; padding: 6px; }
+  .radio-grille:has(.radio-year-tuner) .pill { padding-block: 6px; }
+  .radio-grille:has(.radio-year-tuner) .pill::before { margin-bottom: 4px; }
+  .radio-grille:has(.radio-year-tuner) .progress-track { margin: 8px 0; }
+  .radio-game-panel .score-row { font-size: 10px; }
+  .radio:has(.radio-game-panel) .radio-brand { font-size: 11px; bottom: 5px; }
+  .radio-console, .radio-console:has(.radio-tuner-search) { padding-top: 10px; gap: 6px; }
+  .radio-tuner-search { height: 128px; min-height: 128px; max-height: 128px; padding: 6px; }
+  .radio-round-result { max-height: 110px; }
+  .radio-tuner-search .radio-hint { font-size: 10px; margin-bottom: 4px; }
+  .radio-tuner-search input { padding: 5px; }
+  .radio-tuner-search button { min-height: 27px; padding: 4px; }
+  .radio-round-result:has(.radio-answer-thumbnail) { row-gap: 3px; }
+}
+@media (max-width: 360px) {
+  .radio-grille:has(.radio-year-tuner) { height: 180px; }
+  .radio-tuner-search { height: 120px; min-height: 120px; max-height: 120px; }
+  .radio-round-result { max-height: 102px; }
+}
+@media (max-width: 480px) {
+  .radio-round-result .radio-result-time { display: none; }
+  .radio-round-result:has(.radio-answer-thumbnail) { grid-template-columns: 32px minmax(0, 1fr); column-gap: 5px; }
+  .radio-answer-thumbnail { width: 32px; height: 42px; grid-row: 1 / 4; }
+  .radio-round-result:has(.radio-answer-thumbnail) strong { font-size: 10px; }
+  .radio-round-result:has(.radio-answer-thumbnail) .radio-result-movie { font-size: 9px; }
+}

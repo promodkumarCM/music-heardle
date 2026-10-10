@@ -40,11 +40,28 @@ function CinemaHome() {
               <span className="ticket-admission">ADMIT ONE MUSIC LOVER <span className="ticket-barcode" aria-hidden="true" /></span>
             </div>
           </a>
-          <a className="dialogue-game-card" href="#dialogue-game" aria-label="Play Guess the Movie">
-            <div className="dialogue-card-art" aria-hidden="true"><span>“</span><p>FAMOUS LINES.<br /><em>Unforgettable films.</em></p></div>
-            <div className="dialogue-card-copy"><span className="cinema-eyebrow">GAME 02 · THE DIALOGUE ROUND</span><h3>Guess the Movie</h3><p>One familiar dialogue. Which Malayalam film comes to mind?</p><span className="dialogue-card-play">Take your cue ↗</span></div>
-          </a>
-          <a className="dialogue-game-card" href="#clue-game" aria-label="Play Five Clues"><div className="dialogue-card-art" aria-hidden="true"><span>05</span><p>FOLLOW THE CLUES.<br/><em>Name the film.</em></p></div><div className="dialogue-card-copy"><span className="cinema-eyebrow">GAME 03 · THE MOVIE MYSTERY</span><h3>Five Clues</h3><p>One movie, five hints. Solve it early for more points, or reveal the answer after clue five.</p><span className="dialogue-card-play">Open the case ↗</span></div></a>
+          {[
+            { id: 'dialogue', number: '02', title: 'Guess the Movie', category: 'THE DIALOGUE ROUND', topline: 'A MALAYALAM DIALOGUE EXPERIENCE', headline: 'FAMOUS LINES.', subtitle: 'Unforgettable films.', symbol: '“', description: 'One familiar dialogue. Which Malayalam film comes to mind? Read the script and name the movie behind the words.', features: ['Iconic dialogues', 'Type your answer', 'Spelling friendly'], footer: 'ONE LINE. A THOUSAND MEMORIES.' },
+            { id: 'clue', number: '03', title: 'Five Clues', category: 'THE MOVIE MYSTERY', topline: 'A MALAYALAM MOVIE MYSTERY', headline: 'FOLLOW THE CLUES.', subtitle: 'Name the film.', symbol: '05', description: 'One movie, five hints. Solve it early for more points, or reveal the answer after clue five.', features: ['5 clues', '100 points to win', 'Optional timer'], footer: 'FIVE CLUES. ONE GREAT REVEAL.' },
+          ].map(game => (
+            <a className={`featured-game featured-game-${game.id}`} href={`#${game.id}-game`} aria-label={`Play ${game.title}`} key={game.id}>
+              <div className="game-poster">
+                <span className="poster-topline">{game.topline}</span>
+                <div className="poster-game-symbol" aria-hidden="true">{game.symbol}</div>
+                <div className="poster-title">{game.headline}<br /><em>{game.subtitle}</em></div>
+                <span className="poster-bottomline">{game.footer}</span>
+              </div>
+              <div className="game-ticket">
+                <div className="ticket-meta"><span className="live-badge">● NOW PLAYING</span><span>GAME {game.number}</span></div>
+                <p className="ticket-category">{game.category}</p>
+                <h3>{game.title}</h3>
+                <p className="ticket-description">{game.description}</p>
+                <div className="game-features">{game.features.map(feature => <span key={feature}>{feature}</span>)}</div>
+                <span className="ticket-play">Let’s play <span aria-hidden="true">↗</span></span>
+                <span className="ticket-admission">ADMIT ONE FILM LOVER <span className="ticket-barcode" aria-hidden="true" /></span>
+              </div>
+            </a>
+          ))}
           <div className="coming-attractions"><span aria-hidden="true">✧</span><div><h3>More stories. More games.</h3><p>The next attraction is still in the making. Enjoy the music while you wait.</p></div><span className="coming-label">COMING SOON</span></div>
         </section>
         <footer className="cinema-footer"><span>PADAM / THE FILM PLAYHOUSE</span><span>For the fans. For the fun.</span></footer>

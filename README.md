@@ -8,6 +8,15 @@ settings, a five-song queue, and a leaderboard on the same page.
 Requires Node.js and MySQL. Copy `backend/.env.example` to `backend/.env` and
 fill in your database credentials. Run `backend/schema.sql` followed by
 `backend/seed.sql` in MySQL to create and populate the database.
+Then run `node --env-file=.env migrate-song-years.js` from `backend` (also required
+for existing databases). This adds the nullable release year and seeds verified dates.
+
+The radio year tuner offers All and five-year steps from 1990 to 2025. Selecting
+1995 includes only release years greater than 1995 and resets the round and queue.
+Undated songs appear only under All; populate `songs.release_year` as dates are verified.
+The initial year seed covers a subset of the catalog, using film/album release years.
+Song guesses are checked on selection or submission. A wrong guess reveals the
+answer without awarding points; typing alone never ends a round.
 
 Start the API:
 

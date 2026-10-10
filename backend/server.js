@@ -57,7 +57,7 @@ app.post('/dialogues/:id/guess', async (req, res) => {
 
 app.get('/songs', async (req, res) => {
   try {
-    const [rows] = await pool.query('SELECT id, title, movie, youtube_id AS youtubeId FROM songs ORDER BY id')
+    const [rows] = await pool.query('SELECT id, title, movie, youtube_id AS youtubeId, release_year AS releaseYear FROM songs ORDER BY id')
     res.set('Cache-Control', 'no-store').json(rows)
   } catch (error) {
     console.error('Could not load songs:', error.message)

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { fetchDialogues, guessDialogue } from '../lib/api'
+import RoundFeedback, { useRoundFeedback } from './RoundFeedback'
 
 function shuffle(items) {
   const copy = [...items]
@@ -11,6 +12,7 @@ function shuffle(items) {
 }
 
 export default function DialogueGame() {
+  const { feedback, targetRef, showFeedback, clearFeedback } = useRoundFeedback()
   const [clues, setClues] = useState([])
   const [turningPage, setTurningPage] = useState(null)
   const turnLock = useRef(false)
@@ -49,8 +51,9 @@ export default function DialogueGame() {
       if (!mounted.current) return
       if (data.correct || reveal) {
         setResult({ ...data, revealed: reveal })
-        if (data.correct) setSolved(value => value + 1)
-      } else { setMessage('Not quite. Check your spelling or try another movie.'); inputRef.current?.focus() }
+        if (data.correct) { setSolved(value => value + 1); showFeedback('correct') }
+        else clearFeedback()
+      } else { showFeedback('wrong'); setMessage('Not quite. Check your spelling or try another movie.'); inputRef.current?.focus() }
     } catch (err) { if (mounted.current) setError(err.message) }
     finally { requestRef.current = false; if (mounted.current) setBusy(false) }
   }
@@ -62,6 +65,7 @@ export default function DialogueGame() {
   }
   function next() {
     if (turnLock.current || !clue) return
+    clearFeedback()
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       turnLock.current = true
       setTurningPage({ dialogue: clue.dialogue, round, solved })
@@ -81,7 +85,8 @@ export default function DialogueGame() {
         <header className="dialogue-nav"><a href="#">← All games</a><span>PADAM / GAME 02</span></header>
         <div className="dialogue-heading"><p className="cinema-eyebrow">THE DIALOGUE ROUND</p><h1>One line.<br /><em>A whole movie.</em></h1><p>You remember the dialogue. Can you name the film?</p></div>
         <div className="script-page-stack" aria-busy={!!turningPage}>
-        <section className="dialogue-screen" aria-label="Movie dialogue clue">
+        <section ref={targetRef} className="dialogue-screen" aria-label="Movie dialogue clue">
+          <RoundFeedback feedback={feedback} />
           <div className="cinema-reel" aria-hidden="true"><i /><i /><i /><i /><b /></div>
           <div className="dialogue-screen-meta"><span>SCENE {String(round + 1).padStart(2, '0')}</span><span>MALAYALAM CINEMA</span></div>
           {loading ? <p className="dialogue-loading" role="status">Setting the scene…</p> : clue ? <blockquote key={clue.id}><span aria-hidden="true">“</span>{clue.dialogue}</blockquote> : <p className="dialogue-loading">No dialogue loaded.</p>}

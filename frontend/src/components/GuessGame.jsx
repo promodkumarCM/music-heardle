@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
 import Player from './Player'
 import Radio from './Radio'
+import YearTuner from './YearTuner'
 import { fillQueue } from '../lib/songQueue'
 import { DIFFICULTIES, DEFAULT_DIFFICULTY } from '../data/levels'
 import { getProgress, setProgress } from '../lib/storage'
 import { fetchSongs, submitScore } from '../lib/api'
 
 const MAX_SNIPPET_SECONDS = Math.max(...DIFFICULTIES.map((d) => d.snippetSeconds))
+const YEAR_STATIONS = [0, 1990, 1995, 2000, 2005, 2010, 2015, 2020, 2025]
 
 function pickSong(songs, excludeId) {
   const pool = songs.filter((s) => s.id !== excludeId)
@@ -18,6 +20,8 @@ export default function GuessGame({ onScoreSaved }) {
   const [progress, setProgressState] = useState(getProgress)
   const [difficulty, setDifficulty] = useState(DEFAULT_DIFFICULTY)
   const [songs, setSongs] = useState([])
+  const [afterYear, setAfterYear] = useState(0)
+  const eligibleSongs = songs.filter((item) => !afterYear || item.releaseYear > afterYear)
   const [song, setSong] = useState(null)
   const [catalogError, setCatalogError] = useState('')
   const [catalogRequest, setCatalogRequest] = useState(0)
@@ -65,13 +69,13 @@ export default function GuessGame({ onScoreSaved }) {
   }, [playerReady, song, status])
 
   function takeNextSong() {
-    queueRef.current = fillQueue(songs, queueRef.current, songRef.current.id, unavailableRef.current)
+    queueRef.current = fillQueue(eligibleSongs, queueRef.current, songRef.current?.id, unavailableRef.current)
     const next = queueRef.current.shift()
     if (!next) {
       setPlaybackStatus('No playable songs remain. Reload to try again.')
       return null
     }
-    queueRef.current = fillQueue(songs, queueRef.current, next.id, unavailableRef.current)
+    queueRef.current = fillQueue(eligibleSongs, queueRef.current, next.id, unavailableRef.current)
     return next
   }
 
@@ -85,7 +89,7 @@ export default function GuessGame({ onScoreSaved }) {
   // leave the player stuck forever — swap in a different song automatically
   // instead of making the player stare at a dead Play button.
   function handleUnplayable(videoId) {
-    if (songRef.current?.youtubeId !== videoId) return
+    if (status !== 'active' || songRef.current?.youtubeId !== videoId) return
     playerRef.current?.stop()
     unavailableRef.current.add(songRef.current.id)
     const next = takeNextSong()
@@ -98,8 +102,12 @@ export default function GuessGame({ onScoreSaved }) {
   }
 
   function checkGuess(value) {
-    if (status !== 'active') return
-    if (value.trim().toLowerCase() !== song.title.trim().toLowerCase()) return
+    if (status !== 'active' || !value.trim()) return
+    if (value.trim().toLowerCase() !== song.title.trim().toLowerCase()) {
+      playerRef.current?.stop()
+      setStatus('wrong')
+      return
+    }
     const timeMs = Date.now() - (startedAtRef.current ?? Date.now())
     playerRef.current?.stop()
     setLastTimeMs(timeMs)
@@ -113,7 +121,21 @@ export default function GuessGame({ onScoreSaved }) {
 
   function handleGuessChange(e) {
     setGuess(e.target.value)
-    checkGuess(e.target.value)
+  }
+
+  function tuneYear(year) {
+    playerRef.current?.stop()
+    setAfterYear(year)
+    const pool = songs.filter((item) => (!year || item.releaseYear > year) && !unavailableRef.current.has(item.id))
+    const next = pool.length ? pickSong(pool, song?.id) : null
+    queueRef.current = next ? fillQueue(pool, [], next.id, unavailableRef.current) : []
+    setSong(next)
+    setGuess('')
+    setStatus('active')
+    setLoadError(false)
+    setPlaybackStatus('Press Tune to play the clip.')
+    startedAtRef.current = null
+    setDifficulty(DIFFICULTIES[0])
   }
 
   function handleSubmit(e) {
@@ -140,7 +162,7 @@ export default function GuessGame({ onScoreSaved }) {
     setDifficulty(DIFFICULTIES[0]) // always back to Impossible for the next song
   }
 
-  if (!song) {
+  if (!songs.length) {
     return (
       <div className="card game">
         <p role="status">{catalogError || 'Loading songs…'}</p>
@@ -154,27 +176,30 @@ export default function GuessGame({ onScoreSaved }) {
   return (
     <>
       <Radio
-        tunerContent={nameSet && status === 'active' ? (
+        feedback={status}
+        roundId={song?.id}
+        yearTuner={nameSet && <YearTuner years={YEAR_STATIONS} value={afterYear} onChange={tuneYear} />}
+        tunerContent={nameSet && !song ? <p className="radio-hint" role="status">No playable songs with a known release year after {afterYear}. Choose another year or All.</p> : nameSet && status === 'active' ? (
           <>
               <p className="radio-hint" role="status">{playbackStatus}</p>
 
               <form className="guess-row" autoComplete="off" onSubmit={handleSubmit}>
                 <input
-                  aria-label="Search songs"
+                  aria-label="Guess song"
                   autoComplete="off"
                   spellCheck={false}
                   value={guess}
                   onChange={handleGuessChange}
-                  placeholder="🔍 Search songs..."
+                  placeholder="Guess song..."
                 />
                 {guess.trim().length >= 2 && (
                   <div className="song-suggestions" aria-label="Matching songs">
-                    {songs.filter((item) => item.title.toLowerCase().includes(guess.trim().toLowerCase())).slice(0, 5).map((item) => (
+                    {eligibleSongs.filter((item) => item.title.toLowerCase().includes(guess.trim().toLowerCase())).slice(0, 5).map((item) => (
                       <button type="button" key={item.id} onClick={() => { setGuess(item.title); checkGuess(item.title) }}>{item.title}</button>
                     ))}
                   </div>
                 )}
-                <button type="button" onClick={giveUp}>Give up</button>
+                <div className="radio-guess-actions"><button type="submit" disabled={!guess.trim()}>Guess</button><button type="button" onClick={giveUp}>Give up</button></div>
               </form>
           </>
         ) : nameSet ? (
@@ -186,7 +211,7 @@ export default function GuessGame({ onScoreSaved }) {
               alt={`${song.movie} — ${song.title}`}
               onError={(event) => { event.currentTarget.style.display = 'none' }}
             />
-            <span className="radio-result-label">{status === 'correct' ? '✓ Correct!' : 'The answer'}</span>
+            <span className={`radio-result-label ${status === 'wrong' ? 'radio-result-wrong' : ''}`}>{status === 'correct' ? '🎉 Correct!' : status === 'wrong' ? 'Wrong song. The answer is:' : 'The answer'}</span>
             <strong>{song.title}</strong>
             <span className="radio-result-movie">{song.movie}</span>
             {status === 'correct' && <span className="radio-result-time">Guessed in {(lastTimeMs / 1000).toFixed(1)}s</span>}
@@ -194,7 +219,7 @@ export default function GuessGame({ onScoreSaved }) {
           </div>
         ) : null}
         onPlay={playClip}
-        disabled={!playerReady || !nameSet || status !== 'active'}
+        disabled={!song || !playerReady || !nameSet || status !== 'active'}
         ready={playerReady}
         seconds={difficulty.snippetSeconds}
         volume={volume}

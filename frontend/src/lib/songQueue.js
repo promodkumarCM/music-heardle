@@ -1,6 +1,7 @@
 export function fillQueue(catalog, queue, currentId, excluded = new Set()) {
   const available = catalog.filter((song) => !excluded.has(song.id))
-  const next = queue.filter((song) => !excluded.has(song.id)).slice(0, 5)
+  const allowedIds = new Set(available.map((song) => song.id))
+  const next = queue.filter((song) => allowedIds.has(song.id)).slice(0, 5)
   while (available.length && next.length < 5) {
     const used = new Set([currentId, ...next.map((song) => song.id)])
     let pool = available.filter((song) => !used.has(song.id))

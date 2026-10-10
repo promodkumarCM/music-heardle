@@ -146,3 +146,60 @@
 .clue-cover-seal { display: grid; place-items: center; width: 28px; height: 28px; border: 1px solid #b69c6255; border-radius: 50%; font-size: 16px; letter-spacing: 0; }
 @keyframes clue-unveil { 0%, 12% { transform: translateX(0); opacity: 1; } 85% { opacity: 1; } 100% { transform: translateX(103%); opacity: 0; visibility: hidden; } }
 @media (prefers-reduced-motion: reduce) { .clue-reveal-cover { display: none; animation: none; } }
+
+/* Every game gets the same poster-and-admission-ticket presentation. */
+.featured-game + .featured-game { margin-top: 24px; }
+.featured-game-dialogue .game-poster { background: radial-gradient(circle at 10% 20%, #a5ab82, transparent 65%), #596b50; }
+.featured-game-clue .game-poster { background: radial-gradient(circle at 10% 20%, #d4ad70, transparent 65%), #966442; }
+.poster-game-symbol { position: absolute; right: -8px; top: 20px; font: 220px/1 Georgia, serif; color: #f9e6b733; transform: rotate(-10deg); }
+.featured-game-dialogue .poster-title, .featured-game-clue .poster-title { font-size: clamp(25px, 3.5vw, 39px); right: 22px; letter-spacing: -1px; line-height: 1.15; }
+.featured-game-dialogue .poster-title em, .featured-game-clue .poster-title em { display: inline-block; font-size: clamp(36px, 4.5vw, 55px); margin-top: 10px; }
+.featured-game .game-features { margin-bottom: auto; }
+@media (max-width: 640px) { .featured-game-dialogue .poster-title, .featured-game-clue .poster-title { font-size: 30px; } .featured-game-dialogue .poster-title em, .featured-game-clue .poster-title em { font-size: 43px; } }
+
+/* Keep the mystery, guesses and next-clue action together in one view. */
+.clue-page .dialogue-shell { max-width: 850px; padding-bottom: 12px; }
+.clue-page .dialogue-nav { padding: 13px 0; }
+.clue-page .dialogue-heading { padding: 16px 0 12px; }
+.clue-page .dialogue-heading .cinema-eyebrow { margin-bottom: 6px; font-size: 8px; }
+.clue-page .dialogue-heading h1 { display: flex; flex-wrap: wrap; gap: 0 10px; font-size: clamp(26px, 4vw, 36px); line-height: 1.15; margin: 0; }
+.clue-page .dialogue-heading h1 br { display: none; }
+.clue-page .dialogue-heading > p:last-child { margin: 6px 0 0; font-size: 11px; }
+.clue-timer-settings { padding: 8px 12px; gap: 4px 10px; }
+.clue-timer-settings select { padding: 6px 8px; }
+.clue-timer-settings p { font-size: 10px; }
+.clue-score { padding: 9px 0; }
+.clue-score strong { display: inline; margin-left: 8px; font-size: 20px; }
+.clue-case { padding: 10px 14px; }
+.clue-steps span { padding: 5px 2px; }
+.clue-steps b { margin-top: 3px; font-size: 11px; }
+.clue-list { margin-top: 5px; }
+.clue-list li { min-height: 39px; padding: 8px 0; gap: 10px; }
+.clue-list p { font-size: 13px; line-height: 1.4; }
+.clue-list .locked p { font-size: 11px; }
+.clue-number { font-size: 15px; }
+.clue-page .dialogue-answer { min-height: 0; padding: 12px 0 8px; }
+.clue-page .dialogue-answer label { font-size: 17px; margin-bottom: 8px; }
+.clue-page .dialogue-input-row { flex-direction: row; gap: 8px; }
+.clue-page .dialogue-input-row input { padding: 10px; }
+.clue-page .dialogue-answer button { padding: 9px 12px; }
+.clue-actions { flex-direction: row; margin-top: 8px; }
+.clue-actions > span { max-width: 55%; font-size: 9px; }
+.clue-actions button { width: auto; flex-shrink: 0; }
+.clue-page .dialogue-feedback { margin: 6px 0; font-size: 11px; }
+.clue-page .dialogue-endnote { padding-top: 8px; font-size: 9px; }
+.clue-countdown { margin-top: 7px; gap: 4px; }
+.clue-countdown strong { font-size: 18px; }
+.clue-page .dialogue-result h2 { font-size: 24px; }
+@media (max-width: 640px) {
+  .cinema-home.clue-page { padding-inline: 14px; }
+  .clue-page .dialogue-heading { padding-top: 12px; }
+  .clue-page .dialogue-input-row input { width: 0; font-size: 16px; }
+  .clue-page .dialogue-input-row button { font-size: 11px; padding-inline: 9px; }
+  .clue-list li { min-height: 38px; padding-block: 7px; }
+  .clue-list p { font-size: 12px; }
+  .clue-page .dialogue-answer label { font-size: 15px; }
+  .clue-score { font-size: 8px; letter-spacing: .5px; }
+  .clue-score strong { font-size: 18px; }
+}
+.clue-case { position: relative; }

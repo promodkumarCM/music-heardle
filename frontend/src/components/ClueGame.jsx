@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { clueGameRequest } from '../lib/api'
+import RoundFeedback, { useRoundFeedback } from './RoundFeedback'
 export default function ClueGame() {
+  const { feedback, targetRef, showFeedback, clearFeedback } = useRoundFeedback()
   const [timerSeconds,setTimerSeconds]=useState(0)
   const [remaining,setRemaining]=useState(0)
   const deadline=useRef(0)
@@ -29,6 +31,9 @@ export default function ClueGame() {
       const data=await clueGameRequest(action==='start'?'start':`${round.token}/${action}`,action==='start'?{previousId:round?.puzzleId}:{guess})
       if(!alive.current)return
       setRound(data);setExpired(false)
+      if(action==='start'||action==='reveal')clearFeedback()
+      if(data.incorrect)showFeedback('wrong')
+      if(data.status==='correct'&&!credited.current.has(data.token))showFeedback('correct')
       if(action==='start')setGuess('')
       if(data.incorrect)setMessage('Not quite. Try another name or open the next clue.')
       if(data.status==='correct'&&!credited.current.has(data.token)){credited.current.add(data.token);setScore(value=>value+data.points)}
@@ -73,7 +78,8 @@ export default function ClueGame() {
       <div className="clue-clock-track"><div style={{width:Math.min(100,remaining/timerSeconds*100)+'%'}} /></div>
     </div>}
     <div className="clue-score"><span>THIS VISIT <strong>{score} pts</strong></span><span>{active?'UP FOR GRABS':'ROUND SCORE'} <strong>{active?round.availablePoints:round?.points||0} pts</strong></span></div>
-    <section className="clue-case" aria-label="Movie clues" aria-busy={busy}>
+    <section ref={targetRef} className="clue-case" aria-label="Movie clues" aria-busy={busy}>
+      <RoundFeedback feedback={feedback} />
       <div className="clue-steps" aria-label="Points by clue">{[100,80,60,40,20].map((points,i)=><span key={points} className={round?.clues.length===i+1?'current':''}>CLUE {i+1}<b>{points} pts</b></span>)}</div>
       {round?<ol className="clue-list">{Array.from({length:5},(_,i)=><li key={`${round.token}-${i}`} className={i<round.clues.length?'unlocked':'locked'}><span className="clue-number">0{i+1}</span><p>{round.clues[i]||'Clue not yet revealed'}</p>{i<round.clues.length && <span className="clue-reveal-cover" aria-hidden="true"><span>CLUE 0{i+1}</span><span className="clue-cover-seal">✦</span></span>}</li>)}</ol>:<p className="clue-wait" role="status">{busy?'Opening the case…':'The case could not be opened.'}</p>}
     </section>
