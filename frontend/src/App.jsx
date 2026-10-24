@@ -3,11 +3,10 @@ import LyricsStudio from './components/LyricsStudio'
 import Clapperboard from './components/Clapperboard'
 import PictureGame from './components/PictureGame'
 import GameModes from './components/GameModes'
-import BuzzerGame from './components/BuzzerGame'
+import PartyGame from './components/PartyGame'
 import Admin from './components/Admin'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import ClueGame from './components/ClueGame'
-import LyricsGame from './components/LyricsGame'
 import DialogueGame from './components/DialogueGame'
 import GuessGame from './components/GuessGame'
 import Leaderboard from './components/Leaderboard'
@@ -54,35 +53,44 @@ function CinemaHome() {
   )
 }
 
+const soloRoutes={pictures:'picture-game',song:'song-game',dialogue:'dialogue-game',clues:'clue-game',lyrics:'lyrics-game'}
+const gameTitles={pictures:'Picture Clues',song:'Guess the Song',dialogue:'Guess the Movie',clues:'Five Clues',lyrics:'Missing Lyrics'}
+function ModePopup({game}) {
+  const dialog=useRef(null)
+  useEffect(()=>{if(!dialog.current.open)dialog.current.showModal()},[])
+  return <><CinemaHome/><dialog className="buzzer-setup-dialog mode-popup" ref={dialog} aria-labelledby="mode-popup-title" onCancel={()=>{location.hash='#'}}>
+    <div className="buzzer-dialog-heading"><h2 id="mode-popup-title">{gameTitles[game]}</h2><a href="#" className="popup-close" aria-label="Close mode selection">×</a></div>
+    <p>How would you like to play?</p>
+    <div className="mode-popup-options">
+      <a href={`#${soloRoutes[game]}?mode=solo`}><strong>Solo</strong><span>Play on your own and earn your own score.</span></a>
+      <a href={`#host-game?game=${game}`}><strong>Host</strong><span>Set up teams. Answer aloud. The host awards points.</span></a>
+      <a href={`#buzzer-game?game=${game}`}><strong>Buzzer</strong><span>Create or join a room. Everyone plays on their own device.</span></a>
+    </div>
+  </dialog></>
+}
 export default function App() {
-  const [page, setPage] = useState(() => window.location.hash.startsWith('#buzzer-game') ? 'buzzer' : window.location.hash === '#picture-game' ? 'pictures' : window.location.hash === '#admin' ? 'admin' : window.location.hash === '#lyrics-game' ? 'lyrics' : window.location.hash === '#clue-game' ? 'clue' : window.location.hash === '#dialogue-game' ? 'dialogue' : window.location.hash === '#song-game' ? 'song' : 'home')
-  const [scoreVersion, setScoreVersion] = useState(0)
-  useEffect(() => {
-    let previousHash = window.location.hash
-    const gameFor = hash => hash.startsWith('#buzzer-game') ? new URLSearchParams(hash.split('?')[1]).get('game') : ({'#picture-game':'pictures','#song-game':'song','#dialogue-game':'dialogue','#clue-game':'clues','#lyrics-game':'lyrics'})[hash]
-    const updatePage = () => {
-      const sameGame = gameFor(previousHash) && gameFor(previousHash) === gameFor(window.location.hash)
-      previousHash = window.location.hash
-      setPage(window.location.hash.startsWith('#buzzer-game') ? 'buzzer' : window.location.hash === '#picture-game' ? 'pictures' : window.location.hash === '#admin' ? 'admin' : window.location.hash === '#lyrics-game' ? 'lyrics' : window.location.hash === '#clue-game' ? 'clue' : window.location.hash === '#dialogue-game' ? 'dialogue' : window.location.hash === '#song-game' ? 'song' : 'home')
-      if (!sameGame && window.location.hash !== '#now-showing') window.scrollTo(0, 0)
-    }
-    window.addEventListener('hashchange', updatePage)
-    return () => window.removeEventListener('hashchange', updatePage)
-  }, [])
-  if (page === 'buzzer') return <BuzzerGame />
-  if (page === 'pictures') return <PictureGame />
-  if (page === 'admin') return <Admin />
-  if (page === 'lyrics') return <LyricsGame />
-  if (page === 'clue') return <ClueGame />
-  if (page === 'dialogue') return <DialogueGame />
-  if (page === 'home') return <CinemaHome />
-  return (
-    <main className="app">
-      <a className="back-to-cinema" href="#">← All games <span>PADAM</span></a>
-
-      <GameModes game="song" />
-      <GuessGame onScoreSaved={() => setScoreVersion((value) => value + 1)} />
-      <Leaderboard refreshKey={scoreVersion} />
-    </main>
-  )
+  const [hash,setHash]=useState(window.location.hash)
+  const [scoreVersion,setScoreVersion]=useState(0)
+  useEffect(()=>{
+    const update=()=>{setHash(window.location.hash);window.scrollTo(0,0)}
+    window.addEventListener('hashchange',update)
+    return()=>window.removeEventListener('hashchange',update)
+  },[])
+  const [route,query='']=hash.split('?')
+  const params=new URLSearchParams(query)
+  if(route==='#admin')return <Admin/>
+  if(route==='#host-game'||route==='#buzzer-game')return <PartyGame key={hash} mode={route==='#host-game'?'host':'buzzer'} backdrop={<CinemaHome/>}/>
+  const game=Object.keys(soloRoutes).find(key=>`#${soloRoutes[key]}`===route)
+  if(!game)return <CinemaHome/>
+  if(params.get('mode')!=='solo')return <ModePopup key={game} game={game}/>
+  if(game==='pictures')return <PictureGame/>
+  if(game==='lyrics')return <PartyGame key="solo-lyrics" mode="solo" game="lyrics" backdrop={<CinemaHome/>}/>
+  if(game==='clues')return <ClueGame/>
+  if(game==='dialogue')return <DialogueGame/>
+  return <main className="app">
+    <a className="back-to-cinema" href="#">← All games <span>PADAM</span></a>
+    <GameModes game="song"/>
+    <GuessGame onScoreSaved={()=>setScoreVersion(value=>value+1)}/>
+    <Leaderboard refreshKey={scoreVersion}/>
+  </main>
 }

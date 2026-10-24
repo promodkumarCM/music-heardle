@@ -15,9 +15,22 @@ router.post('/queue',async(req,res)=>{
   const excluded=new Set((Array.isArray(req.body.exclude)?req.body.exclude.slice(0,30):[]).map(t=>rounds.get(t)?.id))
   let available=rows.filter(r=>!excluded.has(r.id));if(!available.length)available=rows
   const result=[]
-  while(available.length&&result.length<6){const row=available.splice(randomInt(available.length),1)[0];const r={...row,token:randomUUID(),status:'active',points:0,timeMs:0,started:null,weight:9,expires:Date.now()+7200000,scoreSaved:false};rounds.set(r.token,r);result.push(view(r))}
+  while(available.length&&result.length<6){const row=available.splice(randomInt(available.length),1)[0];const r={...row,afterYear:year,token:randomUUID(),status:'active',points:0,timeMs:0,started:null,weight:9,expires:Date.now()+7200000,scoreSaved:false};rounds.set(r.token,r);result.push(view(r))}
   res.json(result)
  }catch{res.status(503).json({error:'Could not load songs.'})}
+})
+router.post('/:token/suggestions',async(req,res)=>{
+ const round=rounds.get(req.params.token)
+ if(!round||round.expires<Date.now())return res.status(410).json({error:'This round expired. Start another song.'})
+ const query=req.body?.query
+ if(typeof query!=='string'||query.length>255)return res.status(400).json({error:'Enter a song name.'})
+ const q=query.trim().normalize('NFKC')
+ if(q.length<2)return res.json({titles:[]})
+ try {
+  // Suggestions depend on the typed query and year filter, never the answer.
+  const [rows]=await pool.query('SELECT DISTINCT title FROM songs WHERE (? = 0 OR release_year > ?) AND LOCATE(LOWER(?), LOWER(title)) > 0 ORDER BY (LOCATE(LOWER(?), LOWER(title)) = 1) DESC, title LIMIT 8',[round.afterYear,round.afterYear,q,q])
+  res.json({titles:rows.map(row=>row.title)})
+ }catch{res.status(503).json({error:'Song suggestions unavailable. You can still type an answer.'})}
 })
 router.post('/:token/:action',async(req,res)=>{
  const r=rounds.get(req.params.token),action=req.params.action

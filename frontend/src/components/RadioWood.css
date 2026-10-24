@@ -89,6 +89,9 @@ body:has(.app .wood-radio)::before {
 .wood-radio .radio-tuner-search input { background:#fff8e4;border-color:#b69b65; }
 .wood-radio .radio-tuner-search button { background:#f2e4c9;border-color:#b99b6b;color:#49331e; }
 .wood-radio .radio-round-result { max-height:122px; }
+.wood-radio .radio-tuner-search { color:#352615; }
+.wood-radio .radio-round-result strong { color:#352615; }
+.wood-radio .radio-result-time { color:#58432a; }
 .wood-radio .radio-result-movie,.wood-radio .radio-tuner-search .radio-hint { color:#655034; }
 @media(max-width:480px) {
  .radio.wood-radio { padding:25px 13px 23px;border-radius:12px; }

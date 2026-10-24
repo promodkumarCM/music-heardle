@@ -7,6 +7,7 @@ import {pool} from './db.js'
 test('opaque song rounds, single-use answers and server-authoritative scoring',async()=>{
  const original=pool.query;let writes=0,values
  pool.query=async(sql,args)=>{
+  if(sql.startsWith('SELECT DISTINCT title'))return [[{title:'Secret Song'},{title:'Second Song'}]]
   if(sql.startsWith('SELECT'))return [[{id:42,title:'Secret Song',movie:'Secret Movie',youtube_id:'abcdefghijk'}]]
   writes++;values=args;return [{insertId:1}]
  }
@@ -16,6 +17,11 @@ test('opaque song rounds, single-use answers and server-authoritative scoring',a
  async function post(path,body={}){const res=await fetch(base+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});return {status:res.status,data:await res.json()}}
  try{
   const {data:[round]}=await post('/queue');assert.equal(round.title,undefined);assert.equal(round.movie,undefined);assert.notEqual(round.id,42)
+  assert.deepEqual((await post(`/${round.id}/suggestions`,{query:'S'})).data,{titles:[]})
+  assert.deepEqual((await post(`/${round.id}/suggestions`,{query:'Se'})).data,{titles:['Secret Song','Second Song']})
+  assert.equal(writes,0)
+  assert.equal((await post('/unknown/suggestions',{query:'Se'})).status,410)
+  assert.equal((await post(`/${round.id}/suggestions`,{query:123})).status,400)
   assert.equal((await post('/42/reveal')).status,410)
   assert.equal((await post(`/${round.id}/guess`,{guess:'Secret Song'})).status,400)
   await post(`/${round.id}/play`,{weight:1});await post(`/${round.id}/play`,{weight:9})

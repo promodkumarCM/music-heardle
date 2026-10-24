@@ -79,42 +79,15 @@ next clue; after clue five it reveals the answer for zero points. Wrong guesses
 do not reset the timer. Players can change or disable it; this is a casual play
 option, not a server-enforced competitive time limit.
 
-## Missing Lyrics (Game 04)
+## Missing Lyrics
 
-Open `/#lyrics-game`. The starter catalog uses three complete sections from the
-user-supplied lyrics. Each round chooses two sections and hides 2–3 words per
-section. Correct words earn 10 points, wrong or revealed words earn zero, and
-attempts cannot be repeated. Malayalam Unicode and punctuation are normalized;
-transliteration and approximate spelling are not supported for missing words.
-
-Host mode lets one operator mark Team A and Team B before revealing. Reveals
-settle any unmarked attempts at zero. Online mode uses shared room codes with
-multiple members per team, identical blanks, server-authoritative attempts and
-team-private reveals. Updates poll every 1.5 seconds. Either team may start the
-next round once both finish. Scores are per round. Membership tokens are stored
-in sessionStorage to reconnect on refresh. Room codes allow joining either team;
-this is a casual game without accounts or competitive identity verification.
-
-Rooms live in server memory for six hours and reset on restart. Run one API
-instance. On another device, open a reachable LAN/hosted frontend address, not
-localhost. The lyrics API defaults to the frontend hostname on port 4000;
-set VITE_API_URL for a deployed API. For LAN testing, start Vite with --host
-0.0.0.0 and allow the frontend/API ports through the local firewall as needed.
-
-Lyrics update: show all supplied stanzas and refrains in their original order,
-masking words in only two randomly selected main stanzas. The pasted non-lyric
-shopping text after the final stanza is omitted. Host mode awards each word only
-to the first correct team and automatically locks the other team out. Online
-teams continue to answer independently. Restarting the API clears existing rooms.
-
-Host reveal controls now preview words without settling scores. Click a blank
-for its reveal, or use Reveal next / Reveal all; then award the first correct
-team. If nobody answered correctly, mark both teams missed. Online reveals
-still settle the requesting team's word at zero.
-
-Host reveal flow: after every reveal, choose Team A, Team B, or Neither before
-another reveal is permitted. This is enforced by the API as well as the UI.
-Reveal all remains available only in online mode, where it affects one team.
+Open `/#lyrics-game` for Solo, or choose Host or Buzzer in the mode selector.
+Every song hides exactly ten unique Malayalam words. Easy prefers the first
+two stanzas, Medium the middle, and Hard the final stanzas, using nearby stanzas
+when the preferred region lacks enough unique words. Songs with fewer than ten
+eligible words are excluded. Repeated answers are never left visible elsewhere.
+Each correct word earns ten points. Malayalam Unicode and punctuation are
+normalized; missing words require Malayalam spelling. Words are played in order.
 
 ## Admin panel
 
@@ -157,50 +130,45 @@ external song recognition, repeated new rounds, and automation are still possibl
 Deploy frontend and backend together. Restarting the backend expires active rounds.
 Run `node --test songGame.test.js` to verify answer privacy and score replay checks.
 
-## Host + buzzer
+## Host, Buzzer, and Solo
 
-The home page also has a separate **Team Buzzer** card. It defaults to Standalone
-Buzzer: ask your own questions aloud, award 100 points for a correct answer, or
-finish a question without points. This mode needs no game catalog or database
-content. Team invitations, timers, lockouts, undo, and cumulative scores work
-the same way as the integrated game modes.
+All five games offer the same three modes:
 
-Choose Host + buzzer on the home page or in Missing Lyrics, or open `/#buzzer-game`.
-This is separate from the existing host-only and online typing modes. It supports
-Missing Lyrics, Guess the Movie, Five Clues, and Guess the Song.
+- Host (`/#host-game?game=lyrics`, or pictures/song/dialogue/clues): choose 2–8
+  unique team names and start on one screen. Teams answer aloud. The host checks
+  the answer and awards points to the first correct team, or reveals for zero.
+  Players do not need devices or room invitations.
+- Buzzer (`/#buzzer-game?game=lyrics`): the creator enters their name and creates
+  a room as a competing player. Others join by code or link, each with their own
+  score. The creator starts after at least two players join (up to twenty).
+  Buzzing opens automatically. The first request wins a 5–120 second answer
+  window; only that player can submit. The server checks answers and awards
+  points. Wrong answers and timeouts lock out that player and reopen for others.
+  Exhausting all attempts reveals the answer. Any player can advance a settled
+  round. A majority can vote to skip while buzzers are open.
+- Solo: existing individual song, picture, dialogue, and clue games; Missing
+  Lyrics now also supports individual answers and scores without teams.
 
-The host selects 2–8 uniquely named teams, 1–20 players per team, and a 5–120 second
-answer window. Share a team invitation link to assign joining players directly,
-or share the room link/code and assign players in the lobby. The host can remove
-players and lock joining. All players must be assigned, and each team must have
-at least one player before starting. Teams remain fixed during play.
+Host and Buzzer scores accumulate across rounds. The creator can switch games
+once a round is complete, keeping participants, team names, and scores. Lyrics
+rounds contain ten words; finish or skip them before switching games. Movie and
+song answers earn 100 points. Five Clues awards 100/80/60/40/20 by clue number.
+Lyrics awards 10 points per word. Song answers require the song title.
 
-The host opens buzzing explicitly. The first request received by the server locks
-the buzzer for everyone and starts the answer timer. Players answer aloud. The
-host can privately check the answer, mark correct/wrong, and reopen buzzing for
-remaining teams after a wrong answer or timeout. A team gets one attempt per
-question. Public reveal ends the question without points. Undo restores the last
-manual scoring/reveal decision, but cannot make players forget a shown answer.
+Refresh reconnects the same tab using sessionStorage. Leave game clears that
+connection. Rooms live in server memory for six hours and reset on API restart;
+run one API instance. Buzzer rooms poll every 400 ms; the server settles races.
+The older `/buzzer` and `/lyrics-game` APIs remain for compatibility; the new
+interface uses `/party-game`.
 
-Lyrics uses a host-selected blank per question worth 10 points. Dialogue and song
-questions award 100 points; Five Clues awards 100/80/60/40/20 according to the
-current clue. Song playback is on the host device using a YouTube embed. Scores
-accumulate within the room, including when unanswered questions are skipped.
+For phones on the same Wi-Fi, start Vite with `npm run dev -- --host 0.0.0.0`,
+open the computer's LAN address before creating the room, and share that link.
+Localhost links work only on the same computer. Frontend port 5173 and API port
+4000 must be reachable. Set VITE_API_URL for a deployed API.
 
-For phones on the same Wi-Fi, start Vite with `--host 0.0.0.0` and open the host
-computer's LAN address on the host device before copying invitation links. Do not
-share localhost/127.0.0.1 links with other devices. The API port (4000 by default)
-and frontend port must be reachable. For deployment set VITE_API_URL and use HTTPS.
-
-Room and player tokens live in sessionStorage, so refresh reconnects the same tab.
-Rooms expire after six hours and disappear on server restart. Use one backend
-instance; room state is in memory. Updates poll every 350 ms; server arrival order
-settles races, but network latency can affect fairness. This is casual play, not
-a secure tournament system: the other existing game APIs expose some catalog
-answers. Keep the host token and private answer display private.
-
-Checks: `node --test buzzer.test.js` from backend; with the API running,
-`node --test buzzer-api.test.js` exercises all catalogs and a 12-player room.
+Checks: `node --test backend/partyEngine.test.js backend/partyGame.test.js
+backend/lyricsPuzzle.test.js` from the project root, plus `npm run build` in
+frontend. The API test uses an isolated local server and a stub catalog.
 
 ## Picture Clues image uploads (Railway)
 

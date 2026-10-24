@@ -20,11 +20,13 @@ export default function GuessGame({ onScoreSaved }) {
   const [busy, setBusy] = useState(false)
   const requestLock = useRef(false)
   const [guess, setGuess] = useState('')
+  const [suggestions,setSuggestions]=useState([])
   const [status, setStatus] = useState('active') // active | correct | revealed
   const [lastTimeMs, setLastTimeMs] = useState(0)
   const [playbackStatus, setPlaybackStatus] = useState('Press Tune to play the clip.')
   const [volume, setVolume] = useState(70)
   const [playerReady, setPlayerReady] = useState(false)
+  const [preparedVideoId, setPreparedVideoId] = useState(null)
   const [loadError, setLoadError] = useState(false)
   const [fullSongId, setFullSongId] = useState(null)
   const queueRef = useRef([])
@@ -34,6 +36,17 @@ export default function GuessGame({ onScoreSaved }) {
   songRef.current = song
 
   useEffect(() => setProgress(progress), [progress])
+  useEffect(()=>{
+    setSuggestions([])
+    if(!song||status!=='active'||guess.trim().length<2)return
+    const controller=new AbortController()
+    const timer=setTimeout(()=>{
+      songRequest(song.id+'/suggestions',{query:guess},controller.signal)
+        .then(data=>{if(!controller.signal.aborted)setSuggestions(data.titles)})
+        .catch(()=>{})
+    },180)
+    return()=>{clearTimeout(timer);controller.abort()}
+  },[guess,song?.id,status])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -81,10 +94,15 @@ export default function GuessGame({ onScoreSaved }) {
   }
 
   async function playClip() {
-    if(requestLock.current||!song)return
+    if(requestLock.current||!song||preparedVideoId!==song.youtubeId)return
     requestLock.current=true;setBusy(true)
-    try {const data=await songRequest(song.id+'/play',{weight:difficulty.weight});setLoadError(false);playerRef.current?.playSnippet(data.youtubeId,0,data.seconds,volume)}
-    catch(e){setPlaybackStatus(e.message)}finally{requestLock.current=false;setBusy(false)}
+    try {
+      const recording=songRequest(song.id+'/play',{weight:difficulty.weight})
+      // Keep playback inside the user's click, before yielding to the network.
+      playerRef.current?.playSnippet(song.youtubeId,0,difficulty.snippetSeconds,volume)
+      await recording;setLoadError(false)
+    }
+    catch(e){playerRef.current?.stop();setPlaybackStatus(e.message)}finally{requestLock.current=false;setBusy(false)}
   }
 
   async function handleUnplayable(videoId) {
@@ -144,12 +162,15 @@ export default function GuessGame({ onScoreSaved }) {
               <form className="guess-row" autoComplete="off" onSubmit={handleSubmit}>
                 <input
                   aria-label="Guess song"
+                  list="song-title-suggestions"
                   autoComplete="off"
                   spellCheck={false}
                   value={guess}
                   onChange={handleGuessChange}
                   placeholder="Guess song..."
+                  maxLength={255}
                 />
+                <datalist id="song-title-suggestions">{suggestions.map(title=><option key={title} value={title}/>)}</datalist>
                 <div className="radio-guess-actions"><button type="submit" disabled={busy||!guess.trim()}>Guess</button><button type="button" disabled={busy} onClick={giveUp}>Give up</button><button type="button" disabled={busy} onClick={()=>nextRound(true)}>Skip →</button></div>
               </form>
           </>
@@ -173,8 +194,8 @@ export default function GuessGame({ onScoreSaved }) {
           </div>
         ) : null}
         onPlay={playClip}
-        disabled={busy || !song || !playerReady || !nameSet || status !== 'active'}
-        ready={playerReady}
+        disabled={busy || !song || !playerReady || preparedVideoId!==song.youtubeId || !nameSet || status !== 'active'}
+        ready={playerReady && !!song && preparedVideoId===song.youtubeId}
         seconds={difficulty.snippetSeconds}
         volume={volume}
         onVolumeChange={(value) => {
@@ -233,7 +254,7 @@ export default function GuessGame({ onScoreSaved }) {
       <iframe key={song.youtubeId} title={`Play ${song.title}`} src={`https://www.youtube.com/embed/${song.youtubeId}?autoplay=1&playsinline=1`} allow="autoplay; encrypted-media; fullscreen" allowFullScreen />
       <p><a href={`https://www.youtube.com/watch?v=${song.youtubeId}`} target="_blank" rel="noopener noreferrer">Open song on YouTube ↗</a></p>
     </section>}
-    <Player onPlaybackStatus={setPlaybackStatus} ref={playerRef} onReady={() => setPlayerReady(true)} onUnplayable={handleUnplayable} />
+    <Player onPlaybackStatus={setPlaybackStatus} ref={playerRef} onReady={() => setPlayerReady(true)} onPrepared={setPreparedVideoId} onUnplayable={handleUnplayable} />
     {!nameSet && <div className="card game">
 
       {!nameSet ? (

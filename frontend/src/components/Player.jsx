@@ -18,12 +18,13 @@ function loadYouTubeApi() {
 }
 
 const MAX_ATTEMPTS = 2
-const WATCHDOG_MS = 3500
+const WATCHDOG_MS = 10000
 
 // Hidden YouTube player: audio-only UX, no video shown, no YouTube chrome visible.
-const Player = forwardRef(function Player({ onReady, onUnplayable, onPlaybackStatus }, ref) {
+const Player = forwardRef(function Player({ onReady, onPrepared, onUnplayable, onPlaybackStatus }, ref) {
   const containerRef = useRef(null)
   const playerRef = useRef(null)
+  const iframeReadyRef = useRef(false)
   const stopTimerRef = useRef(null)
   const watchdogTimerRef = useRef(null)
   const pendingDurationRef = useRef(null)
@@ -32,12 +33,45 @@ const Player = forwardRef(function Player({ onReady, onUnplayable, onPlaybackSta
   const lastRequestRef = useRef({ videoId: null, at: 0 })
   const attemptRef = useRef({ videoId: null, count: 0 })
   const armWatchdogRef = useRef(null)
+  const preparedVideoRef = useRef(null)
+  const preparationTimerRef = useRef(null)
+  const preparationAttemptsRef = useRef(0)
+  const preparedCallbackRef = useRef(onPrepared)
+  preparedCallbackRef.current = onPrepared
   const playbackStatusRef = useRef(onPlaybackStatus)
   playbackStatusRef.current = onPlaybackStatus
   const onReadyRef = useRef(onReady)
   const onUnplayableRef = useRef(onUnplayable)
   onReadyRef.current = onReady
   onUnplayableRef.current = onUnplayable
+
+  function preparationFallback(videoId) {
+    if (preparedVideoRef.current !== videoId || pendingVideoIdRef.current) return
+    // A failed background cue must not prevent a user-initiated playback attempt.
+    preparedCallbackRef.current?.(videoId)
+    playbackStatusRef.current?.('Preparation is taking longer. Press Tune to try playing, or skip this song.')
+  }
+  function cue(videoId) {
+    clearTimeout(preparationTimerRef.current)
+    preparationAttemptsRef.current++
+    playerRef.current?.cueVideoById?.({videoId,startSeconds:0})
+    preparationTimerRef.current=setTimeout(()=>{
+      if(preparedVideoRef.current!==videoId||pendingVideoIdRef.current)return
+      if(preparationAttemptsRef.current<MAX_ATTEMPTS)cue(videoId)
+      else preparationFallback(videoId)
+    },WATCHDOG_MS)
+  }
+
+  function prepare(videoId) {
+    if (!videoId || preparedVideoRef.current === videoId) return
+    preparedVideoRef.current = videoId
+    preparationAttemptsRef.current = 0
+    clearTimeout(preparationTimerRef.current)
+    preparedCallbackRef.current?.(null)
+    playbackStatusRef.current?.('Preparing song…')
+    // Cue without autoplay; the CUED event confirms that this song is ready.
+    if (iframeReadyRef.current) cue(videoId)
+  }
 
   useEffect(() => {
     let cancelled = false
@@ -73,14 +107,28 @@ const Player = forwardRef(function Player({ onReady, onUnplayable, onPlaybackSta
       playerRef.current = new YT.Player(target, {
         height: '0',
         width: '0',
+        playerVars: { playsinline: 1, origin: window.location.origin },
         events: {
           // player methods (loadVideoById etc) don't exist until this fires
-          onReady: () => onReadyRef.current?.(),
+          onReady: (event) => {
+            playerRef.current = event.target
+            iframeReadyRef.current = true
+            if (preparedVideoRef.current) cue(preparedVideoRef.current)
+            onReadyRef.current?.()
+          },
           onAutoplayBlocked: () => {
             clearTimeout(watchdogTimerRef.current)
+            pendingDurationRef.current = null
+            pendingVideoIdRef.current = null
             playbackStatusRef.current?.('Playback was blocked. Press Tune again to retry.')
           },
           onStateChange: (e) => {
+            const currentId = playerRef.current?.getVideoData?.()?.video_id
+            if (e.data === window.YT.PlayerState.CUED && currentId === preparedVideoRef.current && !pendingVideoIdRef.current) {
+              clearTimeout(preparationTimerRef.current)
+              preparedCallbackRef.current?.(currentId)
+              playbackStatusRef.current?.('Song ready. Press Tune to play the clip.')
+            }
             // Only start the "stop after N seconds" clock once playback has
             // actually begun — starting it at loadVideoById() time meant a
             // short snippet (e.g. Impossible's 1s) could get paused by our
@@ -93,7 +141,6 @@ const Player = forwardRef(function Player({ onReady, onUnplayable, onPlaybackSta
             // immediately fire) the stop timer for the new song. Guard by
             // checking the player's actual currently-loaded video id.
             if (e.data !== window.YT.PlayerState.PLAYING || pendingDurationRef.current == null) return
-            const currentId = playerRef.current?.getVideoData?.()?.video_id
             if (currentId !== pendingVideoIdRef.current) return
 
             playbackStatusRef.current?.('Playing…')
@@ -106,13 +153,32 @@ const Player = forwardRef(function Player({ onReady, onUnplayable, onPlaybackSta
               playbackStatusRef.current?.('Clip finished. Press Tune to replay.')
             }, duration * 1000)
           },
-          onError: () => {
+          onError: (event) => {
             // A load failure (network blip, momentary API hiccup, or a
             // genuinely blocked video) would otherwise leave the player
             // silently stuck. Funnel through the same retry loop used for a
             // silent (non-erroring) failure, rather than two separate ones.
             const videoId = pendingVideoIdRef.current
-            if (!videoId || attemptRef.current.videoId !== videoId) return
+            if (!videoId) {
+              clearTimeout(preparationTimerRef.current)
+              const preparing=preparedVideoRef.current
+              if(!preparing)return
+              const code=Number(event?.data)
+              const reason={2:'This song has an invalid video link.',100:'This video is unavailable or private.',101:'The owner does not allow this video to play here.',150:'The owner does not allow this video to play here.',153:'YouTube could not verify this player. Reload the page and try again.'}[code]
+              if(!reason) {
+                if(preparationAttemptsRef.current<MAX_ATTEMPTS) {
+                  playbackStatusRef.current?.('Retrying song preparation…')
+                  preparationTimerRef.current=setTimeout(()=>{
+                    if(preparedVideoRef.current===preparing&&!pendingVideoIdRef.current)cue(preparing)
+                  },1000)
+                } else preparationFallback(preparing)
+                return
+              }
+              preparedCallbackRef.current?.(null)
+              playbackStatusRef.current?.(`${reason} (YouTube ${code})${code===153?'':' Skip to try another song.'}`)
+              return
+            }
+            if (attemptRef.current.videoId !== videoId) return
             armWatchdog(videoId, pendingStartRef.current)
           },
         },
@@ -120,19 +186,16 @@ const Player = forwardRef(function Player({ onReady, onUnplayable, onPlaybackSta
     })
     return () => {
       cancelled = true
+      iframeReadyRef.current = false
       clearTimeout(stopTimerRef.current)
       clearTimeout(watchdogTimerRef.current)
+      clearTimeout(preparationTimerRef.current)
       playerRef.current?.destroy?.()
     }
   }, [])
 
   useImperativeHandle(ref, () => ({
-    prepare(videoId) {
-      const player = playerRef.current
-      if (!player?.cueVideoById || player.getVideoData?.()?.video_id === videoId) return
-      // Cue metadata without autoplay. YouTube decides when media is buffered.
-      player.cueVideoById({ videoId, startSeconds: 0 })
-    },
+    prepare,
     playSnippet(videoId, startSeconds, durationSeconds, volume = 70) {
       const player = playerRef.current
       if (!player || !player.loadVideoById) return
@@ -149,6 +212,7 @@ const Player = forwardRef(function Player({ onReady, onUnplayable, onPlaybackSta
 
       clearTimeout(stopTimerRef.current)
       clearTimeout(watchdogTimerRef.current)
+      clearTimeout(preparationTimerRef.current)
       pendingDurationRef.current = durationSeconds
       pendingVideoIdRef.current = videoId
       pendingStartRef.current = startSeconds
@@ -171,6 +235,7 @@ const Player = forwardRef(function Player({ onReady, onUnplayable, onPlaybackSta
       pendingVideoIdRef.current = null
       clearTimeout(stopTimerRef.current)
       clearTimeout(watchdogTimerRef.current)
+      clearTimeout(preparationTimerRef.current)
       playerRef.current?.pauseVideo?.()
     },
   }))

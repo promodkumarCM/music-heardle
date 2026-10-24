@@ -6,6 +6,8 @@ import clueGame from './clueGame.js'
 import lyricsGame from './lyricsGame.js'
 import admin from './admin.js'
 import buzzer from './buzzer.js'
+import partyGame from './partyGame.js'
+import titleSuggestions from './titleSuggestions.js'
 import cors from 'cors'
 import { pool } from './db.js'
 import { normalizeMovie, matchMovie } from './movieMatching.js'
@@ -18,6 +20,8 @@ app.use('/picture-game', pictureGame)
 app.use('/song-game', songGame)
 app.use('/admin', admin)
 app.use('/buzzer', buzzer)
+app.use('/party-game', partyGame)
+app.use('/title-suggestions', titleSuggestions)
 app.use('/clue-game', clueGame)
 app.use('/lyrics-game', lyricsGame)
 

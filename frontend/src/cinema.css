@@ -459,3 +459,69 @@ html { scrollbar-gutter:stable; }
  .cinema-game-grid .game-tile-illustrated .game-tile-copy h3 { font-size:16px; }
  .cinema-game-grid .game-tile-illustrated .game-tile-play { margin:0 9px; padding:5px 0 8px; }
 }
+
+/* Missing Lyrics setup has two play options and needs its own dialog layout. */
+.lyrics-setup-dialog { width:min(680px,calc(100% - 28px)); }
+.lyrics-setup-dialog .buzzer-dialog-heading { margin-bottom:22px; }
+.lyrics-setup-dialog .buzzer-dialog-heading h2 { font:24px Georgia,serif; }
+.lyrics-setup-dialog .buzzer-dialog-heading button { flex-shrink:0; }
+.lyrics-setup-dialog .lyrics-difficulty { display:flex;align-items:center;gap:12px;font-size:14px; }
+.lyrics-setup-dialog .lyrics-difficulty select { flex:1;min-width:0;margin:0; }
+.lyrics-setup-dialog select,.lyrics-setup-dialog input { box-sizing:border-box;max-width:100%;padding:10px 12px;border:1px solid #a58b5d;border-radius:8px;background:#19241c;color:#efe4cd;font:14px system-ui,sans-serif; }
+.lyrics-setup-dialog .lyrics-setup { grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:16px;margin-top:18px; }
+.lyrics-setup-dialog .clue-case { min-width:0;padding:18px; }
+.lyrics-setup-dialog .lyrics-setup h2 { margin:0 0 12px;font:24px Georgia,serif; }
+.lyrics-setup-dialog .lyrics-setup p { margin:0 0 18px;font-size:13px; }
+.lyrics-setup-dialog .lyrics-setup form { padding-top:18px;border-top:1px solid #a58b5d44; }
+.lyrics-setup-dialog #room-code { width:100%;min-width:0; }
+.lyrics-setup-dialog .lyrics-setup form select { flex:1;min-width:0; }
+@media(max-width:640px) {
+ .lyrics-setup-dialog .lyrics-setup { grid-template-columns:1fr; }
+ .lyrics-setup-dialog .buzzer-dialog-heading h2 { font-size:22px; }
+}
+
+/* Shared Host / Buzzer / Solo room flow. */
+.party-setup { max-width:600px;margin:22px auto;padding:24px; }
+.party-setup h2,.party-answer-panel h2 { margin:0 0 16px;font:26px Georgia,serif; }
+.party-setup form { display:grid;gap:16px; }
+.party-page label { display:grid;gap:7px;font-size:14px; }
+.party-page input,.party-page select { box-sizing:border-box;width:100%;min-width:0;max-width:100%;padding:11px 12px;border:1px solid #a58b5d;border-radius:8px;background:#19241c;color:#efe4cd;font:15px system-ui,sans-serif; }
+.party-page button { padding:11px 16px;border:1px solid #a58b5d;border-radius:8px;background:#dfc18a;color:#283429;cursor:pointer;font-size:14px; }
+.party-page button:disabled { cursor:default;opacity:.55; }
+.party-page .lyrics-blank:disabled { opacity:1;color:#62481e;cursor:default; }
+.party-page .active-blank { outline:2px solid #a56e25;outline-offset:3px; }
+.party-team-fields { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px; }
+.party-scores { display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:20px 0; }
+.party-scores>div { display:grid;gap:6px;min-width:100px;padding:12px 16px;border:1px solid #a58b5d66;border-radius:10px;background:#222d25; }
+.party-scores strong { color:#dfc18a; }
+.party-scores .winning { outline:2px solid #dfc18a; }
+.party-answer-panel { margin:20px 0;padding:24px; }
+.party-answer-panel p,.party-setup p { font-size:14px;line-height:1.65; }
+.party-guess { display:flex;align-items:end;gap:12px;margin:18px 0;max-width:600px; }
+.party-guess label { flex:1; }
+.party-answer-panel .team-buzzer { display:block;margin:18px auto;width:160px;height:100px;background:#b94130;color:#fff4df;font-size:24px;font-weight:700;border-radius:50%; }
+.party-revealed-answer { color:#dfc18a;font-size:22px!important; }
+.party-switch { display:flex;align-items:end;gap:12px;margin-top:24px;padding-top:20px;border-top:1px solid #a58b5d55; }
+.party-switch label { flex:1;max-width:360px; }
+.party-setup>input { margin-top:12px; }
+.party-page .radio { margin-inline:auto; }
+@media(max-width:640px) {
+ .party-setup,.party-answer-panel { padding:18px; }
+ .party-team-fields { grid-template-columns:1fr; }
+ .party-guess,.party-switch { flex-direction:column;align-items:stretch; }
+ .party-scores>div { min-width:75px;padding:10px; }
+}
+
+/* Choose a mode and finish setup before mounting the game stage. */
+.mode-popup,.party-setup-dialog { width:min(560px,calc(100% - 28px)); }
+.mode-popup>p { margin:20px 0;font-size:14px; }
+.mode-popup-options { display:grid;gap:12px; }
+.mode-popup-options a { display:grid;gap:7px;padding:18px;border:1px solid #a58b5d66;border-radius:10px;background:#19241c;color:#efe4cd;text-decoration:none; }
+.mode-popup-options a:hover,.mode-popup-options a:focus-visible { border-color:#dfc18a;background:#2c3a2d; }
+.mode-popup-options strong { font:23px Georgia,serif;color:#dfc18a; }
+.mode-popup-options span { font-size:13px;line-height:1.6;color:#c5cbbd; }
+.popup-close { display:grid;place-items:center;flex-shrink:0;width:36px;height:36px;border:1px solid #a58b5d;border-radius:8px;color:#efe4cd;text-decoration:none;font:26px system-ui,sans-serif; }
+.party-setup-dialog .party-setup { margin:20px 0 0;padding:0;border:0;background:none; }
+.party-setup-dialog .party-setup h2 { font-size:21px; }
+.party-page.party-preflight { min-height:0;padding:0;background:none; }
+.party-preflight>.dialogue-shell { padding:0; }
