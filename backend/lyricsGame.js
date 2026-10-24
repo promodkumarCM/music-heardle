@@ -1,3 +1,4 @@
+import {matchesLyric,normalizeLyric as normalize} from './lyricsMatching.js'
 import express from 'express'
 import { randomBytes, randomUUID, randomInt } from 'node:crypto'
 
@@ -6,7 +7,6 @@ import { pool } from './db.js'
 import { puzzle, canMakePuzzle, difficulties } from './lyricsPuzzle.js'
 export { puzzle } from './lyricsPuzzle.js'
 const rooms = new Map()
-const normalize = value => value.normalize('NFC').replace(/[\u200c\u200d]/g, '').replace(/[^\p{L}\p{M}\p{N}]/gu, '')
 function blanks(room) { return room.sections.flat().filter(word => word.id !== undefined) }
 function score(team) { return Object.values(team.answers).filter(answer => answer.correct).length * 10 }
 function pendingReveal(room) { return room.mode==='host' ? blanks(room).find(w=>room.revealed.has(w.id)&&room.teams.some(t=>!t.answers[w.id]))?.id : undefined }
@@ -91,7 +91,7 @@ router.post('/rooms/:code/action',(req,res)=>{
       if(!word||!team||team.answers[id])return res.status(409).json({error:'This word has already been settled or is invalid.'})
       if(action==='mark'&&room.mode!=='host')return res.status(403).json({error:'Manual marking is only for host mode.'})
       if(action==='guess'&&(typeof guess!=='string'||!normalize(guess)||guess.length>150))return res.status(400).json({error:'Enter a word.'})
-      team.answers[id]={correct:action==='mark'?correct===true:normalize(guess)===normalize(word.text),kind:action}
+      team.answers[id]={correct:action==='mark'?correct===true:matchesLyric(guess,word.text),kind:action}
       if(room.mode==='host' && team.answers[id].correct) {
         room.revealed.add(id)
         room.teams.forEach(other=>{if(other!==team)other.answers[id] ||= {correct:false,kind:'claimed'}})

@@ -66,3 +66,35 @@ test('majority skip voting ends the round without awarding points',()=>{
   assert.equal(r.phase,'open');assert.equal(r.skipVotes.length,1)
   act(r,bob,'skip');assert.equal(r.phase,'settled');assert.deepEqual(r.teams.map(t=>t.score),[0,0])
 })
+
+
+test('solo can select any unanswered lyric blank without exposing or scoring it',()=>{
+ const r=make('solo','lyrics');r.content=[Array.from({length:10},(_,id)=>({id,text:`വാക്ക്${id}`}))]
+ act(r,alice,'start');act(r,alice,'select',{id:7})
+ assert.equal(r.active,7);assert.equal(r.phase,'answering')
+ assert.equal(partyView(r,alice,1000).content[0][7].text,null)
+ assert.equal(r.teams[0].score,0)
+ act(r,alice,'guess',{guess:'വാക്ക്7'})
+ assert.equal(r.teams[0].score,10)
+ act(r,alice,'continue');assert.equal(r.active,8)
+ assert.throws(()=>act(r,alice,'select',{id:7}))
+ assert.throws(()=>act(r,alice,'select',{id:99}))
+ assert.throws(()=>act(r,bob,'select',{id:3}))
+ act(r,alice,'select',{id:3});assert.equal(r.active,3)
+})
+
+test('buzzer players cannot change the shared active lyric word',()=>{
+ const r=make('buzzer','lyrics');r.content=[[{id:0,text:'ഒന്ന്'},{id:1,text:'രണ്ട്'}]]
+ act(r,alice,'start')
+ assert.throws(()=>act(r,alice,'select',{id:1}))
+ act(r,alice,'buzz');assert.throws(()=>act(r,alice,'select',{id:1}))
+ assert.equal(r.active,0)
+})
+
+test('lyrics awards points for a small final-letter spelling variation',()=>{
+ const r=make('solo','lyrics');r.content=[[{id:0,text:'പുഞ്ചിരിക്കും'}]]
+ act(r,alice,'start');act(r,alice,'guess',{guess:'പുഞ്ചിരിക്കു'})
+ assert.equal(r.teams[0].score,10)
+ assert.equal(r.notice,'Correct answer!')
+ assert.equal(r.phase,'settled')
+})

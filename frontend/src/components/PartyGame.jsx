@@ -1,7 +1,10 @@
+import LyricsAnswerResult from './LyricsAnswerResult'
+import LyricsPlayLayout from './LyricsPlayLayout'
 import {useEffect,useRef,useState} from 'react'
 import GameModes from './GameModes'
 import useTitleSuggestions from '../lib/useTitleSuggestions'
 import BuzzerStage from './BuzzerStage'
+import LyricsAnswerForm from './LyricsAnswerForm'
 
 const BASE=import.meta.env.VITE_API_URL||`${location.protocol}//${location.hostname}:4000`
 const games={pictures:'Picture Clues',song:'Guess the Song',dialogue:'Guess the Movie',clues:'Five Clues',lyrics:'Missing Lyrics'}
@@ -16,6 +19,7 @@ export default function PartyGame({mode='buzzer',game:gameProp,backdrop}) {
   const [room,setRoom]=useState(null),[busy,setBusy]=useState(false),[error,setError]=useState('')
   const [tab,setTab]=useState(params.get('room')?'join':'create'),[code,setCode]=useState(params.get('room')||''),[name,setName]=useState('')
   const [teamNames,setTeamNames]=useState(['Team A','Team B']),[seconds,setSeconds]=useState(15),[difficulty,setDifficulty]=useState('easy')
+  const [lastLyricAnswer,setLastLyricAnswer]=useState('')
   const [guess,setGuess]=useState(''),[remaining,setRemaining]=useState(0),[copied,setCopied]=useState(''),[nextGame,setNextGame]=useState(initialGame)
   const lock=useRef(false),generation=useRef(0),offset=useRef(0),setupDialog=useRef(null)
   const game=room?.game||initialGame
@@ -49,6 +53,7 @@ export default function PartyGame({mode='buzzer',game:gameProp,backdrop}) {
   },[room?.deadline])
   useEffect(()=>{setGuess('')},[room?.round,room?.active,room?.phase])
   useEffect(()=>setNextGame(game),[game])
+  useEffect(()=>setLastLyricAnswer(''),[room?.round,game])
   async function run(fn){
     if(lock.current)return
     lock.current=true;generation.current++;setBusy(true);setError('')
@@ -59,7 +64,13 @@ export default function PartyGame({mode='buzzer',game:gameProp,backdrop}) {
     setSession({code:data.code,token:data.token,game:data.game,entryGame:initialGame});receive(data)
   })}
   function act(action,extra={}){run(async()=>{
-    const data=await request(`rooms/${room.code}/action`,{action,version:room.version,...extra});receive(data)
+    let data=await request(`rooms/${room.code}/action`,{action,version:room.version,...extra})
+    if(mode==='solo'&&game==='lyrics'&&['guess','reveal'].includes(action)&&data.phase==='settled') {
+      setLastLyricAnswer({id:data.active,guess:extra.guess,answer:data.answer,correct:data.notice==='Correct answer!',revealed:action==='reveal'})
+      receive(data)
+      if(!data.complete)data=await request(`rooms/${room.code}/action`,{action:'continue',version:data.version})
+    }
+    receive(data)
     if(action==='game')setSession(s=>({...s,game:data.game}))
   })}
   function leave(){generation.current++;setSession(null);setRoom(null);setError('');setCopied('')}
@@ -99,16 +110,18 @@ export default function PartyGame({mode='buzzer',game:gameProp,backdrop}) {
       <div className="lyrics-room-bar"><span>{labels[mode]} · Round {room.round}{game==='lyrics'?` · ${room.difficulty} · 10 hidden words`:''}</span><button disabled={busy} onClick={leave}>Leave game</button></div>
       <div className="party-scores">{room.teams.map((team,i)=><div key={i} className={room.winner?.team===i?'winning':''}><span>{team.name}{mode==='buzzer'&&room.team===i?' (you)':''}</span><strong>{team.score} pts</strong></div>)}</div>
       {phase!=='lobby'&&<>
-        <BuzzerStage game={game} room={room} busy={busy} act={act} automaticWords/>
+        <LyricsPlayLayout enabled={game==='lyrics'} activeKey={`${room.round}:${room.active}`}>
+        <BuzzerStage game={game} room={room} busy={busy} act={act} automaticWords={mode==='buzzer'}/>
         <section className="party-answer-panel clue-case">
-          <h2 role="status">{status}</h2>
-          {game==='lyrics'&&<p>Word {(room.active??0)+1} of 10 · 10 points</p>}
+          <h2 role="status">{game==='lyrics'?`Word ${(room.active??0)+1} of 10`:status}</h2>
+          {game==='lyrics'&&mode==='buzzer'&&<p>{status}</p>}
           {phase==='answering'&&mode==='buzzer'&&<p role="timer">{remaining} seconds remaining</p>}
+          {game==='lyrics'&&<LyricsAnswerResult result={lastLyricAnswer}/>}
           {room.notice&&<p aria-live="polite">{room.notice}</p>}
           {mode==='buzzer'&&!settled&&<button className="team-buzzer" disabled={busy||phase!=='open'||room.blocked.includes(room.team)} onClick={()=>act('buzz')}>BUZZ</button>}
           {mode==='buzzer'&&room.blocked.includes(room.team)&&!settled&&<p>Your attempt is used. Other players can still buzz.</p>}
           {mode==='buzzer'&&phase==='open'&&<button disabled={busy||room.skipVotes.includes(room.me)} onClick={()=>act('skip')}>{room.skipVotes.includes(room.me)?'Skip vote recorded':'Vote to skip round'} · {room.skipVotes.length}/{Math.floor(room.players.length/2)+1}</button>}
-          {phase==='answering'&&canAnswer&&mode!=='host'&&<form className="party-guess" onSubmit={e=>{e.preventDefault();act('guess',{guess})}}><label>{game==='lyrics'?'Missing word':game==='song'?'Song name':'Movie name'}<input list={game==='lyrics'?undefined:'party-title-suggestions'} autoFocus required autoComplete="off" maxLength={255} value={guess} onChange={e=>setGuess(e.target.value)}/></label>{game!=='lyrics'&&<datalist id="party-title-suggestions">{suggestions.map(title=><option key={title} value={title}/>)}</datalist>}<button disabled={busy||!guess.trim()}>Submit answer</button></form>}
+          {phase==='answering'&&canAnswer&&mode!=='host'&&(game==='lyrics'?<LyricsAnswerForm resetKey={`${room.round}:${room.active}`} label={`Word ${(room.active??0)+1}`} submitLabel="Check" disabled={busy} onSubmit={answer=>act('guess',{guess:answer})}/>:<form className="party-guess" onSubmit={e=>{e.preventDefault();act('guess',{guess})}}><label>{game==='song'?'Song name':'Movie name'}<input list="party-title-suggestions" autoFocus required autoComplete="off" maxLength={255} value={guess} onChange={e=>setGuess(e.target.value)}/></label><datalist id="party-title-suggestions">{suggestions.map(title=><option key={title} value={title}/>)}</datalist><button disabled={busy||!guess.trim()}>Submit answer</button></form>)}
           {mode==='host'&&!settled&&<><div className="lyrics-controls">{room.teams.map((team,i)=><button key={i} disabled={busy} onClick={()=>act('mark',{team:i})}>{team.name} · +{game==='lyrics'?10:game==='clues'?120-room.clue*20:100}</button>)}<button disabled={busy} onClick={()=>act('reveal')}>Nobody · Reveal</button></div><details><summary>Check answer</summary><p>{room.answer}</p></details></>}
           {game==='clues'&&!settled&&room.clue<5&&<button disabled={busy||mode==='buzzer'&&phase!=='open'} onClick={()=>act('clue')}>Next clue ({room.clue}/5)</button>}
           {mode==='solo'&&!settled&&<button disabled={busy} onClick={()=>act('reveal')}>Reveal · 0 points</button>}
@@ -116,6 +129,7 @@ export default function PartyGame({mode='buzzer',game:gameProp,backdrop}) {
             {room.creator&&room.complete&&mode!=='solo'&&<form className="party-switch" onSubmit={e=>{e.preventDefault();act('game',{game:nextGame})}}><label>Switch game · keep scores<select value={nextGame} onChange={e=>setNextGame(e.target.value)}>{Object.entries(games).map(([key,title])=><option key={key} value={key}>{title}</option>)}</select></label><button disabled={busy||nextGame===game}>Switch game</button></form>}
           </>}
         </section>
+        </LyricsPlayLayout>
       </>}
     </>}
     {error&&!preflight&&<p role="alert" className="dialogue-feedback">{error}</p>}

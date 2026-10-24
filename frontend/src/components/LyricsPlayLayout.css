@@ -1,0 +1,48 @@
+.lyrics-play-layout { display:grid; grid-template-columns:minmax(0,1fr) 330px; gap:20px; align-items:start; }
+.lyrics-reading-pane { min-width:0; }
+.lyrics-page .lyrics-play-layout .lyrics-studio-sheet { margin:0; }
+.lyrics-page .lyrics-play-layout .studio-lyrics-content { columns:1; }
+.lyrics-page .lyrics-play-layout .lyrics-stanza { font-size:20px; line-height:2.3; margin:18px 0; }
+.lyrics-page .lyrics-play-layout .lyrics-blank { display:inline-block; position:relative; min-width:52px; margin:4px 6px; padding:7px 9px 3px; line-height:1.6; vertical-align:baseline; white-space:nowrap; scroll-margin-block:110px; }
+.lyrics-page .lyrics-play-layout .lyrics-blank sup { position:absolute; left:3px; top:1px; font:9px/1 monospace; }
+.lyrics-page .lyrics-play-layout .active-blank { outline:2px solid #a56e25; outline-offset:3px; background:#efd097; color:#30291e; }
+.lyrics-page .lyrics-play-layout .lyrics-active-stanza { background:#c49a4910; border-radius:6px; }
+.lyrics-page .lyrics-play-layout .lyrics-blank:disabled { opacity:1; }
+.lyrics-answer-dock { position:sticky; top:16px; min-width:0; max-height:calc(100dvh - 32px); overflow:auto; border:1px solid #a98a4b; border-radius:12px; background:#172017; box-shadow:0 8px 24px #0005; color:#f3ead8; }
+.lyrics-page .lyrics-answer-dock .party-answer-panel,.lyrics-page .lyrics-answer-dock .lyrics-selected-answer { margin:0; padding:16px; border:0; background:transparent; }
+.lyrics-answer-dock h2 { font-size:20px; margin:0 0 8px; }
+.lyrics-answer-dock .lyrics-word-picker { display:flex; flex-wrap:wrap; gap:6px; margin:10px 0; }
+.lyrics-page .lyrics-word-picker button { min-width:36px; min-height:36px; padding:5px; }
+.lyrics-word-picker button[aria-pressed="true"] { outline:2px solid #efd097; outline-offset:2px; }
+.lyrics-page .lyrics-answer-dock .lyrics-answer-form { margin:10px 0; }
+.lyrics-page .lyrics-answer-dock .lyrics-input-mode label { font-size:12px; }
+.lyrics-page .lyrics-answer-dock p { margin:6px 0; }
+@media(max-width:760px) {
+ .lyrics-page { padding-inline:12px; }
+ .lyrics-play-layout { display:grid; grid-template-columns:minmax(0,1fr); grid-template-rows:minmax(100px,1fr) auto; gap:8px; height:var(--play-height,calc(100dvh - 16px)); min-width:0; scroll-margin-top:8px; }
+ .lyrics-reading-pane { align-self:stretch; height:100%; min-height:0; overflow:auto; overflow-x:hidden; overscroll-behavior:contain; border-radius:8px; scrollbar-gutter:stable; -webkit-overflow-scrolling:touch; }
+ .lyrics-answer-dock { position:static; width:100%; max-width:100%; max-height:calc(var(--play-height,100dvh) * .55); border-radius:10px; padding-bottom:env(safe-area-inset-bottom); overflow:auto; overscroll-behavior:contain; box-shadow:0 4px 16px #0005; }
+ .lyrics-page .lyrics-play-layout .studio-paper { padding:14px 12px; }
+ .lyrics-page .lyrics-play-layout .studio-stand-lip { left:0; right:0; }
+ .lyrics-page .lyrics-play-layout .lyrics-stanza { font-size:19px; line-height:2.1; overflow-wrap:break-word; }
+ .lyrics-page .lyrics-answer-dock .party-answer-panel,.lyrics-page .lyrics-answer-dock .lyrics-selected-answer { padding:10px 12px; min-width:0; }
+ .lyrics-answer-dock h2,.lyrics-page .lyrics-answer-dock .party-answer-panel h2 { font-size:17px; margin-bottom:4px; }
+ .lyrics-page .lyrics-answer-dock .lyrics-input-mode legend,.lyrics-answer-dock .lyrics-typing-help { display:none; }
+ .lyrics-page .lyrics-answer-dock .lyrics-input-mode { gap:4px 12px; }
+ .lyrics-page .lyrics-answer-dock .lyrics-input-mode label { min-height:30px; }
+ .lyrics-answer-dock .lyrics-answer-label { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
+ .lyrics-page .lyrics-answer-dock .lyrics-answer-form { gap:6px; margin:6px 0; }
+ .lyrics-page .lyrics-answer-dock .lyrics-answer-entry { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:6px; }
+ .lyrics-page .lyrics-answer-dock .lyrics-answer-entry>input { width:100%; min-width:0; font-size:16px; }
+ .lyrics-page .lyrics-answer-dock .lyrics-answer-entry>button { width:auto; min-height:44px; padding:8px 12px; }
+ .lyrics-page .lyrics-answer-dock .lyrics-spelling-options { flex-wrap:nowrap; overflow-x:auto; padding:3px; }
+ .lyrics-page .lyrics-answer-dock .lyrics-spelling-options button { flex-shrink:0; }
+ .lyrics-answer-dock .lyrics-word-picker { flex-wrap:nowrap; overflow-x:auto; padding:3px; margin:4px 0; }
+ .lyrics-word-picker button { flex-shrink:0; }
+ .lyrics-page .lyrics-play-layout .lyrics-blank { scroll-margin-block:16px; }
+ .lyrics-page .lyrics-answer-dock .party-answer-panel>p[role="status"] { max-height:3.3em; overflow:auto; overflow-wrap:anywhere; }
+}
+
+.lyrics-answer-result { margin:10px 0; padding:10px 12px; border:1px solid #a98a4b66; border-radius:8px; background:#ffffff08; font-size:13px; line-height:1.6; overflow-wrap:anywhere; }
+.lyrics-answer-result strong { color:#efd097; }
+.lyrics-answer-result [lang="ml"] { font-size:16px; }

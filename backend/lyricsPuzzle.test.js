@@ -3,17 +3,42 @@ import assert from 'node:assert/strict'
 import { puzzle, canMakePuzzle } from './lyricsPuzzle.js'
 import songs from './lyricsSeed.js'
 const sections = Array.from({length:6}, (_,s)=>Array.from({length:16},(_,w)=>'വാക്ക്'+String.fromCharCode(0x0d15+s)+String.fromCharCode(0x0d15+w)).join(' '))
-for (const [difficulty, allowed] of [['easy',[0,1]],['medium',[2,3]],['hard',[4,5]]]) {
-  test(`${difficulty} hides exactly ten words in its region`,()=>{
-    for(let run=0;run<20;run++) {
+for (const [preferred, difficulty] of ['easy','medium','hard'].entries()) {
+  test(`${difficulty} spreads ten blanks across the song with a difficulty bias`,()=>{
+    for(let run=0;run<30;run++) {
       const result=puzzle(sections,difficulty)
       const blanks=result.flat().filter(w=>w.id!==undefined)
       assert.equal(blanks.length,10)
       assert.deepEqual(blanks.map(w=>w.id),Array.from({length:10},(_,i)=>i))
-      result.forEach((stanza,i)=>{if(!allowed.includes(i))assert.ok(stanza.every(w=>w.id===undefined))})
+      const counts=result.map(stanza=>stanza.filter(w=>w.id!==undefined).length)
+      assert.ok(counts.every(count=>count>0))
+      for(let region=0;region<3;region++) {
+        assert.equal(counts[region*2]+counts[region*2+1],region===preferred?6:2)
+        assert.equal(counts[region*2],counts[region*2+1])
+      }
     }
   })
 }
+
+test('newlines inside a stanza distribute blanks across actual lyric lines',()=>{
+  const song=[sections.join('\n')]
+  for(const difficulty of ['easy','medium','hard']) {
+    const result=puzzle(song,difficulty)[0]
+    const counts=[0]
+    for(const word of result) {
+      if(word.id!==undefined) counts[counts.length-1]++
+      if(word.text.includes('\n')) counts.push(0)
+    }
+    assert.equal(counts.length,6)
+    assert.ok(counts.every(count=>count>0))
+  }
+})
+
+test('sparse regions redistribute their quota without losing blanks',()=>{
+  const result=puzzle(['ലാൽ ലാൽ',...sections.slice(0,2),'ലാൽ ലാൽ'],'hard')
+  assert.equal(result.flat().filter(w=>w.id!==undefined).length,10)
+})
+
 test('catalog rounds have ten blanks and no answer visible elsewhere',()=>{
   for(const song of songs.filter(canMakePuzzle))for(const difficulty of ['easy','medium','hard']) {
     const words=puzzle(song,difficulty).flat()

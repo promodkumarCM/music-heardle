@@ -7,6 +7,13 @@ dist/
 .DS_Store
 Thumbs.db
 
+# Local cleanup archives and generated development artifacts
+.local-archive/
+review/
+output/
+__pycache__/
+*.pyc
+
 
 backend/uploads/
 uploads/

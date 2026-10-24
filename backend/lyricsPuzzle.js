@@ -18,20 +18,39 @@ export function canMakePuzzle(sections) {
 export function puzzle(sections, difficulty = 'easy') {
   if (!difficulties.includes(difficulty)) throw new Error('Unknown difficulty.')
   const candidates = candidatesFor(sections)
-  const middle = (sections.length - 1) / 2
-  // Prefer the requested region, expanding to nearby stanzas when necessary.
-  const rank = index => difficulty === 'easy' ? Math.max(0, index - 1) : difficulty === 'hard' ? Math.max(0, sections.length - 2 - index) : Math.abs(index - middle)
-  const priority = sections.map((_, index) => index).sort((a, b) => rank(a) - rank(b) || a - b)
+  // Work with actual lyric lines, including newlines inside each stanza.
+  const lines = []
+  sections.forEach((section, sectionIndex) => {
+    const eligible = new Set(candidates[sectionIndex])
+    let line = []
+    section.split(/(\s+)/).forEach((text, index) => {
+      if (eligible.has(index)) line.push(`${sectionIndex}:${index}`)
+      if (text.includes('\n')) { lines.push(line); line = [] }
+    })
+    lines.push(line)
+  })
+  const regions = Array.from({ length: 3 }, () => [])
+  lines.forEach((words, index) => {
+    regions[Math.min(2, Math.floor(index * 3 / lines.length))].push({ words: [...words], count: 0 })
+  })
+  const preferred = difficulties.indexOf(difficulty)
   const hidden = new Set()
-  for (let start = 0; start < priority.length && hidden.size < 10;) {
-    const distance = rank(priority[start])
-    const pool = []
-    while (start < priority.length && rank(priority[start]) === distance) {
-      const section = priority[start++]
-      pool.push(...candidates[section].map(index => `${section}:${index}`))
+  // Six blanks in the difficulty's region, two in each other third.
+  // Balance picks across lines before adding another blank to the same line.
+  function take(region, amount) {
+    for (let i = 0; i < amount; i++) {
+      const available = region.filter(line => line.words.length)
+      if (!available.length) break
+      const least = Math.min(...available.map(line => line.count))
+      const choices = available.filter(line => line.count === least)
+      const line = choices[randomInt(choices.length)]
+      hidden.add(line.words.splice(randomInt(line.words.length), 1)[0])
+      line.count++
     }
-    while (pool.length && hidden.size < 10) hidden.add(pool.splice(randomInt(pool.length), 1)[0])
   }
+  regions.forEach((region, index) => take(region, index === preferred ? 6 : 2))
+  // Sparse or repeated lyrics may not have enough eligible words in a third.
+  take(regions.flat(), 10 - hidden.size)
   if (hidden.size !== 10) throw new Error('Song needs at least 10 unique Malayalam words.')
   let id = 0
   return sections.map((section, sectionIndex) => section.split(/(\s+)/).map((text, index) =>

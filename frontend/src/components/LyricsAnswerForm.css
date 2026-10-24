@@ -1,0 +1,17 @@
+.lyrics-page .lyrics-answer-form { display:flex; flex-direction:column; align-items:stretch; gap:8px; width:100%; min-width:0; max-width:640px; margin:14px 0; }
+.lyrics-answer-form .lyrics-input-mode { display:flex; flex-wrap:wrap; gap:8px 18px; margin:0; padding:0; border:0; min-width:0; }
+.lyrics-answer-form .lyrics-input-mode legend { font-size:12px; color:#d8c8a8; margin-bottom:6px; }
+.lyrics-answer-form .lyrics-input-mode label { display:flex; align-items:center; gap:7px; font-size:13px; color:#f3ead8; }
+.lyrics-page .lyrics-answer-form .lyrics-input-mode input { flex:none; width:auto; min-height:0; margin:0; padding:0; accent-color:#dfc18a; }
+.lyrics-answer-form .lyrics-answer-label { color:#f3ead8; font-size:14px; }
+.lyrics-answer-entry { display:flex; gap:8px; align-items:stretch; min-width:0; }
+.lyrics-page .lyrics-answer-form .lyrics-answer-entry input { flex:1; width:100%; min-width:0; margin:0; font-size:16px; }
+.lyrics-answer-entry>button { flex:none; }
+.lyrics-answer-form .lyrics-typing-help,.lyrics-answer-form .lyrics-conversion-error { margin:0; color:#d8c8a8; font-size:12px; line-height:1.6; }
+.lyrics-answer-preview { color:#f3ead8; font-size:14px; overflow-wrap:anywhere; }
+.lyrics-answer-preview strong { font-size:20px; line-height:1.7; }
+.lyrics-spelling-options { display:flex; flex-wrap:wrap; gap:8px; }
+.lyrics-page .lyrics-spelling-options button { background:#263226; color:#f3ead8; border:1px solid #8f805b; padding:7px 10px; min-height:40px; font-size:17px; }
+.lyrics-page .lyrics-spelling-options button[aria-pressed="true"] { background:#dfc18a; color:#283429; border-color:#dfc18a; outline:2px solid #f3ead8; outline-offset:2px; }
+.lyrics-conversion-error button { margin-left:4px; }
+@media(max-width:480px) { .lyrics-answer-entry { flex-wrap:wrap; } .lyrics-answer-entry>input { flex-basis:100%; } .lyrics-answer-entry>button { width:100%; } .lyrics-input-mode label { min-height:44px; } .lyrics-page .lyrics-spelling-options button { min-height:44px; } }

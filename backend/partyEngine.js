@@ -1,3 +1,4 @@
+import {matchesLyric} from './lyricsMatching.js'
 import {normalizeMovie, matchMovie} from './movieMatching.js'
 
 export const fail = (message, status=409) => { throw Object.assign(new Error(message), {status}) }
@@ -7,7 +8,8 @@ export function beginQuestion(room) {
   room.phase=room.mode==='host'?'closed':room.mode==='solo'?'answering':'open'
 }
 export function chooseWord(room) {
-  room.active=blanks(room).find(w=>!room.settled[w.id])?.id ?? null
+  const remaining=blanks(room).filter(w=>!room.settled[w.id])
+  room.active=(remaining.find(w=>w.id>(room.active??-1))||remaining[0])?.id ?? null
 }
 function settle(room, correct, team) {
   if(correct) room.teams[team].score+=room.game==='lyrics'?10:room.game==='clues'?120-room.clue*20:100
@@ -33,6 +35,10 @@ export function partyAction(room, player, body, now=Date.now()) {
     if(room.mode==='buzzer'&&room.players.length<2)fail('Wait for at least two players.')
     if(room.game==='lyrics')chooseWord(room)
     beginQuestion(room)
+  } else if(a==='select') {
+    if(room.game!=='lyrics'||room.mode==='buzzer'||!creator||!['answering','closed','settled'].includes(room.phase))fail('Word selection is not available.')
+    if(!Number.isInteger(body.id)||!blanks(room).some(w=>w.id===body.id)||room.settled[body.id])fail('Choose an unanswered word.',400)
+    room.active=body.id;beginQuestion(room)
   } else if(a==='buzz') {
     if(room.mode!=='buzzer'||room.phase!=='open'||room.blocked.includes(player.team))fail('Buzzer is not available.')
     room.winner={id:player.id,team:player.team,name:player.name};room.phase='answering';room.deadline=now+room.seconds*1000;room.notice=''
@@ -48,7 +54,7 @@ export function partyAction(room, player, body, now=Date.now()) {
     if(room.mode==='host'||room.phase!=='answering'||(room.mode==='buzzer'&&room.winner?.id!==player.id))fail('Wait for your turn to answer.')
     if(typeof body.guess!=='string'||!body.guess.trim()||body.guess.length>255)fail('Enter an answer.',400)
     const answer=room.game==='lyrics'?blanks(room).find(w=>w.id===room.active)?.text:room.target
-    const correct=room.game==='lyrics'||room.game==='song'
+    const correct=room.game==='lyrics'?matchesLyric(body.guess,answer):room.game==='song'
       ? normalizeMovie(body.guess)===normalizeMovie(answer)
       : matchMovie(body.guess,answer,room.movieCatalog).correct
     room.notice=correct?'Correct answer!':'Incorrect answer.'

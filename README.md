@@ -89,6 +89,19 @@ eligible words are excluded. Repeated answers are never left visible elsewhere.
 Each correct word earns ten points. Malayalam Unicode and punctuation are
 normalized; missing words require Malayalam spelling. Words are played in order.
 
+Lyrics answer fields default to Manglish: type a word using English letters,
+check the Malayalam preview, and choose another spelling when needed before
+submitting. The Malayalam option accepts direct keyboard input or pasted text.
+Only the selected Malayalam word is submitted for scoring. This is available in
+Solo, Buzzer, and the older online team-play screen; host teams still answer aloud.
+
+`POST /transliteration` converts a single typed word through the public
+[Varnam service](https://github.com/varnamproject/varnamd-govarnam). It does not
+consult the lyrics catalog or hidden answer. Suggestions are debounced in the
+browser and cached with bounded storage on the backend. Conversion requires
+internet access; if the service is unavailable, players can retry or use direct
+Malayalam input. Deploy both frontend and backend for this feature.
+
 ## Admin panel
 
 Open Admin at the bottom-right of the home page, or `/#admin`. The local login
