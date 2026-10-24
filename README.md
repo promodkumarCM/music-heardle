@@ -201,3 +201,19 @@ answers. Keep the host token and private answer display private.
 
 Checks: `node --test buzzer.test.js` from backend; with the API running,
 `node --test buzzer-api.test.js` exercises all catalogs and a 12-player room.
+
+## Picture Clues image uploads (Railway)
+
+Admin → Picture Clues accepts a laptop/desktop image and an optional mobile image for the same movie. Upload each image, then click Create entry or Save changes. Leaving mobile empty uses the desktop image. Existing image URLs still work.
+
+Images are stored as files on the backend; their URLs are saved in the existing `picture_puzzles.image_url` and `mobile_image_url` columns. No database migration is needed.
+
+For persistent Railway storage:
+1. Attach a Railway volume to the **backend service**, mounted at `/data`.
+2. Set `UPLOAD_DIR=/data/picture-clues` on that backend service and redeploy.
+3. Keep `VITE_API_URL` pointing to the publicly reachable backend HTTPS URL.
+4. Configure a private `ADMIN_PASSWORD` for production.
+
+Local development defaults to `uploads/picture-clues` relative to the backend working directory. Production uploads are refused unless `UPLOAD_DIR` is configured. Setting the variable alone does not create a Railway volume. Back up the volume along with the database. Replaced or unused uploads are retained; deleting a catalog record does not delete files.
+
+The authenticated upload endpoint accepts PNG/JPEG/WebP file bodies up to 8 MB, checks file signatures and generates opaque filenames. Uploaded clue images are publicly readable. Do not upload private files. SVG and HTML uploads are rejected.

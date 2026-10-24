@@ -1,0 +1,78 @@
+.cinema-home.clue-page { background:linear-gradient(#10140cb0,#11150c70),url('/art/film-reels.png') center/cover fixed,#15190f; }
+.clue-page .dialogue-shell { max-width:1000px; }
+.clue-page .dialogue-heading { text-align:center; padding:10px 0 5px; }
+.clue-page .dialogue-heading h1 { justify-content:center; color:#f3e5c6; }
+.clue-page .dialogue-heading .cinema-eyebrow { display:none; }
+.clue-page .game-modes { margin:8px auto 12px; }
+.film-clues { position:relative; padding:14px 30px; border:5px ridge #7f6439; border-radius:5px; background:linear-gradient(110deg,#352b19,#0c0c08 25%,#211d12 85%,#6c5127); box-shadow:0 12px 30px #0009,inset 0 0 0 3px #090b07; }
+.film-clues::before,.film-clues::after { content:''; position:absolute; top:14px; bottom:14px; width:10px; border-radius:2px; background:repeating-linear-gradient(to bottom,#dcc084 0 9px,transparent 9px 20px); opacity:.8; }
+.film-clues::before { left:10px; }.film-clues::after { right:10px; }
+.film-frames { list-style:none; padding:0; margin:0; display:grid; gap:8px; }
+.film-frames li { position:relative; overflow:hidden; display:grid; grid-template-columns:45px 65px minmax(0,1fr); align-items:center; min-height:62px; border:3px solid #292319; outline:1px solid #765b303f; box-shadow:inset 0 0 16px #39261070,0 2px 3px #000; }
+.film-frames .film-lit { background:radial-gradient(ellipse,#fff2cd,#d7b16c); color:#352714; }
+.film-frames .film-dark { background:linear-gradient(110deg,#333426,#454333,#292c21); color:#b7aa85; }
+.film-frame-number { font:26px Georgia,serif; text-align:center; }
+.film-frame-points { font:12px Georgia,serif; padding:14px 8px; border-inline:1px solid #6f57254d; text-align:center; }
+.film-frames p { font:16px/1.45 Georgia,serif; padding:10px 16px; margin:0; overflow-wrap:anywhere; }
+.film-dark p { font-style:italic; font-size:14px; color:#b7aa85; }
+.film-clues .clue-reveal-cover { background:linear-gradient(100deg,#34372a,#494637); border-radius:0; }
+.clue-page .clue-timer-settings { padding:6px 10px; margin:0 0 10px; display:flex; align-items:center; flex-wrap:wrap; gap:8px; background:#182015d9; }
+.clue-page .clue-timer-settings > p { display:none; }
+.clue-page .clue-timer-settings select { padding:5px 10px; font-size:12px; }
+.clue-page .clue-score { margin:8px 0; font-size:9px; }
+.clue-page .clue-score strong { font-size:18px; }
+.clue-page .dialogue-answer { background:#12190dd9; padding:10px 14px; border-radius:8px; margin-top:12px; }
+.clue-page .dialogue-answer label { font-size:13px; }
+.clue-page .dialogue-input-row input { background:#1b2318; color:#f3e5c6; border-color:#a78953; }
+.clue-page .dialogue-input-row button { background:linear-gradient(#e9cf91,#c5a362); color:#302818; }
+.clue-page .buzzer-host-bar { background:#12190de8; }
+.game-tile-film-art { display:flex; align-items:center; padding:18px; background:linear-gradient(#12180b60,#12180b60),url('/art/film-reels.png') center/cover; }
+.film-clues-mini { width:100%; padding:7px 15px; border-width:3px; }
+.film-clues-mini::before,.film-clues-mini::after { width:5px; top:7px; bottom:7px; background-size:auto; }
+.film-clues-mini::before { left:5px; }.film-clues-mini::after { right:5px; }
+.film-clues-mini .film-frames { gap:4px; }
+.film-clues-mini .film-frames li { min-height:24px; grid-template-columns:22px 38px 1fr; border-width:1px; }
+.film-clues-mini .film-frame-number { font-size:12px; }
+.film-clues-mini .film-frame-points { font-size:8px; padding:5px 2px; }
+.film-clues-mini p { font-size:9px; padding:4px; }
+@media(max-width:600px){
+ .cinema-home.clue-page { background-attachment:scroll; }
+ .film-clues { padding:9px 18px; border-width:3px; }
+ .film-clues::before { left:5px; }.film-clues::after { right:5px; }
+ .film-clues::before,.film-clues::after { width:6px; }
+ .film-frames li { grid-template-columns:30px 46px minmax(0,1fr); min-height:62px; }
+ .film-frame-number { font-size:20px; }
+ .film-frame-points { font-size:10px; padding:10px 3px; }
+ .film-frames p { font-size:13px; padding:9px; }
+ .film-dark p { font-size:12px; }
+ .game-tile-film-art { padding:8px; }
+ .film-clues-mini { padding:5px 10px; }
+ .film-clues-mini .film-frames li { min-height:18px; grid-template-columns:17px 28px 1fr; }
+ .film-clues-mini .film-frame-points { font-size:6px; }
+ .film-clues-mini p { font-size:6px; }
+}
+/* Keep the complete round compact on laptop screens. */
+.cinema-home.clue-page .dialogue-shell { max-width:1000px; }
+.cinema-home.clue-page .dialogue-heading { padding:8px 0 4px; }
+.cinema-home.clue-page .game-modes { margin:6px auto 10px; }
+.cinema-home.clue-page .film-frames li { min-height:50px; }
+.cinema-home.clue-page .clue-score { margin:5px 0; }
+.cinema-home.clue-page .dialogue-answer { padding:8px 12px; margin-top:6px; }
+.cinema-home.clue-page .dialogue-answer label { font-size:13px; margin-bottom:5px; }
+.cinema-home.clue-page .clue-actions { margin-top:7px; }
+@media(max-width:600px){.cinema-home.clue-page .film-frames li { min-height:60px; }}
+.clue-start-settings { padding:18px; margin:10px 0; border:1px solid #b99b62; border-radius:8px; background:#20281ef5; }
+.clue-start-settings h2 { margin:0 0 12px; font-size:22px; }
+.clue-start-settings form { display:flex; flex-wrap:wrap; align-items:center; gap:12px; }
+.clue-start-settings p { flex-basis:100%; margin:0; font-size:12px; color:#ded1b4; }
+.clue-start-settings input { width:90px; margin-left:8px; }
+.clue-board-controls { display:flex; align-items:center; justify-content:space-between; gap:12px; margin:10px 0; }
+.clue-board-controls span { font-size:12px; color:#e1d2af; }
+.cinema-home.clue-page .clue-board-controls button,.clue-start-settings button { background:linear-gradient(#efd59a,#c3a05e); color:#241d10; border:1px solid #edcf8a; padding:12px 22px; min-height:44px; font-weight:600; box-shadow:0 3px 10px #0005; }
+@media(max-width:600px){.clue-board-controls button { flex:1; }.clue-start-settings form>button { width:100%; }}
+.clue-timer-dialog form { display:grid; gap:12px; }
+.clue-timer-dialog form>label { font-size:14px; }
+.clue-timer-dialog select { width:100%; }
+.clue-timer-dialog input { width:100%; margin-top:8px; }
+.clue-timer-dialog form p { margin:0; font-size:13px; line-height:1.6; color:#ded1b4; }
+.clue-timer-dialog form>button { min-height:44px; background:linear-gradient(#efd59a,#c3a05e); color:#241d10; font-weight:600; }

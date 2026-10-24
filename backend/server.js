@@ -1,3 +1,4 @@
+import {uploadDirectory} from './pictureUploads.js'
 import pictureGame from './pictureGame.js'
 import songGame from './songGame.js'
 import express from 'express'
@@ -12,6 +13,7 @@ import { normalizeMovie, matchMovie } from './movieMatching.js'
 const app = express()
 app.use(cors())
 app.use(express.json())
+app.use('/uploads/picture-clues', express.static(uploadDirectory,{dotfiles:'deny',index:false,setHeaders:res=>res.set('X-Content-Type-Options','nosniff')}))
 app.use('/picture-game', pictureGame)
 app.use('/song-game', songGame)
 app.use('/admin', admin)

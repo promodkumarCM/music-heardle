@@ -375,3 +375,87 @@ html { scrollbar-gutter:stable; }
  .game-tile-symbol { font-size:22px; }
  .game-tile-play { padding-top:8px; }
 }
+.game-tile-icon { display: block; width: 44px; height: 44px; }
+@media (max-width: 700px) { .game-tile-icon { width: 30px; height: 30px; } }
+@media (max-width: 380px) { .game-tile-icon { width: 25px; height: 25px; } }
+.game-tile-illustrated { position: relative; overflow: hidden; background: #171c19; }
+.game-tile-art { position: absolute; inset: 0 0 auto; width: 100%; height: 64%; object-fit: cover; }
+.game-tile-illustrated .game-tile-top { position: relative; z-index: 1; }
+.game-tile-illustrated .game-tile-top > span:first-child { background: #111b; padding: 5px 7px; border-radius: 4px; }
+.game-tile-illustrated .game-tile-copy { position: relative; margin: auto 0 0; padding: 12px 0; }
+.game-tile-illustrated .game-tile-copy h3 { font-size: clamp(23px, 2.5vw, 32px); }
+.game-tile-illustrated .game-tile-copy p { display: none; }
+.game-tile-illustrated .game-tile-play { position: relative; }
+@media(max-width:700px) {
+ .game-tile-illustrated .game-tile-copy h3 { font-size: clamp(20px, 4.5vw, 28px); }
+ .game-tile-illustrated .game-tile-copy { padding: 8px 0; }
+ .game-tile-art { height: 56%; }
+}
+.game-tile-artwork { position: absolute; inset: 0 0 auto; height: 64%; }
+.game-tile-artwork .game-tile-art { height: 100%; }
+@media(max-width:700px) { .game-tile-artwork { height: 56%; } }
+
+/* A single landscape theatre image keeps the stage and collage in proportion. */
+.cinema-game-tile-picture .game-tile-artwork { height: 62%; overflow: hidden; }
+.cinema-game-tile-picture .game-tile-art { height: 100%; object-fit: cover; object-position: center; }
+.cinema-game-tile-picture .game-tile-top { display: none; }
+.cinema-game-tile-picture .game-tile-copy { margin-top: auto; }
+@media(max-width:700px) {
+ .cinema-game-tile-picture .game-tile-artwork { height: 54%; }
+}
+.cinema-game-tile-picture .game-tile-artwork { height: 54%; }
+.admin-picture-uploads { min-width: 0; border: 1px solid #a58c5b66; border-radius: 10px; padding: 16px; margin: 0 0 20px; }
+.admin-picture-uploads input[type=file] { width: 100%; min-width: 0; box-sizing: border-box; }
+.admin-upload-preview { display: block; width: 100%; max-height: 180px; object-fit: contain; background: #121713; border-radius: 6px; margin: 10px 0 16px; }
+
+/* Shared home-card proportions keep every game aligned. */
+.cinema-game-grid .cinema-game-tile.game-tile-illustrated {
+ display:grid;
+ grid-template-rows:60% minmax(0,1fr) auto;
+ padding:0;
+ background:#202820;
+ border-color:#b99b6259;
+}
+.cinema-game-grid .game-tile-illustrated .game-tile-artwork {
+ position:relative;
+ inset:auto;
+ grid-row:1;
+ width:100%;
+ height:100%;
+ min-height:0;
+ box-sizing:border-box;
+ overflow:hidden;
+ border-bottom:1px solid #b99b6226;
+}
+.cinema-game-grid .game-tile-illustrated .game-tile-top { display:none; }
+.cinema-game-grid .game-tile-illustrated .game-tile-copy {
+ grid-row:2;
+ display:flex;
+ align-items:center;
+ margin:0;
+ padding:12px clamp(16px,2.5vw,30px);
+ min-width:0;
+}
+.cinema-game-grid .game-tile-illustrated .game-tile-play {
+ grid-row:3;
+ margin:0 clamp(16px,2.5vw,30px);
+ padding:12px 0 20px;
+ border-color:#d5bc8138;
+}
+.cinema-game-grid .game-tile-illustrated:hover,
+.cinema-game-grid .game-tile-illustrated:focus-visible {
+ border-color:#dfb970;
+ box-shadow:0 5px 22px #0004,0 0 14px #d5aa4f20;
+}
+.cinema-game-grid .game-tile-illustrated:focus-visible { outline:2px solid #dfb970;outline-offset:3px; }
+@media(max-width:700px){
+ .cinema-game-grid .cinema-game-tile.game-tile-illustrated { grid-template-rows:54% minmax(0,1fr) auto; }
+ .cinema-game-grid .game-tile-illustrated .game-tile-copy { padding:7px 12px; }
+ .cinema-game-grid .game-tile-illustrated .game-tile-copy h3 { font-size:clamp(17px,4.1vw,27px); line-height:1.12; }
+ .cinema-game-grid .game-tile-illustrated .game-tile-play { margin:0 12px; padding:7px 0 11px; font-size:11px; }
+}
+@media(max-width:380px){
+ .cinema-game-grid .game-tile-illustrated .game-tile-copy { padding:5px 9px; }
+ .cinema-game-grid .game-tile-illustrated .game-tile-copy h3 { font-size:16px; }
+ .cinema-game-grid .game-tile-illustrated .game-tile-play { margin:0 9px; padding:5px 0 8px; }
+}

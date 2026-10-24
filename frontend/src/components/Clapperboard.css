@@ -1,0 +1,64 @@
+.clapperboard { position:relative; margin:48px 0 24px; padding-top:56px; isolation:isolate; filter:drop-shadow(0 14px 16px #0005); }
+.clapper-top,.clapper-fixed { height:42px; background:repeating-linear-gradient(120deg,#242722 0 46px,#d1c4a6 47px 88px,#252821 89px 130px); border:1px solid #9a8764; box-shadow:inset 0 2px 3px #fff3,inset 0 -3px 4px #0008; }
+.clapper-top { position:absolute; inset:0 0 auto; transform-origin:22px 90%; transform:rotate(-3deg); border-radius:7px 7px 2px 2px; animation:clapper-snap .65s ease-out; }
+.clapper-fixed { position:absolute; top:48px; left:0; right:0; height:36px; border-radius:3px 3px 0 0; }
+.clapper-hinge { position:absolute; z-index:2; top:18px; left:0; width:62px; height:66px; border-radius:12px 28px 6px 6px; background:linear-gradient(120deg,#8f703b,#3e301e); border:1px solid #ae8e52; box-shadow:2px 2px 4px #0008; }
+.clapper-hinge i { position:absolute; width:10px; height:10px; border-radius:50%; background:radial-gradient(circle at 30% 25%,#dfc58b,#715124 70%); box-shadow:1px 2px 2px #000; }
+.clapper-hinge i:nth-child(1){left:10px;top:10px}.clapper-hinge i:nth-child(2){left:10px;bottom:10px}.clapper-hinge i:nth-child(3){right:10px;bottom:10px}
+.clapper-body { padding:48px 32px 22px; border:1px solid #806f4d; border-radius:0 0 12px 12px; background:repeating-linear-gradient(15deg,#ffffff02 0 1px,transparent 1px 4px),radial-gradient(ellipse at top,#2c3029,#141814); box-shadow:inset 0 0 20px #0006; }
+.clapper-meta { padding-bottom:12px; border-bottom:2px solid #b7a98a88; font:12px monospace; letter-spacing:3px; color:#dfbd79; }
+.clapper-body blockquote { min-height:170px; display:flex; align-items:center; justify-content:center; margin:0; padding:28px 0; color:#f3e7c9; font:500 clamp(24px,3.5vw,40px)/1.65 Georgia,serif; text-align:center; overflow-wrap:anywhere; }
+.clapper-footer { border-top:2px solid #b7a98a88; padding-top:16px; text-align:center; color:#d5b473; font:10px/1.5 monospace; letter-spacing:2px; }
+.dialogue-page { background:radial-gradient(ellipse at 50% 35%,#303729,transparent 65%),#171c19; }
+.dialogue-page .dialogue-heading { text-align:center; }
+.dialogue-page .dialogue-heading .cinema-eyebrow { justify-content:center; }
+.dialogue-page .dialogue-heading h1 { color:#f3e7c9; }
+.dialogue-page .dialogue-heading > p:last-child { color:#c3bba7; }
+.clapperboard-compact { margin:0; width:82%; padding-top:24px; filter:drop-shadow(0 5px 5px #0008); }
+.clapperboard-compact .clapper-top { height:20px; background-size:70px 100%; transform:rotate(-5deg); animation:none; }
+.clapperboard-compact .clapper-fixed { top:22px;height:16px; }
+.clapperboard-compact .clapper-hinge { top:10px;width:28px;height:29px;border-radius:4px 12px 3px 3px; }
+.clapperboard-compact .clapper-hinge i { width:4px;height:4px; }
+.clapperboard-compact .clapper-hinge i:nth-child(1){left:4px;top:4px}.clapperboard-compact .clapper-hinge i:nth-child(2){left:4px;bottom:4px}.clapperboard-compact .clapper-hinge i:nth-child(3){right:4px;bottom:4px}
+.clapperboard-compact .clapper-body { padding:20px 12px 8px; border-radius:0 0 6px 6px; }
+.clapperboard-compact .clapper-meta { font-size:7px;padding-bottom:4px;letter-spacing:1px; }
+.clapperboard-compact .clapper-body blockquote { min-height:0; padding:8px 0; font:italic 19px/1.2 Georgia,serif; }
+.clapperboard-compact .clapper-footer { font-size:6px;letter-spacing:1px;padding-top:4px; }
+.game-tile-clapper-art { display:flex; justify-content:center; align-items:center; background:radial-gradient(ellipse,#3a4031,#1b211b); }
+@keyframes clapper-snap { 0%{transform:rotate(-12deg)} 48%{transform:rotate(0)} 65%{transform:rotate(-1deg)} 100%{transform:rotate(-3deg)} }
+@media(max-width:600px){.clapperboard:not(.clapperboard-compact){margin-top:36px}.clapper-body{padding:44px 18px 18px}.clapper-body blockquote{min-height:150px;padding:20px 0;font-size:25px}.clapper-meta{font-size:10px}.clapper-footer{font-size:8px;letter-spacing:1px}}
+@media(prefers-reduced-motion:reduce){.clapper-top{animation:none}}
+.cinema-game-tile-dialogue .game-tile-artwork { height:54%; }
+.cinema-game-tile-dialogue.game-tile-illustrated .game-tile-top { visibility:hidden; }
+@media(max-width:480px){.clapperboard-compact .clapper-body blockquote{font-size:14px}.clapperboard-compact .clapper-footer{display:none}.clapperboard-compact .clapper-body{padding-bottom:5px}}
+.cinema-home.dialogue-page { background:radial-gradient(ellipse at 50% 35%,#303729,transparent 65%),#171c19; }
+.dialogue-page .dialogue-answer form > label { font-family:Georgia,serif; color:#eee1c3; }
+.dialogue-page .dialogue-input-row input { background:#151b17; color:#f1e6cd; border-color:#a58c56; font-family:inherit; }
+.dialogue-page .dialogue-input-row button { background:linear-gradient(#d6b873,#b8944c); color:#211e16; border-color:#bda065; }
+.dialogue-page .dialogue-form-bottom button { color:#e5cc99; border-color:#a58c56; }
+/* Give the playable board more vertical space without enlarging home cards. */
+.clapperboard:not(.clapperboard-compact) .clapper-body blockquote { min-height: 240px; padding-block: 36px; }
+@media(max-width:600px) {
+ .clapperboard:not(.clapperboard-compact) .clapper-body blockquote { min-height: 210px; padding-block: 28px; }
+}
+/* A taller miniature slate on the dialogue game card. */
+.clapperboard-compact .clapper-body blockquote { min-height: 36px; padding-block: 12px; }
+@media(max-width:480px) {
+ .clapperboard-compact .clapper-body blockquote { min-height: 24px; padding-block: 8px; }
+}
+.clapperboard-compact .clapper-body blockquote { min-height: 62px; padding-block: 14px; }
+@media(max-width:700px) {
+ .clapperboard-compact .clapper-body blockquote { min-height: 40px; padding-block: 10px; }
+}
+@media(max-width:480px) {
+ .clapperboard-compact .clapper-body blockquote { min-height: 32px; padding-block: 8px; }
+}
+/* Taller front-page clapperboard, kept within the artwork area. */
+.cinema-game-tile-dialogue .game-tile-artwork { height: 60%; }
+.clapperboard-compact .clapper-body blockquote { min-height: 86px; padding-block: 16px; }
+@media(max-width:700px) {
+ .clapperboard-compact .clapper-body blockquote { min-height: 54px; padding-block: 12px; }
+}
+@media(max-width:480px) {
+ .clapperboard-compact .clapper-body blockquote { min-height: 44px; padding-block: 8px; }
+}

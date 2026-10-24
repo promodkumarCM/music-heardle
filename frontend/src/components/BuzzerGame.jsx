@@ -30,8 +30,8 @@ export default function BuzzerGame(){
  const allBlocked=room&&room.blocked.length===room.teams.length
 
  const selected=room?.game||game
- const titles={pictures:<>One picture.<br/><em>Which movie?</em></>,lyrics:<>Know the words?<br/><em>Fill the silence.</em></>,dialogue:<>One line.<br/><em>A whole movie.</em></>,clues:<>Five clues.<br/><em>One movie.</em></>}
- const heading={"pictures":["02","THE PICTURE CLUE","Look closely. Name the film."],"dialogue":["02","THE DIALOGUE ROUND","You remember the dialogue. Can you name the film?"],"clues":["03","THE FIVE-CLUE MYSTERY","The sooner it clicks, the more points you earn."],"lyrics":["04","THE MISSING LYRICS","Full lyrics · Blanks in two sections · 10 points per word"]}[selected]
+ const titles={pictures:<>One picture.<br/><em>Which movie?</em></>,lyrics:<>Missing Lyrics</>,dialogue:<>Guess the Movie</>,clues:<>Five clues.<br/><em>One movie.</em></>}
+ const heading={"pictures":["02","THE PICTURE CLUE","Look closely. Name the film."],"dialogue":["02","THE DIALOGUE ROUND","One dialogue. One unforgettable film."],"clues":["04","THE FIVE-CLUE MYSTERY","The sooner it clicks, the more points you earn."],"lyrics":["05","THE MISSING LYRICS","Complete the song. Bring the scene back."]}[selected]
  const phase=room?.phase
  const status=phase==='open'?'Buzzers open!':phase==='answering'?room.teams[room.winner.team].name+' buzzed first!':phase==='settled'?'Round settled':allBlocked?'All teams have tried.':'Buzzers closed'
  return <main className={selected==='song'?'app buzzer-page buzzer-integrated':'cinema-home buzzer-page buzzer-integrated '+(selected==='pictures'?'picture-page':selected==='dialogue'?'dialogue-page':selected==='clues'?'clue-page':'lyrics-page')}><div className="dialogue-shell">

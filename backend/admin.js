@@ -1,3 +1,4 @@
+import {imageBody,uploadImage,uploadError} from './pictureUploads.js'
 import express from 'express'
 import {randomBytes,scryptSync,timingSafeEqual} from 'node:crypto'
 import {pool} from './db.js'
@@ -15,6 +16,7 @@ router.post('/login',(req,res)=>{
  attempts.delete(ip);const token=randomBytes(32).toString('hex');sessions.set(token,now+2*60*60*1000);res.json({token})
 })
 router.use((req,res,next)=>{const token=req.get('Authorization')?.replace(/^Bearer /,'');if(!token||!sessions.has(token)||sessions.get(token)<Date.now()){if(token)sessions.delete(token);return res.status(401).json({error:'Please sign in.'})}req.adminToken=token;next()})
+router.post('/picture-upload',imageBody,uploadImage,uploadError)
 router.post('/logout',(req,res)=>{sessions.delete(req.adminToken);res.json({ok:true})})
 router.get('/session',(req,res)=>res.json({username}))
 function validate(kind,input){
@@ -35,8 +37,8 @@ function validate(kind,input){
  }
  if(kind==='songs'&&!/^[A-Za-z0-9_-]{11}$/.test(out.youtube_id))throw Error('YouTube ID must contain 11 characters.')
  if(out.source_url&&!/^https?:\/\//i.test(out.source_url))throw Error('Source URL must begin with https:// or http://.')
- if(out.mobile_image_url&&!/^(https?:\/\/|\/picture-clues\/)/i.test(out.mobile_image_url))throw Error('Use an image URL or /picture-clues/ path.')
- if(out.image_url&&!/^(https?:\/\/|\/picture-clues\/)/i.test(out.image_url))throw Error('Use an HTTPS image URL or /picture-clues/ path.')
+ if(out.mobile_image_url&&!/^(https?:\/\/|\/uploads\/picture-clues\/|\/picture-clues\/)/i.test(out.mobile_image_url))throw Error('Use an image URL or /picture-clues/ path.')
+ if(out.image_url&&!/^(https?:\/\/|\/uploads\/picture-clues\/|\/picture-clues\/)/i.test(out.image_url))throw Error('Use an HTTPS image URL or /picture-clues/ path.')
  return out
 }
 router.use('/:kind',(req,res,next)=>{if(!Object.hasOwn(definitions,req.params.kind))return res.status(404).json({error:'Unknown catalog.'});const d=definitions[req.params.kind];req.definition=d;req.kind=req.params.kind;next()})

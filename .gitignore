@@ -7,3 +7,6 @@ dist/
 .DS_Store
 Thumbs.db
 
+
+backend/uploads/
+uploads/

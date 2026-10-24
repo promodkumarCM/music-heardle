@@ -1,3 +1,4 @@
+import Clapperboard from './Clapperboard'
 import GameModes from './GameModes'
 import { useEffect, useRef, useState } from 'react'
 import { fetchDialogues, guessDialogue } from '../lib/api'
@@ -84,22 +85,11 @@ export default function DialogueGame() {
     <main className="cinema-home dialogue-page">
       <div className="dialogue-shell">
         <header className="dialogue-nav"><a href="#">← All games</a><span>PADAM / GAME 03</span></header>
-        <div className="dialogue-heading"><p className="cinema-eyebrow">THE DIALOGUE ROUND</p><h1>One line.<br /><em>A whole movie.</em></h1><p>You remember the dialogue. Can you name the film?</p></div>
+        <div className="dialogue-heading"><p className="cinema-eyebrow">THE DIALOGUE ROUND</p><h1>Guess the Movie</h1><p>One dialogue. One unforgettable film.</p></div>
  <GameModes game="dialogue" />
-        <div className="script-page-stack" aria-busy={!!turningPage}>
-        <section ref={targetRef} className="dialogue-screen" aria-label="Movie dialogue clue">
-          <RoundFeedback feedback={feedback} />
-          <div className="cinema-reel" aria-hidden="true"><i /><i /><i /><i /><b /></div>
-          <div className="dialogue-screen-meta"><span>SCENE {String(round + 1).padStart(2, '0')}</span><span>MALAYALAM CINEMA</span></div>
-          {loading ? <p className="dialogue-loading" role="status">Setting the scene…</p> : clue ? <blockquote key={clue.id}><span aria-hidden="true">“</span>{clue.dialogue}</blockquote> : <p className="dialogue-loading">No dialogue loaded.</p>}
-          <div className="dialogue-screen-footer"><span>READ IT. HEAR IT IN YOUR HEAD.</span><span>{solved} SOLVED THIS VISIT</span></div>
-        </section>
-        {turningPage && <div className="dialogue-screen script-turning-page" aria-hidden="true" onAnimationEnd={event => { if (event.target === event.currentTarget) finishPageTurn() }}>
-          <div className="dialogue-screen-meta"><span>SCENE {String(turningPage.round + 1).padStart(2, '0')}</span><span>MALAYALAM CINEMA</span></div>
-          <blockquote><span>“</span>{turningPage.dialogue}</blockquote>
-          <div className="dialogue-screen-footer"><span>READ IT. HEAR IT IN YOUR HEAD.</span><span>{turningPage.solved} SOLVED THIS VISIT</span></div>
-        </div>}
-        </div>
+        <Clapperboard round={round+1} targetRef={targetRef} feedback={<RoundFeedback feedback={feedback}/>} footer={solved+' SOLVED · NAME THE MOVIE'}>
+          {loading ? <span role="status">Setting the scene…</span> : clue?.dialogue || 'No dialogue loaded.'}
+        </Clapperboard>
         <section className="dialogue-answer" aria-label="Your answer">
           {result ? <div className="dialogue-result" role="status"><span className="cinema-eyebrow">{result.correct ? '✦ THAT’S A WRAP. YOU GOT IT!' : 'THE FILM BEHIND THE LINE'}</span><h2>{result.movie}</h2><button onClick={next}>{round + 1 === clues.length ? 'Play another set' : 'Next dialogue'} <span aria-hidden="true">→</span></button></div>
             : clue && !loading ? <form autoComplete="off" onSubmit={e => { e.preventDefault(); answer() }}><label htmlFor="movie-guess">Which movie is this from?</label><div className="dialogue-input-row"><input ref={inputRef} id="movie-guess" autoComplete="off" spellCheck={false} maxLength={255} placeholder="Type the movie name…" value={guess} onChange={e => { setGuess(e.target.value); setMessage('') }} disabled={busy || !!turningPage} /><button type="submit" disabled={busy || !!turningPage || !guess.trim()}>{busy ? 'Checking…' : 'Check answer'} <span aria-hidden="true">→</span></button></div><div className="dialogue-form-bottom"><span>English or Malayalam titles accepted.</span><button type="button" disabled={busy || !!turningPage} onClick={next}>Skip dialogue →</button><button type="button" disabled={busy || !!turningPage} onClick={() => answer(true)}>Reveal movie</button></div></form> : null}

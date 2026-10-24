@@ -23,6 +23,17 @@ router.post('/start', async (req,res) => {
     res.json(snapshot(round))
   } catch(error) { console.error(error.message);res.status(503).json({error:'Could not start a puzzle. Please try again.'}) }
 })
+router.post('/:token/suggestions', (req,res) => {
+  const round=rounds.get(req.params.token)
+  if(!round||round.expires<Date.now()) return res.status(410).json({error:'This round expired.'})
+  const query=req.body?.query
+  if(typeof query!=='string'||query.length>255) return res.status(400).json({error:'Enter a movie name.'})
+  const q=query.trim().normalize('NFKC').toLowerCase()
+  if(q.length<2)return res.json({titles:[]})
+  const titles=[...new Set(round.catalog.filter(row=>[row.movie,...(row.aliases||[])].some(name=>String(name).normalize('NFKC').toLowerCase().includes(q))).map(row=>row.movie))]
+    .sort((a,b)=>Number(b.toLowerCase().startsWith(q))-Number(a.toLowerCase().startsWith(q))||a.localeCompare(b)).slice(0,8)
+  res.json({titles})
+})
 router.post('/:token/:action', (req,res) => {
   const round=rounds.get(req.params.token)
   if(!round||round.expires<Date.now()) return res.status(410).json({error:'This round expired. Start a new movie.'})

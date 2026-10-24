@@ -1,3 +1,6 @@
+import FilmClues from './FilmClues'
+import LyricsStudio from './LyricsStudio'
+import Clapperboard from './Clapperboard'
 import PictureStage from './PictureStage'
 import './PictureGame.css'
 import {useEffect,useRef,useState} from 'react'
@@ -19,8 +22,8 @@ export default function BuzzerStage({game,room,busy,act}){
    <div className="radio-game-panel"><div className="pills">{DIFFICULTIES.map(d=><button key={d.name} className="pill" aria-pressed={duration===d.snippetSeconds} disabled={!live||busy||room.phase==='answering'} onClick={()=>setDuration(d.snippetSeconds)}>{d.name}</button>)}</div><div className="progress-track"><div className="progress-fill" style={{width:`${duration/12*100}%`}} />{DIFFICULTIES.map(d=><div className="progress-tick" key={d.name} style={{left:`${d.snippetSeconds/12*100}%`}} />)}</div><div className="score-row"><span>{duration}s clip</span><span>100 points per answer</span></div></div>
   </Radio><Player ref={player} onReady={()=>setReady(true)} onPlaybackStatus={setMessage} onUnplayable={()=>setMessage('Clip unavailable. Skip this round.')} />
  </>
- if(game==='dialogue')return <div className="script-page-stack"><section key={room?.round} className="dialogue-screen"><div className="dialogue-screen-meta"><span>SCENE {String(room?.round||1).padStart(2,'0')}</span><span>MALAYALAM CINEMA</span></div><blockquote><span aria-hidden="true">“</span>{live?room.content:'Your next scene awaits your teams.'}</blockquote><div className="dialogue-screen-footer"><span>READ IT. HEAR IT IN YOUR HEAD.</span><span>100 POINTS</span></div></section></div>
- if(game==='clues')return <section className="clue-case"><div className="clue-steps">{[100,80,60,40,20].map((n,i)=><span className={room?.clue===i+1?'current':''} key={n}>CLUE {i+1}<b>{n} pts</b></span>)}</div><ol className="clue-list">{Array.from({length:5},(_,i)=><li key={`${room?.round}-${i}`} className={live&&i<room.content.length?'unlocked':'locked'}><span className="clue-number">0{i+1}</span><p>{live?room.content[i]||'Clue not yet revealed':'Clue not yet revealed'}</p></li>)}</ol></section>
- if(game==='lyrics')return <section className="clue-case lyrics-sheet">{live?room.content.map((s,i)=><p className="lyrics-stanza" key={i}>{s.map((w,j)=>w.id===undefined?<span key={j}>{w.text}</span>:<button className={`lyrics-blank ${room.active===w.id?'active-blank':''}`} key={j} disabled={busy||!!room.settled[w.id]||!['closed','settled'].includes(room.phase)} onClick={()=>act('select',{id:w.id})}><sup>{w.id+1}</sup>{w.text||'-----'}</button>)}</p>):<p className="lyrics-stanza">Invite your teams. Pick a missing word. Open the buzzer.</p>}</section>
+ if(game==='dialogue')return <Clapperboard round={room?.round||1} footer="100 POINTS · NAME THE MOVIE">{live?room.content:'Your next scene awaits your teams.'}</Clapperboard>
+ if(game==='clues')return <FilmClues clues={live?room.content:[]} roundKey={room?.round} busy={busy}/>
+ if(game==='lyrics')return <LyricsStudio round={room?.round||1}>{live?room.content.map((s,i)=><p className="lyrics-stanza" key={i}>{s.map((w,j)=>w.id===undefined?<span key={j}>{w.text}</span>:<button className={`lyrics-blank ${room.active===w.id?'active-blank':''}`} key={j} disabled={busy||!!room.settled[w.id]||!['closed','settled'].includes(room.phase)} onClick={()=>act('select',{id:w.id})}><sup>{w.id+1}</sup>{w.text||'-----'}</button>)}</p>):<p className="lyrics-stanza">Invite your teams. Pick a missing word. Open the buzzer.</p>}</LyricsStudio>
  return <section className="clue-case"><p>Ask your question aloud, then open the buzzer.</p></section>
 }

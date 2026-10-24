@@ -1,3 +1,4 @@
+import FilmClues from './FilmClues'
 import GameModes from './GameModes'
 import { useEffect, useRef, useState } from 'react'
 import { clueGameRequest } from '../lib/api'
@@ -13,8 +14,26 @@ export default function ClueGame() {
   const autoIssued=useRef(false)
   const actRef=useRef(null)
   const [round,setRound]=useState(null)
+  const [setupOpen,setSetupOpen]=useState(true)
+  const setupDialog=useRef(null)
+  useEffect(()=>{
+    const dialog=setupDialog.current
+    if(!dialog)return
+    if(!round&&setupOpen&&!dialog.open)dialog.showModal()
+    else if((round||!setupOpen)&&dialog.open)dialog.close()
+  },[round,setupOpen])
   const [guess,setGuess]=useState('')
-  const [busy,setBusy]=useState(true)
+  const [suggestions,setSuggestions]=useState([])
+  useEffect(()=>{
+    setSuggestions([])
+    if(!round||round.status!=='active'||guess.trim().length<2)return
+    const controller=new AbortController()
+    const timer=setTimeout(()=>clueGameRequest(round.token+'/suggestions',{query:guess},controller.signal)
+      .then(data=>{if(!controller.signal.aborted)setSuggestions(data.titles||[])})
+      .catch(()=>{}),200)
+    return()=>{clearTimeout(timer);controller.abort()}
+  },[guess,round?.token,round?.status])
+  const [busy,setBusy]=useState(false)
   const [error,setError]=useState('')
   const [message,setMessage]=useState('')
   const [expired,setExpired]=useState(false)
@@ -22,12 +41,7 @@ export default function ClueGame() {
   const credited=useRef(new Set())
   const lock=useRef(false)
   const alive=useRef(true)
-  useEffect(()=>{
-    alive.current=true
-    const controller=new AbortController()
-    clueGameRequest('start',{},controller.signal).then(data=>{if(!controller.signal.aborted)setRound(data)}).catch(err=>{if(!controller.signal.aborted)setError(err.message)}).finally(()=>{if(!controller.signal.aborted)setBusy(false)})
-    return ()=>{alive.current=false;controller.abort()}
-  },[])
+  useEffect(()=>{alive.current=true;return()=>{alive.current=false}},[])
   async function act(action) {
     if(lock.current||busy) return
     lock.current=true;setBusy(true);setError('');setMessage('')
@@ -70,37 +84,37 @@ export default function ClueGame() {
     <header className="dialogue-nav"><a href="#">← All games</a><span>PADAM / GAME 04</span></header>
     <div className="dialogue-heading"><p className="cinema-eyebrow">THE FIVE-CLUE MYSTERY</p><h1>Five clues.<br/><em>One movie.</em></h1><p>The sooner it clicks, the more points you earn.</p></div>
  <GameModes game="clues" />
-    <div className="clue-timer-settings">
-      <label htmlFor="clue-timer">Timer per clue</label>
-      <select id="clue-timer" value={timerChoice} disabled={busy} onChange={e=>{setTimerChoice(e.target.value);setTimerSeconds(e.target.value==='custom'?0:Number(e.target.value))}}>
-        <option value="0">Off · play at your pace</option>
-        {[10,20,30,45,60].map(seconds=><option key={seconds} value={seconds}>{seconds} seconds</option>)}
-        <option value="custom">Custom time…</option>
-      </select>
-      {timerChoice==='custom'&&<form className="clue-custom-timer" onSubmit={e=>{e.preventDefault();if(validCustom&&!busy)setTimerSeconds(Number(customSeconds))}}>
-        <label htmlFor="custom-clue-seconds">Seconds per clue</label>
-        <input id="custom-clue-seconds" type="number" inputMode="numeric" min="1" max="600" step="1" required value={customSeconds} disabled={busy} onChange={e=>setCustomSeconds(e.target.value)} aria-describedby="custom-timer-help" />
-        <button disabled={busy||!validCustom||timerSeconds===Number(customSeconds)}>Apply</button>
-        <span id="custom-timer-help">Enter 1–600 seconds.{timerSeconds>0?` Active: ${timerSeconds}s per clue.`:' Press Apply to start.'}</span>
-      </form>}
-      <p>{timerSeconds?'Each new clue gets a fresh timer. Clue five expires into the answer.':'Turn on a timer to reveal clues automatically.'}</p>
-    </div>
+    {!round&&<><button className="buzzer-setup-launch" onClick={()=>setSetupOpen(true)}>Set up game</button><dialog ref={setupDialog} className="buzzer-setup-dialog clue-timer-dialog" aria-labelledby="clue-setup-title" onCancel={()=>setSetupOpen(false)} onClose={()=>setSetupOpen(false)}>
+      <div className="buzzer-dialog-heading"><h2 id="clue-setup-title">Before the first clue</h2><button aria-label="Close timer setup" disabled={busy} onClick={()=>setSetupOpen(false)}>×</button></div>
+      <form onSubmit={e=>{e.preventDefault();if(timerChoice==='custom'&&!validCustom)return;setTimerSeconds(timerChoice==='custom'?Number(customSeconds):Number(timerChoice));act('start')}}>
+        <label htmlFor="clue-timer">Timer per clue</label>
+        <select id="clue-timer" value={timerChoice} disabled={busy} onChange={e=>setTimerChoice(e.target.value)}>
+          <option value="0">Off · play at your pace</option>
+          {[10,20,30,45,60].map(seconds=><option key={seconds} value={seconds}>{seconds} seconds</option>)}
+          <option value="custom">Custom time…</option>
+        </select>
+        {timerChoice==='custom'&&<label>Seconds per clue<input type="number" min="1" max="600" required value={customSeconds} disabled={busy} onChange={e=>setCustomSeconds(e.target.value)}/></label>}
+        <p>Choose your pace. The first clue appears when you start. A timer automatically reveals the next clue, then the answer after clue five.</p>
+        <button disabled={busy||(timerChoice==='custom'&&!validCustom)}>{busy?'Loading…':'Start · reveal first clue'}</button>
+      </form>
+      {error&&<p role="alert">{error}</p>}
+    </dialog></>}
+    <FilmClues targetRef={targetRef} clues={round?.clues||[]} roundKey={round?.token} busy={busy} feedback={<RoundFeedback feedback={feedback}/>} />
+    {active&&!expired&&<div className="clue-board-controls">
+      <span>{timerSeconds?timerSeconds+'s per clue':'Timer off'}</span>
+      {round.clues.length<5?<button disabled={busy} onClick={()=>act('next')}>Next clue · {round.availablePoints-20} pts →</button>:<button disabled={busy} onClick={()=>act('reveal')}>Reveal movie →</button>}
+    </div>}
     {timerSeconds>0&&active&&!expired&&<div className={'clue-countdown'+(remaining<=5?' urgent':'')}>
       <span>{error?'Timer paused — use the buttons below to retry.':round.clues.length<5?'NEXT CLUE IN':'ANSWER REVEALS IN'}</span>
       <strong role="timer" aria-label="Seconds remaining">{remaining}s</strong>
       <div className="clue-clock-track"><div style={{width:Math.min(100,remaining/timerSeconds*100)+'%'}} /></div>
     </div>}
     <div className="clue-score"><span>THIS VISIT <strong>{score} pts</strong></span><span>{active?'UP FOR GRABS':'ROUND SCORE'} <strong>{active?round.availablePoints:round?.points||0} pts</strong></span></div>
-    <section ref={targetRef} className="clue-case" aria-label="Movie clues" aria-busy={busy}>
-      <RoundFeedback feedback={feedback} />
-      <div className="clue-steps" aria-label="Points by clue">{[100,80,60,40,20].map((points,i)=><span key={points} className={round?.clues.length===i+1?'current':''}>CLUE {i+1}<b>{points} pts</b></span>)}</div>
-      {round?<ol className="clue-list">{Array.from({length:5},(_,i)=><li key={`${round.token}-${i}`} className={i<round.clues.length?'unlocked':'locked'}><span className="clue-number">0{i+1}</span><p>{round.clues[i]||'Clue not yet revealed'}</p>{i<round.clues.length && <span className="clue-reveal-cover" aria-hidden="true"><span>CLUE 0{i+1}</span><span className="clue-cover-seal">✦</span></span>}</li>)}</ol>:<p className="clue-wait" role="status">{busy?'Opening the case…':'The case could not be opened.'}</p>}
-    </section>
     <section className="dialogue-answer" aria-label="Movie answer">
-      {active&&!expired?<form autoComplete="off" onSubmit={e=>{e.preventDefault();act('guess')}}><label htmlFor="clue-guess">Which movie connects the clues?</label><div className="dialogue-input-row"><input id="clue-guess" value={guess} onChange={e=>setGuess(e.target.value)} maxLength={255} autoComplete="off" placeholder="Type the movie name…" disabled={busy}/><button disabled={busy||!guess.trim()}>Check answer →</button></div><div className="clue-actions"><button type="button" disabled={busy} onClick={()=>act('skip')}>Skip movie →</button><span>Small spelling mistakes are accepted. No name suggestions.</span>{round.clues.length<5?<button type="button" disabled={busy} onClick={()=>act('next')}>Next clue · {round.availablePoints-20} pts</button>:<button type="button" disabled={busy} onClick={()=>act('reveal')}>Give up & reveal movie</button>}</div></form>:round&&!expired?<div className="dialogue-result" role="status"><p className="cinema-eyebrow">{round.status==='correct'?`CASE CLOSED · +${round.points} POINTS`:'THE ANSWER WAS'}</p><h2>{round.movie}</h2><button disabled={busy} onClick={()=>act('start')}>Next movie →</button></div>:null}
+      {active&&!expired?<form autoComplete="off" onSubmit={e=>{e.preventDefault();act('guess')}}><label htmlFor="clue-guess">Which movie connects the clues?</label><div className="dialogue-input-row"><input id="clue-guess" list="clue-movie-suggestions" value={guess} onChange={e=>setGuess(e.target.value)} maxLength={255} autoComplete="off" placeholder="Type the movie name…" disabled={busy}/><datalist id="clue-movie-suggestions">{suggestions.map(title=><option key={title} value={title}/>)}</datalist><button disabled={busy||!guess.trim()}>Check answer →</button></div><div className="clue-actions"><button type="button" disabled={busy} onClick={()=>act('skip')}>Skip movie →</button><span>Type at least 2 characters for movie suggestions. Small spelling mistakes are accepted.</span></div></form>:round&&!expired?<div className="dialogue-result" role="status"><p className="cinema-eyebrow">{round.status==='correct'?`CASE CLOSED · +${round.points} POINTS`:'THE ANSWER WAS'}</p><h2>{round.movie}</h2><button disabled={busy} onClick={()=>act('start')}>Next movie →</button></div>:null}
       {message&&<p className="dialogue-feedback" role="status">{message}</p>}
       {error&&<p className="dialogue-feedback" role="alert">{error}</p>}
-      {(!round||expired)&&!busy&&<button onClick={()=>act('start')}>{expired?'Start a new movie':'Retry'}</button>}
+      {expired&&!busy&&<button onClick={()=>act('start')}>{expired?'Start a new movie':'Retry'}</button>}
     </section><footer className="dialogue-endnote">100 → 80 → 60 → 40 → 20 points · Reveal unlocks after clue five.</footer>
   </div></main>
 }
