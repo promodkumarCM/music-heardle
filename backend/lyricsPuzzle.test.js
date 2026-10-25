@@ -53,3 +53,27 @@ test('short lyrics cannot produce undersized rounds',()=>{
   assert.throws(()=>puzzle(['കാറ്റ് മഴ']))
   assert.throws(()=>puzzle(sections,'invalid'))
 })
+
+function assertSeparated(result) {
+ const words=result.flat().filter(word=>/[\p{L}\p{M}\p{N}]/u.test(word.text))
+ for(let i=1;i<words.length;i++)assert.ok(words[i-1].id===undefined||words[i].id===undefined,'Consecutive words must not both be hidden')
+}
+test('never hides consecutive words, including across lines and stanzas',()=>{
+ for(const song of [sections,[sections.join('\n')],...songs.filter(canMakePuzzle)]) {
+  for(const difficulty of ['easy','medium','hard'])for(let run=0;run<30;run++)assertSeparated(puzzle(song,difficulty))
+ }
+})
+test('requires ten spaced candidates and avoids random selection dead ends',()=>{
+ const unique=sections[0].split(' ')
+ assert.equal(canMakePuzzle([unique.slice(0,10).join(' ')]),false)
+ assert.throws(()=>puzzle([unique.slice(0,10).join(' ')]))
+ const nineteen=[...unique,...sections[1].split(' ').slice(0,3)]
+ for(const song of [[nineteen.join(' ')],nineteen]) {
+  assert.equal(canMakePuzzle(song),true)
+  for(let run=0;run<30;run++) {
+   const result=puzzle(song)
+   assert.equal(result.flat().filter(word=>word.id!==undefined).length,10)
+   assertSeparated(result)
+  }
+ }
+})

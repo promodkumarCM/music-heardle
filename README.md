@@ -82,10 +82,12 @@ option, not a server-enforced competitive time limit.
 ## Missing Lyrics
 
 Open `/#lyrics-game` for Solo, or choose Host or Buzzer in the mode selector.
-Every song hides exactly ten unique Malayalam words. Easy prefers the first
-two stanzas, Medium the middle, and Hard the final stanzas, using nearby stanzas
-when the preferred region lacks enough unique words. Songs with fewer than ten
-eligible words are excluded. Repeated answers are never left visible elsewhere.
+Every song hides exactly ten unique Malayalam words, with at least one visible
+word between blanks, including across line and stanza boundaries. Easy prefers
+the beginning, Medium the middle, and Hard the ending, targeting six blanks in
+the preferred third and two in each other third where spacing permits. Songs
+without ten eligible, non-consecutive words are excluded. Repeated answers are
+never left visible elsewhere.
 Each correct word earns ten points. Malayalam Unicode and punctuation are
 normalized; missing words require Malayalam spelling. Words are played in order.
 
