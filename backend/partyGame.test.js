@@ -7,7 +7,7 @@ import router from './partyGame.js'
 test('room API supports all games, host scoring, creator participation, and score-preserving game changes',async()=>{
   const original=pool.query
   const lyric=Array.from({length:4},(_,s)=>Array.from({length:12},(_,w)=>'വാക്ക്'+String.fromCharCode(0x0d15+s)+String.fromCharCode(0x0d15+w)).join(' '))
-  pool.query=async sql=>[sql.includes('SELECT movie,aliases')?[]:sql.includes('picture_puzzles')?[{id:1,movie:'Movie',image_url:'/image.png'}]:sql.includes('lyric_songs')?[{id:1,sections:lyric}]:sql.includes('movie_puzzles')?[{id:1,movie:'Movie',clues:['1','2','3','4','5']}]:sql.includes('dialogues')?[{id:1,movie:'Movie',dialogue:'A line'}]:[{id:1,title:'Song',movie:'Movie',youtube_id:'abc'}]]
+  pool.query=async sql=>[sql.includes('SELECT movie,aliases')?[]:sql.includes('picture_puzzles')?[{id:1,movie:'Movie',image_url:'/image.png'}]:sql.includes('lyric_songs')?[{id:1,sections:lyric}]:sql.includes('movie_puzzles')?[{id:1,movie:'Movie',clues:['1','2','3','4','5']}]:sql.includes('dialogues')?[{id:1,movie:'Movie',dialogue:'A line',dialogue_english:'An English line'}]:[{id:1,title:'Song',movie:'Movie',youtube_id:'abc'}]]
   const app=express();app.use(express.json());app.use('/party-game',router)
   const server=app.listen(0,'127.0.0.1');await new Promise(resolve=>server.once('listening',resolve))
   const base=`http://127.0.0.1:${server.address().port}/party-game`
@@ -16,6 +16,7 @@ test('room API supports all games, host scoring, creator participation, and scor
     for(const game of ['pictures','song','dialogue','clues','lyrics']) {
       const {status,data:r}=await post('/rooms',{mode:'host',game,teams:['A','B','C','D'],difficulty:'hard'})
       assert.equal(status,201);assert.equal(r.phase,'closed');assert.equal(r.teams.length,4)
+      if(game==='dialogue')assert.equal(r.dialogueEnglish,'An English line')
       if(game==='lyrics')assert.equal(r.content.flat().filter(w=>w.id!==undefined).length,10)
     }
     let {data:host}=await post('/rooms',{mode:'host',game:'pictures',teams:['A','B']})

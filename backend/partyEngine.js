@@ -90,7 +90,7 @@ export function partyView(room,player,now=Date.now()) {
     :room.game==='clues'?room.content.slice(0,room.clue):room.content
   return {code:room.code,mode:room.mode,game:room.game,difficulty:room.difficulty,host,creator:player.id===room.creator,
     me:player.id,team:player.team,phase:room.phase,round:room.round,version:room.version,seconds:room.seconds,
-    content,mobileImage:room.mobileImage,active:room.active,settled:room.settled,blocked:room.blocked,
+    content,dialogueEnglish:room.game==='dialogue'&&room.phase!=='lobby'?room.dialogueEnglish:undefined,mobileImage:room.mobileImage,active:room.active,settled:room.settled,blocked:room.blocked,
     winner:room.winner,deadline:room.deadline,serverNow:now,notice:room.notice,clue:room.clue,skipVotes:room.skipVotes||[],
     teams:room.teams.map(({name,score})=>({name,score})),players:room.players.map(({id,name,team})=>({id,name,team})),
     complete:room.game!=='lyrics'||Object.keys(room.settled).length===10,

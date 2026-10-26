@@ -1,10 +1,11 @@
+import {validateDialogueVariants} from './dialogueVariants.js'
 import {imageBody,uploadImage,uploadError} from './pictureUploads.js'
 import express from 'express'
 import {randomBytes,scryptSync,timingSafeEqual} from 'node:crypto'
 import {pool} from './db.js'
 const router=express.Router(), sessions=new Map(), attempts=new Map()
 const username=process.env.ADMIN_USERNAME||'admin', passwordHash=scryptSync(process.env.ADMIN_PASSWORD||'admin','padam-admin',32)
-const definitions={pictures:{table:'picture_puzzles',fields:['movie','aliases','image_url','mobile_image_url']},songs:{table:'songs',fields:['title','movie','youtube_id','release_year']},dialogues:{table:'dialogues',fields:['movie','dialogue','aliases','source_url']},clues:{table:'movie_puzzles',fields:['movie','aliases','clues']},lyrics:{table:'lyric_songs',fields:['title','sections']}}
+const definitions={pictures:{table:'picture_puzzles',fields:['movie','aliases','image_url','mobile_image_url']},songs:{table:'songs',fields:['title','movie','youtube_id','release_year']},dialogues:{table:'dialogues',fields:['movie','dialogue','dialogue_english','aliases','source_url','dialogue_variants']},clues:{table:'movie_puzzles',fields:['movie','aliases','clues']},lyrics:{table:'lyric_songs',fields:['title','sections']}}
 const parse=value=>typeof value==='string'?JSON.parse(value):value
 router.use((req,res,next)=>{res.set('Cache-Control','no-store');next()})
 router.post('/login',(req,res)=>{
@@ -20,9 +21,14 @@ router.post('/picture-upload',imageBody,uploadImage,uploadError)
 router.post('/logout',(req,res)=>{sessions.delete(req.adminToken);res.json({ok:true})})
 router.get('/session',(req,res)=>res.json({username}))
 function validate(kind,input){
+ if(kind==='dialogues'){
+  const pairs=validateDialogueVariants(input.dialogue_variants??[{dialogue:input.dialogue,dialogue_english:input.dialogue_english}])
+  input={...input,...pairs[0],dialogue_variants:pairs}
+ }
  const d=definitions[kind],out={}
- for(const field of d.fields){const value=field==='mobile_image_url'?(input[field]||''):input[field]
-  if(['aliases','clues','sections'].includes(field)){
+ for(const field of d.fields){const value=['mobile_image_url','dialogue_english'].includes(field)?(input[field]??''):input[field]
+  if(field==='dialogue_variants'){out[field]=JSON.stringify(value)}
+  else if(['aliases','clues','sections'].includes(field)){
    if(!Array.isArray(value)||value.length>100||value.some(s=>typeof s!=='string'||!s.trim()||s.length>20000))throw Error(`${field}: enter a valid list of text values.`)
    if(field==='clues'&&value.length!==5)throw Error('Exactly five clues are required.')
    if(field==='sections'){
@@ -33,7 +39,7 @@ function validate(kind,input){
    }
    out[field]=JSON.stringify(value.map(s=>s.trim()))
   }else if(field==='release_year'){if(value!==null&&(!Number.isInteger(value)||value<1900||value>2100))throw Error('Release year must be 1900–2100 or blank.');out[field]=value}
-  else{if(typeof value!=='string'||(!['source_url','mobile_image_url'].includes(field)&&!value.trim())||value.length>(field==='dialogue'?10000:['source_url','image_url','mobile_image_url'].includes(field)?600:255))throw Error(`Enter a valid ${field}.`);out[field]=value.trim()}
+  else{if(typeof value!=='string'||(!['source_url','mobile_image_url','dialogue_english'].includes(field)&&!value.trim())||value.length>(['dialogue','dialogue_english'].includes(field)?10000:['source_url','image_url','mobile_image_url'].includes(field)?600:255))throw Error(`Enter a valid ${field}.`);out[field]=value.trim()}
  }
  if(kind==='songs'&&!/^[A-Za-z0-9_-]{11}$/.test(out.youtube_id))throw Error('YouTube ID must contain 11 characters.')
  if(out.source_url&&!/^https?:\/\//i.test(out.source_url))throw Error('Source URL must begin with https:// or http://.')
@@ -42,7 +48,7 @@ function validate(kind,input){
  return out
 }
 router.use('/:kind',(req,res,next)=>{if(!Object.hasOwn(definitions,req.params.kind))return res.status(404).json({error:'Unknown catalog.'});const d=definitions[req.params.kind];req.definition=d;req.kind=req.params.kind;next()})
-router.get('/:kind',async(req,res)=>{try{const d=req.definition;const [rows]=await pool.query(`SELECT id, ${d.fields.join(',')} FROM ${d.table} ORDER BY id DESC`);res.json(rows.map(row=>{for(const f of ['aliases','clues','sections'])if(row[f]!==undefined)row[f]=parse(row[f]);return row}))}catch{res.status(503).json({error:'Could not load catalog.'})}})
+router.get('/:kind',async(req,res)=>{try{const d=req.definition;const [rows]=await pool.query(`SELECT id, ${d.fields.join(',')} FROM ${d.table} ORDER BY id DESC`);res.json(rows.map(row=>{for(const f of ['aliases','clues','sections','dialogue_variants'])if(row[f]!==undefined)row[f]=parse(row[f]);return row}))}catch{res.status(503).json({error:'Could not load catalog.'})}})
 async function save(req,res){
  let data;try{data=validate(req.kind,req.body)}catch(e){return res.status(400).json({error:e.message})}
  const d=req.definition,id=Number(req.params.id)

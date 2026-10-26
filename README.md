@@ -1,5 +1,14 @@
 # Malayalam Music Club
 
+Each movie supports up to 30 dialogue pairs in Admin → Dialogues. Use **Add
+dialogue** to enter another Malayalam line and its optional English version, then
+**Save changes**. Players can switch languages for the selected dialogue; all
+saved pairs are available as game clues. Existing single-dialogue entries remain
+usable. For an existing database, run
+`node --env-file=.env migrate-dialogue-variants.js` from `backend` before deploying
+the updated API. This adds nullable columns and preserves existing dialogue
+content. Restart the API after updating it.
+
 A Malayalam song guessing game with a vintage radio interface, five difficulty
 settings, a five-song queue, and a leaderboard on the same page.
 

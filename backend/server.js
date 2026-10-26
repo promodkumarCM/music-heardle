@@ -1,3 +1,4 @@
+import {expandDialogues} from './dialogueVariants.js'
 import {uploadDirectory} from './pictureUploads.js'
 import pictureGame from './pictureGame.js'
 import songGame from './songGame.js'
@@ -15,6 +16,7 @@ import { normalizeMovie, matchMovie } from './movieMatching.js'
 
 const app = express()
 app.use(cors())
+app.use('/admin',express.json({limit:'2mb'}))
 app.use(express.json())
 app.use('/uploads/picture-clues', express.static(uploadDirectory,{dotfiles:'deny',index:false,setHeaders:res=>res.set('X-Content-Type-Options','nosniff')}))
 app.use('/picture-game', pictureGame)
@@ -38,8 +40,8 @@ app.get('/movies', (req,res) => res.status(410).json({error:'Public catalog disa
 
 app.get('/dialogues', async (req, res) => {
   try {
-    const [rows] = await pool.query('SELECT id, dialogue FROM dialogues ORDER BY id')
-    res.set('Cache-Control', 'no-store').json(rows)
+    const [rows] = await pool.query('SELECT id, dialogue, dialogue_english, dialogue_variants FROM dialogues ORDER BY id')
+    res.set('Cache-Control', 'no-store').json(expandDialogues(rows).map(({id,dialogue,dialogue_english})=>({id,dialogue,dialogue_english})))
   } catch (error) {
     console.error('Dialogue catalog:', error.message)
     res.status(503).json({ error: 'Could not load dialogue clues.' })

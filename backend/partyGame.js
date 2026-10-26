@@ -1,3 +1,4 @@
+import {expandDialogues} from './dialogueVariants.js'
 import express from 'express'
 import {randomBytes,randomUUID,randomInt} from 'node:crypto'
 import {pool} from './db.js'
@@ -7,10 +8,10 @@ import {fail,partyAction,partyView,expireParty,chooseWord,beginQuestion} from '.
 const router=express.Router(),rooms=new Map()
 const parse=x=>typeof x==='string'?JSON.parse(x):x
 async function catalog(game) {
-  const queries={pictures:'SELECT id,movie,image_url,mobile_image_url FROM picture_puzzles',lyrics:'SELECT id,title,sections FROM lyric_songs',dialogue:'SELECT id,movie,dialogue FROM dialogues',clues:'SELECT id,movie,clues FROM movie_puzzles',song:'SELECT id,title,movie,youtube_id FROM songs'}
+  const queries={pictures:'SELECT id,movie,image_url,mobile_image_url FROM picture_puzzles',lyrics:'SELECT id,title,sections FROM lyric_songs',dialogue:'SELECT id,movie,dialogue,dialogue_english,dialogue_variants FROM dialogues',clues:'SELECT id,movie,clues FROM movie_puzzles',song:'SELECT id,title,movie,youtube_id FROM songs'}
   if(!Object.hasOwn(queries,game))fail('Choose a game.',400)
   const [rows]=await pool.query(queries[game])
-  const usable=game==='lyrics'?rows.filter(r=>canMakePuzzle(parse(r.sections))):rows
+  const usable=game==='lyrics'?rows.filter(r=>canMakePuzzle(parse(r.sections))):game==='dialogue'?expandDialogues(rows):rows
   if(!usable.length)fail('No content available for this game.',503)
   return usable
 }
@@ -20,7 +21,7 @@ function next(room) {
   room.content=room.game==='lyrics'?puzzle(parse(row.sections),room.difficulty):room.game==='pictures'?row.image_url:room.game==='clues'?parse(row.clues):room.game==='dialogue'?row.dialogue:row.youtube_id
   room.answer=room.game==='song'?`${row.title} — ${row.movie}`:row.movie
   room.target=room.game==='song'?row.title:row.movie
-  room.mobileImage=row.mobile_image_url||null;room.active=null;room.settled={};room.clue=1;room.notice='';room.round++
+  room.mobileImage=row.mobile_image_url||null;room.dialogueEnglish=room.game==='dialogue'?(row.dialogue_english||''):'';room.active=null;room.settled={};room.clue=1;room.notice='';room.round++
   if(room.game==='lyrics')chooseWord(room)
   beginQuestion(room)
 }

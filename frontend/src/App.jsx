@@ -11,6 +11,8 @@ import DialogueGame from './components/DialogueGame'
 import GuessGame from './components/GuessGame'
 import Leaderboard from './components/Leaderboard'
 import './cinema.css'
+import './components/ModePopup.css'
+import {savedPlayMode,rememberPlayMode,playModeHref} from './lib/playMode'
 
 function CinemaHome() {
   return (
@@ -55,17 +57,32 @@ function CinemaHome() {
 
 const soloRoutes={pictures:'picture-game',song:'song-game',dialogue:'dialogue-game',clues:'clue-game',lyrics:'lyrics-game'}
 const gameTitles={pictures:'Picture Clues',song:'Guess the Song',dialogue:'Guess the Movie',clues:'Five Clues',lyrics:'Missing Lyrics'}
-function ModePopup({game}) {
+function ModePopup({game,force=false}) {
   const dialog=useRef(null)
-  useEffect(()=>{if(!dialog.current.open)dialog.current.showModal()},[])
+  const [remember,setRemember]=useState(()=>!!savedPlayMode())
+  useEffect(()=>{
+    const saved=savedPlayMode()
+    if(saved&&!force){location.replace(playModeHref(game,soloRoutes[game],saved));return}
+    if(!dialog.current.open)dialog.current.showModal()
+  },[game,force])
+  const options=[
+    {mode:'solo',title:'Solo',note:'JUST YOU',description:'Play at your pace. Test your memory and build your score.',icon:<><circle cx="12" cy="8" r="3"/><path d="M5 21v-2a7 7 0 0 1 14 0v2"/></>},
+    {mode:'host',title:'Host a game',note:'ONE SCREEN · TEAMS',description:'Bring everyone together. Teams answer aloud; you award the points.',icon:<><path d="M3 4h18v12H3zM8 21l4-5 4 5M12 16v5"/><path d="m9 10 2 2 4-4"/></>},
+    {mode:'buzzer',title:'Play with buzzers',note:'EVERYONE ON THEIR DEVICE',description:'Create or join a room. Buzz first, answer fast, and win the round.',icon:<><path d="M5 17v-3a7 7 0 0 1 14 0v3M3 17h18v4H3zM10 3h4M12 3v4"/></>},
+  ]
   return <><CinemaHome/><dialog className="buzzer-setup-dialog mode-popup" ref={dialog} aria-labelledby="mode-popup-title" onCancel={()=>{location.hash='#'}}>
+    <p className="mode-popup-eyebrow">PADAM / LET’S PLAY</p>
     <div className="buzzer-dialog-heading"><h2 id="mode-popup-title">{gameTitles[game]}</h2><a href="#" className="popup-close" aria-label="Close mode selection">×</a></div>
-    <p>How would you like to play?</p>
+    <p className="mode-popup-intro">A quiet challenge or a little friendly competition?</p>
     <div className="mode-popup-options">
-      <a href={`#${soloRoutes[game]}?mode=solo`}><strong>Solo</strong><span>Play on your own and earn your own score.</span></a>
-      <a href={`#host-game?game=${game}`}><strong>Host</strong><span>Set up teams. Answer aloud. The host awards points.</span></a>
-      <a href={`#buzzer-game?game=${game}`}><strong>Buzzer</strong><span>Create or join a room. Everyone plays on their own device.</span></a>
+      {options.map(option=><a key={option.mode} href={playModeHref(game,soloRoutes[game],option.mode)} onClick={()=>rememberPlayMode(option.mode,remember)}>
+        <span className="mode-option-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">{option.icon}</svg></span>
+        <span className="mode-option-copy"><span className="mode-option-note">{option.note}</span><strong>{option.title}</strong><span>{option.description}</span></span>
+        <span className="mode-option-arrow" aria-hidden="true">↗</span>
+      </a>)}
     </div>
+    <label className="mode-popup-remember"><input type="checkbox" checked={remember} onChange={event=>setRemember(event.target.checked)}/><span><strong>Don’t show this again</strong><small>Use my chosen mode for all games on this browser.</small></span></label>
+    <p className="mode-popup-footnote">You can always switch using “Change play mode” in a game.</p>
   </dialog></>
 }
 export default function App() {
@@ -82,7 +99,7 @@ export default function App() {
   if(route==='#host-game'||route==='#buzzer-game')return <PartyGame key={hash} mode={route==='#host-game'?'host':'buzzer'} backdrop={<CinemaHome/>}/>
   const game=Object.keys(soloRoutes).find(key=>`#${soloRoutes[key]}`===route)
   if(!game)return <CinemaHome/>
-  if(params.get('mode')!=='solo')return <ModePopup key={game} game={game}/>
+  if(params.get('mode')!=='solo')return <ModePopup key={`${game}:${params.get('mode')}`} game={game} force={params.get('mode')==='choose'}/>
   if(game==='pictures')return <PictureGame/>
   if(game==='lyrics')return <PartyGame key="solo-lyrics" mode="solo" game="lyrics" backdrop={<CinemaHome/>}/>
   if(game==='clues')return <ClueGame/>

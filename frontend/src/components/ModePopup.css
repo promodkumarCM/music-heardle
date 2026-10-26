@@ -1,0 +1,34 @@
+.buzzer-setup-dialog.mode-popup { width:min(570px,calc(100% - 28px)); max-height:calc(100dvh - 32px); padding:28px; border:1px solid #9e8655; border-radius:22px; color:#f3ead7; background:radial-gradient(ellipse at top right,#a7893c17,transparent 65%),#1b271f; box-shadow:0 32px 100px #0009,inset 0 1px 0 #fff1; }
+.mode-popup::backdrop { background:#080e0bd9; backdrop-filter:blur(7px); }
+.mode-popup .mode-popup-eyebrow { margin:0 0 14px; color:#baa475; font:10px/1.5 system-ui,sans-serif; letter-spacing:2.5px; }
+.mode-popup .buzzer-dialog-heading { display:flex; justify-content:space-between; align-items:center; gap:16px; }
+.mode-popup .buzzer-dialog-heading h2 { margin:0; color:#f7e7c7; font:32px/1.15 Georgia,serif; }
+.mode-popup .popup-close { display:grid; place-items:center; flex-shrink:0; width:36px; height:36px; border:1px solid #b8a36d45; border-radius:50%; color:#d6c59e; background:#ffffff05; font:24px/1 system-ui,sans-serif; text-decoration:none; }
+.mode-popup .popup-close:hover { background:#ffffff12; }
+.mode-popup .mode-popup-intro { margin:12px 0 24px; color:#b4bcae; font:14px/1.6 system-ui,sans-serif; }
+.mode-popup .mode-popup-options { display:grid; gap:10px; }
+.mode-popup .mode-popup-options>a { display:grid; grid-template-columns:46px minmax(0,1fr) 18px; align-items:center; gap:16px; padding:17px; border:1px solid #a58b5d45; border-radius:13px; background:#111c1680; color:#f3ead7; text-decoration:none; transition:background .15s,border-color .15s; }
+.mode-popup .mode-popup-options>a:hover { background:#303e2d; border-color:#c9ac6b; }
+.mode-popup .mode-option-icon { display:grid; place-items:center; width:46px; height:46px; border:1px solid #c6a96840; border-radius:12px; background:#c9a65a0c; color:#dfc18a; }
+.mode-popup .mode-option-icon svg { width:25px; height:25px; }
+.mode-popup .mode-option-copy { display:grid; gap:5px; min-width:0; }
+.mode-popup .mode-option-copy .mode-option-note { color:#a9946b; font:8px/1.5 system-ui,sans-serif; letter-spacing:1.4px; }
+.mode-popup .mode-option-copy strong { color:#f5e5c7; font:22px/1.2 Georgia,serif; }
+.mode-popup .mode-option-copy>span:last-child { color:#b8c0b1; font:12px/1.6 system-ui,sans-serif; }
+.mode-popup .mode-option-arrow { color:#c9ac6b; font:20px/1 system-ui,sans-serif; }
+.mode-popup .mode-popup-remember { display:flex; align-items:flex-start; gap:11px; margin-top:24px; padding-top:20px; border-top:1px solid #b8a36d30; cursor:pointer; }
+.mode-popup .mode-popup-remember input { flex:none; width:18px; height:18px; margin:2px 0 0; accent-color:#dfc18a; cursor:pointer; }
+.mode-popup .mode-popup-remember>span { display:grid; gap:5px; }
+.mode-popup .mode-popup-remember strong { color:#e7dcc6; font:500 13px/1.5 system-ui,sans-serif; }
+.mode-popup .mode-popup-remember small { color:#a7b09f; font:11px/1.5 system-ui,sans-serif; }
+.mode-popup .mode-popup-footnote { margin:16px 0 0; color:#949e8e; font:11px/1.6 system-ui,sans-serif; }
+.mode-popup a:focus-visible,.mode-popup input:focus-visible { outline:2px solid #efd097; outline-offset:4px; }
+@media(max-width:480px) {
+ .buzzer-setup-dialog.mode-popup { padding:22px 18px; border-radius:18px; max-height:calc(100dvh - 24px); }
+ .mode-popup .buzzer-dialog-heading h2 { font-size:28px; }
+ .mode-popup .mode-popup-intro { margin-bottom:18px; font-size:12px; }
+ .mode-popup .mode-popup-options>a { grid-template-columns:38px minmax(0,1fr) 14px; gap:12px; padding:14px 12px; }
+ .mode-popup .mode-option-icon { width:38px; height:38px; border-radius:10px; }
+ .mode-popup .mode-option-copy strong { font-size:20px; }
+ .mode-popup .mode-popup-remember { margin-top:18px; padding-top:16px; }
+}

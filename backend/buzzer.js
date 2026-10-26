@@ -1,3 +1,4 @@
+import {expandDialogues} from './dialogueVariants.js'
 import express from 'express'
 import {randomBytes,randomUUID,randomInt} from 'node:crypto'
 import {pool} from './db.js'
@@ -58,9 +59,9 @@ export function action(room,host,player,body,now=Date.now()){
 }
 async function catalog(game){
  if(game==='buzzer')return [{id:0}]
- const queries={pictures:'SELECT id,movie,image_url,mobile_image_url FROM picture_puzzles',lyrics:'SELECT id,title,sections FROM lyric_songs',dialogue:'SELECT id,movie,dialogue FROM dialogues',clues:'SELECT id,movie,clues FROM movie_puzzles',song:'SELECT id,title,movie,youtube_id,release_year FROM songs'}
+ const queries={pictures:'SELECT id,movie,image_url,mobile_image_url FROM picture_puzzles',lyrics:'SELECT id,title,sections FROM lyric_songs',dialogue:'SELECT id,movie,dialogue,dialogue_english,dialogue_variants FROM dialogues',clues:'SELECT id,movie,clues FROM movie_puzzles',song:'SELECT id,title,movie,youtube_id,release_year FROM songs'}
  if(!Object.hasOwn(queries,game))fail('Choose a game.',400)
- const [rows]=await pool.query(queries[game]);if(!rows.length)fail('This catalog is empty.',503);return rows
+ const [rows]=await pool.query(queries[game]);if(!rows.length)fail('This catalog is empty.',503);return game==='dialogue'?expandDialogues(rows):rows
 }
 function next(room){
  room.index=(room.index+1)%room.catalog.length;const row=room.catalog[room.index]
@@ -68,13 +69,13 @@ function next(room){
  if(room.game==='buzzer')room.content='Listen to your host’s question, then buzz when the buzzer opens.'
  room.answer=room.game==='song'?`${row.title} — ${row.movie}`:row.movie
  room.mobileImage=room.game==='pictures'?row.mobile_image_url:null;
- room.active=null;room.settled={};room.blocked=[];room.winner=null;room.deadline=null;room.undo=null;room.clue=1;room.phase='closed';room.round++;room.notice=''
+ room.dialogueEnglish=room.game==='dialogue'?(row.dialogue_english||''):'';room.active=null;room.settled={};room.blocked=[];room.winner=null;room.deadline=null;room.undo=null;room.clue=1;room.phase='closed';room.round++;room.notice=''
 }
 function view(room,host,player){
  expireAnswer(room)
  const answer=room.game==='lyrics'?room.content.flat().find(w=>w.id===room.active)?.text:room.answer
  const content=room.game==='lyrics'?room.content.map(s=>s.map(w=>w.id===undefined?w:{id:w.id,text:room.settled[w.id]?w.text:null})):room.game==='clues'?room.content.slice(0,room.clue):room.game==='song'?(host?room.content:null):room.content
- return {code:room.code,host,game:room.game,afterYear:room.afterYear||0,phase:room.phase,version:room.version,round:room.round,locked:room.locked,limit:room.limit,seconds:room.seconds,teams:room.teams.map(({name,score,invite})=>({name,score,...(host?{invite}:{})})),players:room.players.map(({id,name,team})=>({id,name,team})),me:player?.id,team:player?.team,mobileImage:room.mobileImage||null,content,active:room.active,settled:room.settled,blocked:room.blocked,winner:room.winner,deadline:room.deadline,serverNow:Date.now(),notice:room.notice,clue:room.clue,canUndo:host&&!!room.undo,...(host||room.phase==='settled'?{answer}:{})}
+ return {code:room.code,host,game:room.game,afterYear:room.afterYear||0,phase:room.phase,version:room.version,round:room.round,locked:room.locked,limit:room.limit,seconds:room.seconds,teams:room.teams.map(({name,score,invite})=>({name,score,...(host?{invite}:{})})),players:room.players.map(({id,name,team})=>({id,name,team})),me:player?.id,team:player?.team,mobileImage:room.mobileImage||null,dialogueEnglish:room.game==='dialogue'?room.dialogueEnglish:undefined,content,active:room.active,settled:room.settled,blocked:room.blocked,winner:room.winner,deadline:room.deadline,serverNow:Date.now(),notice:room.notice,clue:room.clue,canUndo:host&&!!room.undo,...(host||room.phase==='settled'?{answer}:{})}
 }
 const wrap=fn=>async(req,res)=>{try{await fn(req,res)}catch(e){res.status(e.status||503).json({error:e.status?e.message:'Room service unavailable.'})}}
 router.use((req,res,next)=>{res.set('Cache-Control','no-store');next()})

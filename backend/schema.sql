@@ -21,6 +21,8 @@ CREATE TABLE IF NOT EXISTS scores (
 CREATE TABLE IF NOT EXISTS dialogues (
   id INT AUTO_INCREMENT PRIMARY KEY,
   dialogue TEXT NOT NULL,
+  dialogue_english TEXT NULL,
+  dialogue_variants JSON NULL,
   movie VARCHAR(255) NOT NULL,
   aliases JSON NOT NULL,
   source_url VARCHAR(600) NOT NULL,

@@ -1,6 +1,9 @@
+import {ensureDialogueEnglish,ensureDialogueVariants} from './dialogueSchema.js'
 import {pool} from './db.js'
 import songs from './lyricsSeed.js'
 try {
+ await ensureDialogueEnglish(pool)
+ await ensureDialogueVariants(pool)
  await pool.query(`CREATE TABLE IF NOT EXISTS lyric_songs (id INT AUTO_INCREMENT PRIMARY KEY, title VARCHAR(255) NOT NULL, sections JSON NOT NULL) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`)
  await pool.query(`CREATE TABLE IF NOT EXISTS app_migrations (name VARCHAR(100) PRIMARY KEY)`)
  const connection=await pool.getConnection()

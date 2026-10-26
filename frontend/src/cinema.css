@@ -525,3 +525,31 @@ html { scrollbar-gutter:stable; }
 .party-setup-dialog .party-setup h2 { font-size:21px; }
 .party-page.party-preflight { min-height:0;padding:0;background:none; }
 .party-preflight>.dialogue-shell { padding:0; }
+
+.admin-entry-actions { display:flex; flex-shrink:0; gap:6px; }
+.admin-entry-actions button { min-height:36px; padding:7px 10px; }
+.admin-editor { scroll-margin-top:16px; }
+.admin-workspace-dialogues { grid-template-columns:minmax(240px,.8fr) minmax(0,1.2fr); align-items:start; }
+.admin-saved-dialogues { grid-column:1/-1; }
+.admin-workspace-dialogues .admin-editor { padding:16px; }
+.admin-workspace-dialogues .admin-editor label { margin-bottom:10px; }
+.admin-workspace-dialogues .admin-editor input,.admin-workspace-dialogues .admin-editor textarea { padding:6px 8px; margin-top:4px; font-size:14px; line-height:1.5; }
+.admin-workspace-dialogues .admin-dialogue-pair { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; padding:10px; margin:10px 0; }
+.admin-workspace-dialogues .admin-dialogue-pair label { margin:0; }
+.admin-workspace-dialogues .admin-dialogue-pair button { grid-column:1/-1; justify-self:start; padding:5px 8px; }
+@media(max-width:700px) { .admin-workspace-dialogues { grid-template-columns:minmax(0,1fr); } }
+@media(max-width:480px) { .admin-workspace-dialogues .admin-dialogue-pair { grid-template-columns:minmax(0,1fr); } }
+.admin-table-scroll { overflow-x:auto; margin-top:16px; }
+.admin-dialogue-table { width:100%; border-collapse:collapse; text-align:left; font-size:13px; }
+.admin-dialogue-table th,.admin-dialogue-table td { padding:12px; border-bottom:1px solid #b3996433; vertical-align:top; overflow-wrap:anywhere; }
+.admin-dialogue-table thead { color:#d7c49d; }
+.admin-dialogue-table th small { display:block; margin-top:6px; color:#a8b09a; font-weight:400; }
+.admin-dialogue-table td p { margin:0 0 12px; white-space:pre-wrap; min-width:150px; line-height:1.7; }
+.admin-dialogue-table td p:last-child { margin-bottom:0; }
+.admin-dialogue-table .admin-row-selected { background:#3b4834; }
+@media(max-width:480px) { .admin-entry-actions { flex-direction:column; } .admin-entry-actions button { min-height:44px; } }
+
+.admin-dialogue-pairs { margin:16px 0 24px; }
+.admin-dialogue-pair { min-width:0; margin:14px 0; padding:16px; border:1px solid #a58b5d66; border-radius:10px; background:#172219; }
+.admin-dialogue-pair legend { color:#dfc18a; padding:0 6px; font-weight:600; }
+.admin-page .admin-dialogue-pair button { background:#352b23; color:#e5cbb0; }
