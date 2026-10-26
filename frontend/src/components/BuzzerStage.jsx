@@ -1,3 +1,4 @@
+import DialogueText from './DialogueText'
 import FilmClues from './FilmClues'
 import LyricsStudio from './LyricsStudio'
 import Clapperboard from './Clapperboard'
@@ -24,7 +25,7 @@ export default function BuzzerStage({game,room,busy,act,automaticWords=false}){
    <div className="radio-game-panel"><div className="pills">{DIFFICULTIES.map(d=><button key={d.name} className="pill" aria-pressed={duration===d.snippetSeconds} disabled={!live||busy||room.phase==='answering'} onClick={()=>setDuration(d.snippetSeconds)}>{d.name}</button>)}</div><div className="progress-track"><div className="progress-fill" style={{width:`${duration/12*100}%`}} />{DIFFICULTIES.map(d=><div className="progress-tick" key={d.name} style={{left:`${d.snippetSeconds/12*100}%`}} />)}</div><div className="score-row"><span>{duration}s clip</span><span>100 points per answer</span></div></div>
   </Radio><Player ref={player} onPrepared={setPreparedVideoId} onReady={()=>setReady(true)} onPlaybackStatus={setMessage} onUnplayable={()=>setMessage('Clip unavailable. Skip this round.')} />
  </>
- if(game==='dialogue')return <Clapperboard round={room?.round||1} footer="100 POINTS · NAME THE MOVIE">{live?room.content:'Your next scene awaits your teams.'}</Clapperboard>
+ if(game==='dialogue')return <DialogueText text={room?.content} english={room?.dialogueEnglish}>{content=><Clapperboard round={room?.round||1} footer="100 POINTS · NAME THE MOVIE">{live?content: 'Your next scene awaits your teams.'}</Clapperboard>}</DialogueText>
  if(game==='clues')return <FilmClues clues={live?room.content:[]} roundKey={room?.round} busy={busy}/>
  if(game==='lyrics')return <LyricsStudio round={room?.round||1}>{live?room.content.map((s,i)=><p className={`lyrics-stanza ${s.some(w=>w.id===room.active)?'lyrics-active-stanza':''}`} key={i}>{s.map((w,j)=>w.id===undefined?<span key={j}>{w.text}</span>:<button className={`lyrics-blank ${room.active===w.id?'active-blank':''}`} key={j} disabled={automaticWords||busy||!!room.settled[w.id]||!['answering','closed','settled'].includes(room.phase)} aria-label={`Word ${w.id+1}${w.text?' · answered':''}`} aria-pressed={room.active===w.id} onClick={()=>act('select',{id:w.id})}><sup>{w.id+1}</sup>{w.text||'-----'}</button>)}</p>):<p className="lyrics-stanza">Invite your teams. Pick a missing word. Open the buzzer.</p>}</LyricsStudio>
  return <section className="clue-case"><p>Ask your question aloud, then open the buzzer.</p></section>
