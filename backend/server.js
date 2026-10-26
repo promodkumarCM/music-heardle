@@ -1,4 +1,5 @@
 import {expandDialogues} from './dialogueVariants.js'
+import contributions from './contributions.js'
 import {uploadDirectory} from './pictureUploads.js'
 import pictureGame from './pictureGame.js'
 import songGame from './songGame.js'
@@ -18,6 +19,7 @@ const app = express()
 app.use(cors())
 app.use('/admin',express.json({limit:'2mb'}))
 app.use(express.json())
+app.use('/contributions',contributions)
 app.use('/uploads/picture-clues', express.static(uploadDirectory,{dotfiles:'deny',index:false,setHeaders:res=>res.set('X-Content-Type-Options','nosniff')}))
 app.use('/picture-game', pictureGame)
 app.use('/song-game', songGame)

@@ -1,5 +1,24 @@
 # Malayalam Music Club
 
+The home-page **Buy me 2 porotta** dialog generates a QR code locally for
+`https://payments.cashfree.com/forms/porotta`, the same ₹60 Porotta Set link used by
+CurrentUndo. The dialog names CurrentUndo as the recipient. This supports that
+project; it is not a PADAM-owned payment account. Optional frontend build settings
+are listed in `frontend/.env.example`. The QR opens the hosted payment page;
+players complete checkout there. PADAM does not track or confirm payments.
+
+Use **Report a bug** on the home page to send an issue to the admin. Reports appear
+in the separate **Bug reports** queue and can be marked resolved. This uses the same
+contributions table and migration described below.
+
+Players can use **Contribute a clue** in each game to submit a free-text suggestion.
+Admin shows a pending contribution queue. Choose **Review and prepare entry**, verify
+the suggestion, fill the catalog fields, then **Approve and add to game**. Approval
+adds a validated entry and marks the suggestion approved in one transaction. Rejected
+and pending suggestions never appear in game rounds. Submissions allow five per hour
+per IP on each API process. For existing databases, run
+`node --env-file=.env migrate-contributions.js` from `backend` before using this feature.
+
 Each movie supports up to 30 dialogue pairs in Admin → Dialogues. Use **Add
 dialogue** to enter another Malayalam line and its optional English version, then
 **Save changes**. Players can switch languages for the selected dialogue; all

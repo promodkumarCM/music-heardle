@@ -1,3 +1,5 @@
+import ContributionForm from './components/ContributionForm'
+import SupportProject from './components/SupportProject'
 import FilmClues from './components/FilmClues'
 import LyricsStudio from './components/LyricsStudio'
 import Clapperboard from './components/Clapperboard'
@@ -22,6 +24,8 @@ function CinemaHome() {
           <a className="cinema-logo" href="#"><span aria-hidden="true">✦</span> PADAM<span className="logo-caption">THE FILM PLAYHOUSE</span></a>
           <span className="cinema-header-note">Made for the love of Malayalam cinema.</span>
         </header>
+        <ContributionForm game="bug"/>
+        <SupportProject/>
         <section className="cinema-games" id="now-showing" aria-labelledby="showing-title">
           <div className="showing-heading"><h2 id="showing-title">Now showing</h2><span>ONE TICKET. ENDLESS NOSTALGIA.</span></div>
           <div className="cinema-game-grid">

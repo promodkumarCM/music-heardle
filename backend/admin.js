@@ -20,6 +20,9 @@ router.use((req,res,next)=>{const token=req.get('Authorization')?.replace(/^Bear
 router.post('/picture-upload',imageBody,uploadImage,uploadError)
 router.post('/logout',(req,res)=>{sessions.delete(req.adminToken);res.json({ok:true})})
 router.get('/session',(req,res)=>res.json({username}))
+router.get('/contributions',async(req,res)=>{try{const [rows]=await pool.query("SELECT id,kind,content,created_at FROM contributions WHERE status='pending' ORDER BY id DESC");res.json(rows)}catch{res.status(503).json({error:'Could not load contributions.'})}})
+router.post('/contributions/:id/resolve',async(req,res)=>{try{const [result]=await pool.query("UPDATE contributions SET status='resolved',reviewed_at=CURRENT_TIMESTAMP WHERE id=? AND kind='bug' AND status='pending'",[req.params.id]);if(!result.affectedRows)return res.status(409).json({error:'Bug report already closed or missing.'});res.json({ok:true})}catch{res.status(503).json({error:'Could not close bug report.'})}})
+router.post('/contributions/:id/reject',async(req,res)=>{try{const [result]=await pool.query("UPDATE contributions SET status='rejected',reviewed_at=CURRENT_TIMESTAMP WHERE id=? AND status='pending'",[req.params.id]);if(!result.affectedRows)return res.status(409).json({error:'Contribution already reviewed or missing.'});res.json({ok:true})}catch{res.status(503).json({error:'Could not reject contribution.'})}})
 function validate(kind,input){
  if(kind==='dialogues'){
   const pairs=validateDialogueVariants(input.dialogue_variants??[{dialogue:input.dialogue,dialogue_english:input.dialogue_english}])
@@ -47,6 +50,22 @@ function validate(kind,input){
  if(out.image_url&&!/^(https?:\/\/|\/uploads\/picture-clues\/|\/picture-clues\/)/i.test(out.image_url))throw Error('Use an HTTPS image URL or /picture-clues/ path.')
  return out
 }
+router.post('/contributions/:id/approve',async(req,res)=>{
+ let connection
+ try {
+  connection=await pool.getConnection();await connection.beginTransaction()
+  const [rows]=await connection.query('SELECT kind,status FROM contributions WHERE id=? FOR UPDATE',[req.params.id])
+  const entry=rows[0]
+  if(entry?.kind==='bug'){await connection.rollback();return res.status(400).json({error:'Bug reports cannot be added to the game catalog.'})}
+  if(!entry||entry.status!=='pending'){await connection.rollback();return res.status(409).json({error:'Contribution already reviewed or missing.'})}
+  let data
+  try{data=validate(entry.kind,req.body)}catch(error){await connection.rollback();return res.status(400).json({error:error.message})}
+  const d=definitions[entry.kind]
+  const [result]=await connection.query(`INSERT INTO ${d.table} (${d.fields.join(',')}) VALUES (${d.fields.map(()=>'?').join(',')})`,d.fields.map(field=>data[field]))
+  await connection.query("UPDATE contributions SET status='approved',catalog_id=?,reviewed_at=CURRENT_TIMESTAMP WHERE id=?",[result.insertId,req.params.id])
+  await connection.commit();res.status(201).json({id:result.insertId})
+ }catch(error){if(connection)await connection.rollback();res.status(error.code==='ER_DUP_ENTRY'?409:503).json({error:error.code==='ER_DUP_ENTRY'?'This movie already exists. Edit its existing catalog entry instead.':'Could not approve contribution.'})}finally{connection?.release()}
+})
 router.use('/:kind',(req,res,next)=>{if(!Object.hasOwn(definitions,req.params.kind))return res.status(404).json({error:'Unknown catalog.'});const d=definitions[req.params.kind];req.definition=d;req.kind=req.params.kind;next()})
 router.get('/:kind',async(req,res)=>{try{const d=req.definition;const [rows]=await pool.query(`SELECT id, ${d.fields.join(',')} FROM ${d.table} ORDER BY id DESC`);res.json(rows.map(row=>{for(const f of ['aliases','clues','sections','dialogue_variants'])if(row[f]!==undefined)row[f]=parse(row[f]);return row}))}catch{res.status(503).json({error:'Could not load catalog.'})}})
 async function save(req,res){

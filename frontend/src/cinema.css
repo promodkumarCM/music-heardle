@@ -550,6 +550,29 @@ html { scrollbar-gutter:stable; }
 @media(max-width:480px) { .admin-entry-actions { flex-direction:column; } .admin-entry-actions button { min-height:44px; } }
 
 .admin-dialogue-pairs { margin:16px 0 24px; }
+.contribution-widget { margin:8px auto 20px; max-width:650px; font-size:13px; }
+.support-project { text-align:center; margin:0 auto 24px; }
+.support-trigger { padding:8px 16px; border:1px solid #ae8b50; border-radius:24px; background:#dfc18a; color:#243126; font:600 13px/1.5 system-ui,sans-serif; cursor:pointer; }
+.support-trigger span { color:#8e4539; margin-right:5px; }
+.support-dialog { position:fixed; box-sizing:border-box; width:min(440px,calc(100% - 32px)); max-height:90dvh; padding:30px 24px; border:1px solid #ad925d; border-radius:16px; background:#202a22; color:#f1e4c8; text-align:center; overflow-y:auto; }
+.support-dialog::backdrop { background:#000b; backdrop-filter:blur(4px); }
+.support-close { position:absolute; top:8px; right:10px; background:transparent; border:0; color:#dfc18a; font-size:26px; cursor:pointer; }
+.support-dialog h2 { font:30px/1.2 Georgia,serif; margin:12px 0; }
+.support-dialog p { font-size:14px; line-height:1.6; }
+.support-dialog .cinema-eyebrow { justify-content:center; font-size:10px; margin-top:10px; }
+.support-dialog .support-amount { font-size:26px; margin:18px 0 12px; }
+.support-dialog small { display:block; font:12px/1.6 system-ui,sans-serif; color:#c3bba7; margin-top:8px; }
+.support-qr { display:block; max-width:100%; height:auto; margin:0 auto; border-radius:8px; }
+.support-upi { overflow-wrap:anywhere; }
+.support-pay { display:block; padding:12px; border-radius:8px; background:#dfc18a; color:#243126; text-decoration:none; font-weight:600; }
+.support-pending { padding:20px 8px; border-top:1px solid #ad925d55; margin-top:20px; }
+.contribution-widget>button { background:transparent; border:1px solid #a58b5d66; color:#dfc18a; padding:6px 12px; font-size:12px; }
+.contribution-form,.admin-contributions { padding:16px; margin:12px 0; border:1px solid #a58b5d66; border-radius:8px; background:#242c23; color:#efe4cd; }
+.contribution-form label { display:block; }
+.contribution-form textarea { display:block; box-sizing:border-box; width:100%; margin-top:8px; padding:10px; font:14px/1.6 system-ui,sans-serif; background:#172219; color:#efe4cd; border:1px solid #a58b5d; resize:vertical; }
+.contribution-form p { font-size:12px; }
+.contribution-original { white-space:pre-wrap; overflow-wrap:anywhere; max-height:220px; overflow:auto; font:14px/1.7 system-ui,sans-serif; }
+.admin-contributions article { border-top:1px solid #a58b5d55; padding:14px 0; }
 .admin-dialogue-pair { min-width:0; margin:14px 0; padding:16px; border:1px solid #a58b5d66; border-radius:10px; background:#172219; }
 .admin-dialogue-pair legend { color:#dfc18a; padding:0 6px; font-weight:600; }
 .admin-page .admin-dialogue-pair button { background:#352b23; color:#e5cbb0; }

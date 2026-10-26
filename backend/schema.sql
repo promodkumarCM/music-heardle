@@ -37,3 +37,10 @@ CREATE TABLE IF NOT EXISTS movie_puzzles (
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS picture_puzzles (id INT AUTO_INCREMENT PRIMARY KEY, movie VARCHAR(255) NOT NULL, aliases JSON NOT NULL, image_url VARCHAR(600) NOT NULL, mobile_image_url VARCHAR(600) NULL);
+
+CREATE TABLE IF NOT EXISTS contributions (
+ id INT AUTO_INCREMENT PRIMARY KEY, kind VARCHAR(20) NOT NULL, content TEXT NOT NULL,
+ status VARCHAR(20) NOT NULL DEFAULT 'pending', catalog_id INT NULL,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, reviewed_at TIMESTAMP NULL,
+ INDEX contribution_status (status,created_at)
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
