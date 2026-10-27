@@ -1,6 +1,6 @@
 import express from 'express'
 import {pool} from './db.js'
-export const contributionKinds=['pictures','songs','dialogues','clues','lyrics','bug']
+export const contributionKinds=['pictures','songs','dialogues','clues','lyrics','characters','bug']
 export const contributionTable=`CREATE TABLE IF NOT EXISTS contributions (
  id INT AUTO_INCREMENT PRIMARY KEY, kind VARCHAR(20) NOT NULL, content TEXT NOT NULL,
  status VARCHAR(20) NOT NULL DEFAULT 'pending', catalog_id INT NULL,

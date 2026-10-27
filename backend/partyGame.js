@@ -8,9 +8,10 @@ import {fail,partyAction,partyView,expireParty,chooseWord,beginQuestion} from '.
 const router=express.Router(),rooms=new Map()
 const parse=x=>typeof x==='string'?JSON.parse(x):x
 async function catalog(game) {
-  const queries={pictures:'SELECT id,movie,image_url,mobile_image_url FROM picture_puzzles',lyrics:'SELECT id,title,sections FROM lyric_songs',dialogue:'SELECT id,movie,dialogue,dialogue_english,dialogue_variants FROM dialogues',clues:'SELECT id,movie,clues FROM movie_puzzles',song:'SELECT id,title,movie,youtube_id FROM songs'}
+  const queries={characters:'SELECT id,movie,character_name,character_english,role,aliases FROM character_puzzles',pictures:'SELECT id,movie,image_url,mobile_image_url FROM picture_puzzles',lyrics:'SELECT id,title,sections FROM lyric_songs',dialogue:'SELECT id,movie,dialogue,dialogue_english,dialogue_variants FROM dialogues',clues:'SELECT id,movie,clues FROM movie_puzzles',song:'SELECT id,title,movie,youtube_id FROM songs'}
   if(!Object.hasOwn(queries,game))fail('Choose a game.',400)
-  const [rows]=await pool.query(queries[game])
+  let rows
+  try{[rows]=await pool.query(queries[game])}catch(error){if(game==='characters'&&error.code==='ER_NO_SUCH_TABLE')fail('Character Files is not set up yet. Ask the admin to finish setting up this game.',503);throw error}
   const usable=game==='lyrics'?rows.filter(r=>canMakePuzzle(parse(r.sections))):game==='dialogue'?expandDialogues(rows):rows
   if(!usable.length)fail('No content available for this game.',503)
   return usable
@@ -18,7 +19,7 @@ async function catalog(game) {
 function next(room) {
   room.index=(room.index+1)%room.catalog.length
   const row=room.catalog[room.index]
-  room.content=room.game==='lyrics'?puzzle(parse(row.sections),room.difficulty):room.game==='pictures'?row.image_url:room.game==='clues'?parse(row.clues):room.game==='dialogue'?row.dialogue:row.youtube_id
+  room.content=room.game==='characters'?{name:row.character_name,english:row.character_english||'',role:row.role}:room.game==='lyrics'?puzzle(parse(row.sections),room.difficulty):room.game==='pictures'?row.image_url:room.game==='clues'?parse(row.clues):room.game==='dialogue'?row.dialogue:row.youtube_id
   room.answer=room.game==='song'?`${row.title} — ${row.movie}`:row.movie
   room.target=room.game==='song'?row.title:row.movie
   room.mobileImage=row.mobile_image_url||null;room.dialogueEnglish=room.game==='dialogue'?(row.dialogue_english||''):'';room.active=null;room.settled={};room.clue=1;room.notice='';room.round++
@@ -35,7 +36,7 @@ router.post('/rooms',wrap(async(req,res)=>{
   if(rooms.size>=500)fail('Rooms are full. Try later.',503)
   const rows=await catalog(game)
   const [aliases]=await pool.query('SELECT movie,aliases FROM dialogues')
-  const movieCatalog=[...new Set(rows.map(r=>r.movie).filter(Boolean))].map(movie=>({movie,aliases:aliases.filter(r=>r.movie===movie).flatMap(r=>parse(r.aliases)||[])}))
+  const movieCatalog=[...new Set(rows.map(r=>r.movie).filter(Boolean))].map(movie=>({movie,aliases:[...aliases.filter(r=>r.movie===movie).flatMap(r=>parse(r.aliases)||[]),...rows.filter(r=>r.movie===movie).flatMap(r=>parse(r.aliases)||[])]}))
   let code;do{code=randomBytes(3).toString('hex').toUpperCase()}while(rooms.has(code))
   const player={id:randomUUID(),token:randomUUID(),name:name.trim(),team:0}
   const room={code,mode,game,difficulty,seconds,catalog:rows,movieCatalog,index:randomInt(rows.length)-1,round:0,version:0,creator:player.id,players:[player],teams:(mode==='host'?teams:[player.name]).map(name=>({name:name.trim(),score:0})),expires:Date.now()+21600000}
@@ -73,7 +74,7 @@ router.post('/rooms/:code/action',wrap(async(req,res)=>{
       if(p.id!==r.creator)fail('Only the room creator can change games.',403)
       const rows=await catalog(req.body.game)
       if(version!==r.version)fail('The round changed. Try again.')
-      r.game=req.body.game;r.catalog=rows;r.movieCatalog=[...new Set(rows.map(row=>row.movie).filter(Boolean))].map(movie=>({movie,aliases:[]}));r.index=-1
+      r.game=req.body.game;r.catalog=rows;r.movieCatalog=[...new Set(rows.map(row=>row.movie).filter(Boolean))].map(movie=>({movie,aliases:rows.filter(row=>row.movie===movie).flatMap(row=>parse(row.aliases)||[])}));r.index=-1
     }
     next(r);r.version++
   } else partyAction(r,p,req.body)

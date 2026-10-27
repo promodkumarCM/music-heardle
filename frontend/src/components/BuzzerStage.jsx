@@ -1,3 +1,4 @@
+import CharacterStage from './CharacterStage'
 import DialogueText from './DialogueText'
 import FilmClues from './FilmClues'
 import LyricsStudio from './LyricsStudio'
@@ -18,6 +19,7 @@ export default function BuzzerStage({game,room,busy,act,automaticWords=false}){
  useEffect(()=>{if(room?.phase==='answering'||room?.phase==='settled')player.current?.stop()},[room?.phase])
  useEffect(()=>{if(game==='song'&&ready&&room?.content)player.current?.prepare(room.content)},[game,ready,room?.content])
  const live=room&&room.phase!=='lobby'
+ if(game==='characters')return <CharacterStage content={live?room.content:null} round={room?.round}/>
  if(game==='pictures')return <PictureStage image={live?room.content:null} mobileImage={room?.mobileImage} round={room?.round}/>
  if(game==='song')return <>
   <Radio yearTuner={<YearTuner disabled={!room||busy||!['lobby','settled'].includes(room.phase)} years={[0,1990,1995,2000,2005,2010,2015,2020,2025]} value={room?.afterYear||0} onChange={year=>{if(room&&!busy&&['lobby','settled'].includes(room.phase))act('year',{afterYear:year})}} />} onPlay={()=>player.current?.playSnippet(room.content,0,duration,volume)} ready={ready&&preparedVideoId===room?.content} disabled={!live||!ready||preparedVideoId!==room?.content||busy||room.phase==='answering'} seconds={duration} volume={volume} onVolumeChange={v=>{setVolume(v);player.current?.setVolume(v)}}

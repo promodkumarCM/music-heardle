@@ -1,7 +1,7 @@
 import {Router} from 'express'
 import {pool} from './db.js'
 
-const sources={pictures:['picture_puzzles','movie'],dialogue:['dialogues','movie'],clues:['movie_puzzles','movie'],song:['songs','title']}
+const sources={characters:['character_puzzles','movie'],pictures:['picture_puzzles','movie'],dialogue:['dialogues','movie'],clues:['movie_puzzles','movie'],song:['songs','title']}
 const router=Router()
 router.post('/',async(req,res)=>{
   res.set('Cache-Control','no-store')

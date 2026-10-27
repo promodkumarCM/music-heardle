@@ -1,3 +1,4 @@
+import CharacterStage from './components/CharacterStage'
 import ContributionForm from './components/ContributionForm'
 import SupportProject from './components/SupportProject'
 import FilmClues from './components/FilmClues'
@@ -24,8 +25,6 @@ function CinemaHome() {
           <a className="cinema-logo" href="#"><span aria-hidden="true">✦</span> PADAM<span className="logo-caption">THE FILM PLAYHOUSE</span></a>
           <span className="cinema-header-note">Made for the love of Malayalam cinema.</span>
         </header>
-        <ContributionForm game="bug"/>
-        <SupportProject/>
         <section className="cinema-games" id="now-showing" aria-labelledby="showing-title">
           <div className="showing-heading"><h2 id="showing-title">Now showing</h2><span>ONE TICKET. ENDLESS NOSTALGIA.</span></div>
           <div className="cinema-game-grid">
@@ -35,8 +34,10 @@ function CinemaHome() {
               { id: 'dialogue', title: 'Guess the Movie', hint: 'Know that dialogue?', clapper: true },
               { id: 'clue', title: 'Five Clues', hint: 'Fewer clues. More points.', film: true },
               { id: 'lyrics', title: 'Missing Lyrics', hint: 'Fill in the missing words.', studio: true },
+              { id: 'characters', title: 'Character Files', hint: 'The name is known. The movie is missing.', dossier: true },
             ].map((game, index) => (
-              <a className={'cinema-game-tile cinema-game-tile-' + game.id + (game.image || game.clapper || game.studio || game.film ? ' game-tile-illustrated' : '')} href={'#' + game.id + '-game'} aria-label={'Play ' + game.title} key={game.id}>
+              <a className={'cinema-game-tile cinema-game-tile-' + game.id + (game.image || game.clapper || game.studio || game.film || game.dossier ? ' game-tile-illustrated' : '')} href={'#' + game.id + '-game'} aria-label={'Play ' + game.title} key={game.id}>
+                {game.dossier && <div className="game-tile-artwork game-tile-dossier-art" aria-hidden="true"><CharacterStage compact/></div>}
                 {game.film && <div className="game-tile-artwork game-tile-film-art" aria-hidden="true"><FilmClues compact clues={[true,true]}/></div>}
                 {game.studio && <div className="game-tile-artwork game-tile-studio-art" aria-hidden="true"><LyricsStudio compact><div className="studio-mini-notation">♪ ♫ ♩ ♫</div><p className="studio-mini-words"><span>____ ♪ ____</span><span>♫ ____ ____</span><span>____ ____ ♩</span></p></LyricsStudio></div>}
                 {game.clapper && <div className="game-tile-artwork game-tile-clapper-art" aria-hidden="true"><Clapperboard compact animate={false}>Famous lines.</Clapperboard></div>}
@@ -53,14 +54,14 @@ function CinemaHome() {
           <div className="coming-attractions"><span aria-hidden="true">✧</span><div><h3>More stories. More games.</h3><p>The next attraction is still in the making. Enjoy the music while you wait.</p></div><span className="coming-label">COMING SOON</span></div>
         </section>
         <a className="admin-home-link" href="#admin">Admin ↗</a>
-        <footer className="cinema-footer"><span>PADAM / THE FILM PLAYHOUSE</span><span>For the fans. For the fun.</span></footer>
+        <footer className="cinema-footer"><span>PADAM / THE FILM PLAYHOUSE</span><div className="home-footer-actions"><SupportProject/><ContributionForm game="bug"/></div><span>For the fans. For the fun.</span></footer>
       </div>
     </main>
   )
 }
 
-const soloRoutes={pictures:'picture-game',song:'song-game',dialogue:'dialogue-game',clues:'clue-game',lyrics:'lyrics-game'}
-const gameTitles={pictures:'Picture Clues',song:'Guess the Song',dialogue:'Guess the Movie',clues:'Five Clues',lyrics:'Missing Lyrics'}
+const soloRoutes={characters:'characters-game',pictures:'picture-game',song:'song-game',dialogue:'dialogue-game',clues:'clue-game',lyrics:'lyrics-game'}
+const gameTitles={characters:'Character Files',pictures:'Picture Clues',song:'Guess the Song',dialogue:'Guess the Movie',clues:'Five Clues',lyrics:'Missing Lyrics'}
 function ModePopup({game,force=false}) {
   const dialog=useRef(null)
   const [remember,setRemember]=useState(()=>!!savedPlayMode())
@@ -104,6 +105,7 @@ export default function App() {
   const game=Object.keys(soloRoutes).find(key=>`#${soloRoutes[key]}`===route)
   if(!game)return <CinemaHome/>
   if(params.get('mode')!=='solo')return <ModePopup key={`${game}:${params.get('mode')}`} game={game} force={params.get('mode')==='choose'}/>
+  if(game==='characters')return <PartyGame key="solo-characters" mode="solo" game="characters" backdrop={<CinemaHome/>}/>
   if(game==='pictures')return <PictureGame/>
   if(game==='lyrics')return <PartyGame key="solo-lyrics" mode="solo" game="lyrics" backdrop={<CinemaHome/>}/>
   if(game==='clues')return <ClueGame/>

@@ -7,7 +7,7 @@ import BuzzerStage from './BuzzerStage'
 import LyricsAnswerForm from './LyricsAnswerForm'
 
 const BASE=import.meta.env.VITE_API_URL||`${location.protocol}//${location.hostname}:4000`
-const games={pictures:'Picture Clues',song:'Guess the Song',dialogue:'Guess the Movie',clues:'Five Clues',lyrics:'Missing Lyrics'}
+const games={characters:'Character Files',pictures:'Picture Clues',song:'Guess the Song',dialogue:'Guess the Movie',clues:'Five Clues',lyrics:'Missing Lyrics'}
 const labels={host:'Host',buzzer:'Buzzer',solo:'Solo'}
 export default function PartyGame({mode='buzzer',game:gameProp,backdrop}) {
   const params=new URLSearchParams(location.hash.split('?')[1]||'')

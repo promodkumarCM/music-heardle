@@ -5,7 +5,7 @@ import {randomBytes,scryptSync,timingSafeEqual} from 'node:crypto'
 import {pool} from './db.js'
 const router=express.Router(), sessions=new Map(), attempts=new Map()
 const username=process.env.ADMIN_USERNAME||'admin', passwordHash=scryptSync(process.env.ADMIN_PASSWORD||'admin','padam-admin',32)
-const definitions={pictures:{table:'picture_puzzles',fields:['movie','aliases','image_url','mobile_image_url']},songs:{table:'songs',fields:['title','movie','youtube_id','release_year']},dialogues:{table:'dialogues',fields:['movie','dialogue','dialogue_english','aliases','source_url','dialogue_variants']},clues:{table:'movie_puzzles',fields:['movie','aliases','clues']},lyrics:{table:'lyric_songs',fields:['title','sections']}}
+const definitions={characters:{table:'character_puzzles',fields:['movie','character_name','character_english','role','aliases','source_url']},pictures:{table:'picture_puzzles',fields:['movie','aliases','image_url','mobile_image_url']},songs:{table:'songs',fields:['title','movie','youtube_id','release_year']},dialogues:{table:'dialogues',fields:['movie','dialogue','dialogue_english','aliases','source_url','dialogue_variants']},clues:{table:'movie_puzzles',fields:['movie','aliases','clues']},lyrics:{table:'lyric_songs',fields:['title','sections']}}
 const parse=value=>typeof value==='string'?JSON.parse(value):value
 router.use((req,res,next)=>{res.set('Cache-Control','no-store');next()})
 router.post('/login',(req,res)=>{
@@ -29,7 +29,7 @@ function validate(kind,input){
   input={...input,...pairs[0],dialogue_variants:pairs}
  }
  const d=definitions[kind],out={}
- for(const field of d.fields){const value=['mobile_image_url','dialogue_english'].includes(field)?(input[field]??''):input[field]
+ for(const field of d.fields){const value=['mobile_image_url','dialogue_english','character_english'].includes(field)?(input[field]??''):input[field]
   if(field==='dialogue_variants'){out[field]=JSON.stringify(value)}
   else if(['aliases','clues','sections'].includes(field)){
    if(!Array.isArray(value)||value.length>100||value.some(s=>typeof s!=='string'||!s.trim()||s.length>20000))throw Error(`${field}: enter a valid list of text values.`)
@@ -42,8 +42,9 @@ function validate(kind,input){
    }
    out[field]=JSON.stringify(value.map(s=>s.trim()))
   }else if(field==='release_year'){if(value!==null&&(!Number.isInteger(value)||value<1900||value>2100))throw Error('Release year must be 1900–2100 or blank.');out[field]=value}
-  else{if(typeof value!=='string'||(!['source_url','mobile_image_url','dialogue_english'].includes(field)&&!value.trim())||value.length>(['dialogue','dialogue_english'].includes(field)?10000:['source_url','image_url','mobile_image_url'].includes(field)?600:255))throw Error(`Enter a valid ${field}.`);out[field]=value.trim()}
+  else{if(typeof value!=='string'||(!['source_url','mobile_image_url','dialogue_english','character_english'].includes(field)&&!value.trim())||value.length>(['dialogue','dialogue_english'].includes(field)?10000:['source_url','image_url','mobile_image_url'].includes(field)?600:255))throw Error(`Enter a valid ${field}.`);out[field]=value.trim()}
  }
+ if(kind==='characters'&&!['hero','villain'].includes(out.role))throw Error('Role must be hero or villain.')
  if(kind==='songs'&&!/^[A-Za-z0-9_-]{11}$/.test(out.youtube_id))throw Error('YouTube ID must contain 11 characters.')
  if(out.source_url&&!/^https?:\/\//i.test(out.source_url))throw Error('Source URL must begin with https:// or http://.')
  if(out.mobile_image_url&&!/^(https?:\/\/|\/uploads\/picture-clues\/|\/picture-clues\/)/i.test(out.mobile_image_url))throw Error('Use an image URL or /picture-clues/ path.')

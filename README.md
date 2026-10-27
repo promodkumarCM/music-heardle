@@ -1,13 +1,27 @@
 # Malayalam Music Club
 
-The home-page **Buy me 2 porotta** dialog generates a QR code locally for
-`https://payments.cashfree.com/forms/porotta`, the same ₹60 Porotta Set link used by
-CurrentUndo. The dialog names CurrentUndo as the recipient. This supports that
-project; it is not a PADAM-owned payment account. Optional frontend build settings
-are listed in `frontend/.env.example`. The QR opens the hosted payment page;
-players complete checkout there. PADAM does not track or confirm payments.
+## Character Files — Cast Dossier
 
-Use **Report a bug** on the home page to send an issue to the admin. Reports appear
+The sixth game shows a hero or villain's **character name**, and players identify
+the movie. Its paper casting-file theme uses a hero/villain stamp and bilingual
+name controls. Solo, Host and Buzzer use the shared setup, room lifecycle, answer
+matching, scores and buzzer timer. Correct answers earn 100 points; reveals earn
+zero. The movie answer stays server-side until settlement, except for the host's
+answer check. Players can contribute suggestions for admin review.
+
+Before using it with an existing database, run from `backend`:
+`node --env-file=.env migrate-characters.js`. This creates an empty catalog without
+changing existing entries. Add verified content through **Admin → Character Files**:
+movie, character name, optional English name, hero/villain role, movie aliases and
+an optional source URL. Multiple characters can belong to the same movie.
+
+The footer groups **Buy me 2 porotta** and **Report a bug**. Both open popups.
+The support popup offers food-themed amounts and a custom amount. Until verified
+UPI details are set in frontend build variables (see frontend/.env.example), it
+shows a labelled non-payment demo QR and disables checkout. It does not redirect
+to CurrentUndo or its Cashfree page. No running-cost totals are fabricated.
+
+Use **Report a bug** in the home-page footer to send an issue to the admin. Reports appear
 in the separate **Bug reports** queue and can be marked resolved. This uses the same
 contributions table and migration described below.
 
