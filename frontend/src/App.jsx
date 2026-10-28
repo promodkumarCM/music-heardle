@@ -51,7 +51,7 @@ function CinemaHome() {
             ))}
           </div>
 
-          <section className="home-contribute" aria-labelledby="contribute-title"><div><span className="cinema-eyebrow">JOIN THE CREW</span><h3 id="contribute-title">Your movie memory deserves a screen credit.</h3><p>Know a legendary dialogue, sneaky clue or unforgettable character? Send it backstage. We’ll check it and put it in the spotlight.</p></div><ContributionForm home/></section>
+          <section className="home-contribute" aria-labelledby="contribute-title"><div><span className="cinema-eyebrow">JOIN THE CREW</span><h3 id="contribute-title">Know a good clue?</h3><p>Share it. We’ll check it and add it to the game.</p></div><ContributionForm home/></section>
         </section>
         <a className="admin-home-link" href="#admin">Admin ↗</a>
         <footer className="cinema-footer"><span>PADAM / THE FILM PLAYHOUSE</span><div className="home-footer-actions"><SupportProject/><ContributionForm game="bug"/></div><span>For the fans. For the fun.</span></footer>
