@@ -550,6 +550,13 @@ html { scrollbar-gutter:stable; }
 @media(max-width:480px) { .admin-entry-actions { flex-direction:column; } .admin-entry-actions button { min-height:44px; } }
 
 .admin-dialogue-pairs { margin:16px 0 24px; }
+.actor-character-pair { min-width:0; padding:14px; margin:18px 0; border:1px solid #a58b5d66; border-radius:8px; background:#19231b; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+.actor-character-pair legend { color:#dfc18a; padding:0 6px; font-size:13px; }
+.actor-character-pair label { margin:0; }
+.actor-character-pair>button { grid-column:1/-1; justify-self:start; }
+.actor-editor-actions { display:flex; flex-wrap:wrap; gap:10px; }
+.actor-workspace .admin-editor input,.actor-workspace .admin-editor textarea { padding:7px 9px; font-size:14px; }
+@media(max-width:600px) { .actor-character-pair { grid-template-columns:minmax(0,1fr); } }
 .contribution-widget { margin:8px auto 20px; max-width:650px; font-size:13px; }
 .support-project { text-align:center; margin:0 auto 24px; }
 .character-file { position:relative; margin:30px 0 24px; padding:24px; border:1px solid #b6a17b; border-radius:4px 14px 14px 14px; background:repeating-linear-gradient(0deg,transparent 0 31px,#58493112 31px 32px),#e7dcc0; color:#332d23; box-shadow:0 14px 30px #0004; }

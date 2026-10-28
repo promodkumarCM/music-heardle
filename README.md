@@ -2,6 +2,13 @@
 
 ## Character Files — Cast Dossier
 
+Admin groups Character Files by actor. Enter the actor and upload a shared photo
+once, then use **Add character and movie** for each character/movie pair. Select
+an actor on the left to edit their existing pairs or add more. **Save actor and
+characters** saves the batch atomically; invalid or duplicate pairs save nothing.
+Each pair remains a separate game clue, using the same actor photo. Existing
+catalog entries are grouped automatically, with no database migration required.
+
 The sixth game first shows a film's **character name**, and players identify
 the movie. Its paper casting-file theme uses a character-name label and bilingual
 name controls. Solo, Host and Buzzer use the shared setup, room lifecycle, answer
