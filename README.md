@@ -2,17 +2,23 @@
 
 ## Character Files — Cast Dossier
 
-The sixth game shows a hero or villain's **character name**, and players identify
+The sixth game first shows a hero or villain's **character name**, and players identify
 the movie. Its paper casting-file theme uses a hero/villain stamp and bilingual
 name controls. Solo, Host and Buzzer use the shared setup, room lifecycle, answer
-matching, scores and buzzer timer. Correct answers earn 100 points; reveals earn
-zero. The movie answer stays server-side until settlement, except for the host's
+matching, scores and buzzer timer. There is no difficulty selection for this game.
+Every round starts with just the character for 100 points. **Reveal actor**, below
+the character on the main screen, displays the optional actor photo (or name when
+no usable photo is available) and lowers the round to 60 points. In Buzzer mode,
+only the creator reveals this shared hint while buzzers are open. The actor name
+and photo URL stay server-side until hinted or settled. Reveals reset each round.
+Revealing the movie earns zero.
+The movie answer stays server-side until settlement, except for the host's
 answer check. Players can contribute suggestions for admin review.
 
 Before using it with an existing database, run from `backend`:
-`node --env-file=.env migrate-characters.js`. This creates an empty catalog without
+`node --env-file=.env migrate-characters.js`. This creates the catalog and adds the actor-name and optional photo columns to existing installations without
 changing existing entries. Add verified content through **Admin → Character Files**:
-movie, character name, optional English name, hero/villain role, movie aliases and
+movie, actor name, optional actor photo URL, character name, optional English name, hero/villain role, movie aliases and
 an optional source URL. Multiple characters can belong to the same movie.
 
 The footer groups **Buy me 2 porotta** and **Report a bug**. Both open popups.

@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS contributions (
 
 CREATE TABLE IF NOT EXISTS character_puzzles (
  id INT AUTO_INCREMENT PRIMARY KEY,
- movie VARCHAR(255) NOT NULL, character_name VARCHAR(255) NOT NULL,
+ movie VARCHAR(255) NOT NULL, actor_name VARCHAR(255) NOT NULL DEFAULT '', actor_image_url VARCHAR(600) NOT NULL DEFAULT '', character_name VARCHAR(255) NOT NULL,
  character_english VARCHAR(255) NOT NULL DEFAULT '', role VARCHAR(20) NOT NULL,
  aliases JSON NOT NULL, source_url VARCHAR(600) NOT NULL DEFAULT '',
  UNIQUE KEY unique_movie_character (movie,character_name)

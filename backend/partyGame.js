@@ -8,7 +8,7 @@ import {fail,partyAction,partyView,expireParty,chooseWord,beginQuestion} from '.
 const router=express.Router(),rooms=new Map()
 const parse=x=>typeof x==='string'?JSON.parse(x):x
 async function catalog(game) {
-  const queries={characters:'SELECT id,movie,character_name,character_english,role,aliases FROM character_puzzles',pictures:'SELECT id,movie,image_url,mobile_image_url FROM picture_puzzles',lyrics:'SELECT id,title,sections FROM lyric_songs',dialogue:'SELECT id,movie,dialogue,dialogue_english,dialogue_variants FROM dialogues',clues:'SELECT id,movie,clues FROM movie_puzzles',song:'SELECT id,title,movie,youtube_id FROM songs'}
+  const queries={characters:'SELECT id,movie,actor_name,actor_image_url,character_name,character_english,role,aliases FROM character_puzzles',pictures:'SELECT id,movie,image_url,mobile_image_url FROM picture_puzzles',lyrics:'SELECT id,title,sections FROM lyric_songs',dialogue:'SELECT id,movie,dialogue,dialogue_english,dialogue_variants FROM dialogues',clues:'SELECT id,movie,clues FROM movie_puzzles',song:'SELECT id,title,movie,youtube_id FROM songs'}
   if(!Object.hasOwn(queries,game))fail('Choose a game.',400)
   let rows
   try{[rows]=await pool.query(queries[game])}catch(error){if(game==='characters'&&error.code==='ER_NO_SUCH_TABLE')fail('Character Files is not set up yet. Ask the admin to finish setting up this game.',503);throw error}
@@ -17,9 +17,10 @@ async function catalog(game) {
   return usable
 }
 function next(room) {
+  room.actorRevealed=false
   room.index=(room.index+1)%room.catalog.length
   const row=room.catalog[room.index]
-  room.content=room.game==='characters'?{name:row.character_name,english:row.character_english||'',role:row.role}:room.game==='lyrics'?puzzle(parse(row.sections),room.difficulty):room.game==='pictures'?row.image_url:room.game==='clues'?parse(row.clues):room.game==='dialogue'?row.dialogue:row.youtube_id
+  room.content=room.game==='characters'?{actor:row.actor_name||'',actorImage:row.actor_image_url||'',name:row.character_name,english:row.character_english||'',role:row.role}:room.game==='lyrics'?puzzle(parse(row.sections),room.difficulty):room.game==='pictures'?row.image_url:room.game==='clues'?parse(row.clues):room.game==='dialogue'?row.dialogue:row.youtube_id
   room.answer=room.game==='song'?`${row.title} — ${row.movie}`:row.movie
   room.target=room.game==='song'?row.title:row.movie
   room.mobileImage=row.mobile_image_url||null;room.dialogueEnglish=room.game==='dialogue'?(row.dialogue_english||''):'';room.active=null;room.settled={};room.clue=1;room.notice='';room.round++
@@ -31,6 +32,7 @@ router.use((req,res,next)=>{res.set('Cache-Control','no-store');next()})
 router.post('/rooms',wrap(async(req,res)=>{
   const {mode,game,teams,seconds=15,difficulty='easy',name='Player 1'}=req.body
   if(!['host','buzzer','solo'].includes(mode)||!difficulties.includes(difficulty)||!Number.isInteger(seconds)||seconds<5||seconds>120)fail('Choose a valid mode, difficulty, and 5–120 second timer.',400)
+  if(game==='characters'&&!['easy','hard'].includes(difficulty))fail('Choose Easy or Hard for Character Files.',400)
   if(typeof name!=='string'||!name.trim()||name.length>30)fail('Enter your name (up to 30 characters).',400)
   if(mode==='host'&&(!Array.isArray(teams)||teams.length<2||teams.length>8||teams.some(n=>typeof n!=='string'||!n.trim()||n.length>30)||new Set(teams.map(n=>n.trim().toLowerCase())).size!==teams.length))fail('Enter 2–8 unique team names.',400)
   if(rooms.size>=500)fail('Rooms are full. Try later.',503)

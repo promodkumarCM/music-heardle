@@ -3,6 +3,7 @@ import {normalizeMovie, matchMovie} from './movieMatching.js'
 
 export const fail = (message, status=409) => { throw Object.assign(new Error(message), {status}) }
 const blanks = room => room.content.flat().filter(w=>w.id!==undefined)
+export const characterPoints=room=>room.actorRevealed?60:100
 export function beginQuestion(room) {
   room.blocked=[]; room.winner=null; room.deadline=null;room.skipVotes=[];room.notice=''
   room.phase=room.mode==='host'?'closed':room.mode==='solo'?'answering':'open'
@@ -12,7 +13,7 @@ export function chooseWord(room) {
   room.active=(remaining.find(w=>w.id>(room.active??-1))||remaining[0])?.id ?? null
 }
 function settle(room, correct, team) {
-  if(correct) room.teams[team].score+=room.game==='lyrics'?10:room.game==='clues'?120-room.clue*20:100
+  if(correct) room.teams[team].score+=room.game==='lyrics'?10:room.game==='clues'?120-room.clue*20:room.game==='characters'?characterPoints(room):100
   room.settled[room.active??0]=true;room.phase='settled';room.winner=null;room.deadline=null
 }
 function miss(room, team) {
@@ -72,6 +73,9 @@ export function partyAction(room, player, body, now=Date.now()) {
     if(room.mode==='host'&&!creator)fail('Host only.',403)
     chooseWord(room);if(room.active===null)fail('All ten words are finished. Start the next song.')
     beginQuestion(room)
+  } else if(a==='actor') {
+    if(room.game!=='characters'||!creator||room.actorRevealed||(!room.content.actor&&!room.content.actorImage)||!['closed','open','answering'].includes(room.phase)||room.mode==='buzzer'&&room.phase!=='open')fail('The actor hint is not available.')
+    room.actorRevealed=true;room.notice='Actor revealed. This round is now worth 60 points for everyone.'
   } else if(a==='clue') {
     if(room.game!=='clues'||room.clue>=5||!['open','closed','answering'].includes(room.phase)||room.mode==='buzzer'&&room.phase!=='open')fail('Cannot open another clue now.')
     if(room.mode==='host'&&!creator)fail('Host only.',403)
@@ -87,13 +91,16 @@ export function partyView(room,player,now=Date.now()) {
   const answer=room.game==='lyrics'?blanks(room).find(w=>w.id===room.active)?.text:room.answer
   const content=room.phase==='lobby'?null:room.game==='lyrics'
     ? room.content.map(s=>s.map(w=>w.id===undefined?w:{id:w.id,text:room.settled[w.id]?w.text:null}))
-    :room.game==='clues'?room.content.slice(0,room.clue):room.content
+    :room.game==='clues'?room.content.slice(0,room.clue):room.game==='characters'
+      ? {name:room.content.name,english:room.content.english,role:room.content.role,...(room.actorRevealed||finished?{actor:room.content.actor,actorImage:room.content.actorImage||''}:{})}
+      :room.content
   return {code:room.code,mode:room.mode,game:room.game,difficulty:room.difficulty,host,creator:player.id===room.creator,
     me:player.id,team:player.team,phase:room.phase,round:room.round,version:room.version,seconds:room.seconds,
     content,dialogueEnglish:room.game==='dialogue'&&room.phase!=='lobby'?room.dialogueEnglish:undefined,mobileImage:room.mobileImage,active:room.active,settled:room.settled,blocked:room.blocked,
     winner:room.winner,deadline:room.deadline,serverNow:now,notice:room.notice,clue:room.clue,skipVotes:room.skipVotes||[],
     teams:room.teams.map(({name,score})=>({name,score})),players:room.players.map(({id,name,team})=>({id,name,team})),
     complete:room.game!=='lyrics'||Object.keys(room.settled).length===10,
+    ...(room.game==='characters'?{actorRevealed:!!room.actorRevealed,actorHintAvailable:!room.actorRevealed&&!!(room.content.actor||room.content.actorImage),availablePoints:characterPoints(room)}:{}),
     ...(host||finished?{answer}:{}),
   }
 }

@@ -96,7 +96,7 @@ export default function PartyGame({mode='buzzer',game:gameProp,backdrop}) {
           {game==='lyrics'&&<label>Difficulty<select value={difficulty} onChange={e=>setDifficulty(e.target.value)}><option value="easy">Easy</option><option value="medium">Medium</option><option value="hard">Hard</option></select></label>}
           {mode==='buzzer'&&<label>Answer timer (seconds)<input required type="number" min={5} max={120} value={seconds} onChange={e=>setSeconds(Number(e.target.value))}/></label>}
         </>}
-        <p>{mode==='buzzer'?'Each player competes individually. The room creator plays too. Answers and points are checked automatically.':mode==='host'?'Teams answer aloud. Award points to the first correct team, or reveal for no points.':game==='lyrics'?'Complete 10 missing words. Each correct answer earns 10 points.':''}</p>
+        {game==='characters'&&<p>Character name first. Reveal the actor on the game screen if you need a hint: the round then awards 60 points instead of 100.</p>}<p>{mode==='buzzer'?'Each player competes individually. The room creator plays too. Answers and points are checked automatically.':mode==='host'?'Teams answer aloud. Award points to the first correct team, or reveal for no points.':game==='lyrics'?'Complete 10 missing words. Each correct answer earns 10 points.':''}</p>
         <button disabled={busy}>{busy?'Loading…':mode==='buzzer'?(tab==='join'?'Join room':'Create room & join'):'Start game'}</button>
       </form>
     </section>}
@@ -107,7 +107,7 @@ export default function PartyGame({mode='buzzer',game:gameProp,backdrop}) {
     {error&&preflight&&<p role="alert">{error}</p>}
     </dialog>
     {room&&!preflight&&<>
-      <div className="lyrics-room-bar"><span>{labels[mode]} · Round {room.round}{game==='lyrics'?` · ${room.difficulty} · 10 hidden words`:''}</span><button disabled={busy} onClick={leave}>Leave game</button></div>
+      <div className="lyrics-room-bar"><span>{labels[mode]} · Round {room.round}{game==='characters'?' · '+room.availablePoints+' points':''}{game==='lyrics'?` · ${room.difficulty} · 10 hidden words`:''}</span><button disabled={busy} onClick={leave}>Leave game</button></div>
       <div className="party-scores">{room.teams.map((team,i)=><div key={i} className={room.winner?.team===i?'winning':''}><span>{team.name}{mode==='buzzer'&&room.team===i?' (you)':''}</span><strong>{team.score} pts</strong></div>)}</div>
       {phase!=='lobby'&&<>
         <LyricsPlayLayout enabled={game==='lyrics'} activeKey={`${room.round}:${room.active}`}>
@@ -122,7 +122,7 @@ export default function PartyGame({mode='buzzer',game:gameProp,backdrop}) {
           {mode==='buzzer'&&room.blocked.includes(room.team)&&!settled&&<p>Your attempt is used. Other players can still buzz.</p>}
           {mode==='buzzer'&&phase==='open'&&<button disabled={busy||room.skipVotes.includes(room.me)} onClick={()=>act('skip')}>{room.skipVotes.includes(room.me)?'Skip vote recorded':'Vote to skip round'} · {room.skipVotes.length}/{Math.floor(room.players.length/2)+1}</button>}
           {phase==='answering'&&canAnswer&&mode!=='host'&&(game==='lyrics'?<LyricsAnswerForm resetKey={`${room.round}:${room.active}`} label={`Word ${(room.active??0)+1}`} submitLabel="Check" disabled={busy} onSubmit={answer=>act('guess',{guess:answer})}/>:<form className="party-guess" onSubmit={e=>{e.preventDefault();act('guess',{guess})}}><label>{game==='song'?'Song name':'Movie name'}<input list="party-title-suggestions" autoFocus required autoComplete="off" maxLength={255} value={guess} onChange={e=>setGuess(e.target.value)}/></label><datalist id="party-title-suggestions">{suggestions.map(title=><option key={title} value={title}/>)}</datalist><button disabled={busy||!guess.trim()}>Submit answer</button></form>)}
-          {mode==='host'&&!settled&&<><div className="lyrics-controls">{room.teams.map((team,i)=><button key={i} disabled={busy} onClick={()=>act('mark',{team:i})}>{team.name} · +{game==='lyrics'?10:game==='clues'?120-room.clue*20:100}</button>)}<button disabled={busy} onClick={()=>act('reveal')}>Nobody · Reveal</button></div><details><summary>Check answer</summary><p>{room.answer}</p></details></>}
+          {mode==='host'&&!settled&&<><div className="lyrics-controls">{room.teams.map((team,i)=><button key={i} disabled={busy} onClick={()=>act('mark',{team:i})}>{team.name} · +{game==='lyrics'?10:game==='clues'?120-room.clue*20:game==='characters'?room.availablePoints:100}</button>)}<button disabled={busy} onClick={()=>act('reveal')}>Nobody · Reveal</button></div><details><summary>Check answer</summary><p>{room.answer}</p></details></>}
           {game==='clues'&&!settled&&room.clue<5&&<button disabled={busy||mode==='buzzer'&&phase!=='open'} onClick={()=>act('clue')}>Next clue ({room.clue}/5)</button>}
           {mode==='solo'&&!settled&&<button disabled={busy} onClick={()=>act('reveal')}>Reveal · 0 points</button>}
           {settled&&<><p className="party-revealed-answer">{room.answer}</p><button disabled={busy} onClick={()=>act(game==='lyrics'&&!room.complete?'continue':'next')}>{game==='lyrics'&&!room.complete?'Next word':'Next round'} →</button>
