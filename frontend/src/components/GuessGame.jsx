@@ -1,3 +1,4 @@
+import StockFinished from './StockFinished'
 import { useEffect, useRef, useState } from 'react'
 import Player from './Player'
 import Radio from './Radio'
@@ -20,6 +21,7 @@ export default function GuessGame({ onScoreSaved }) {
   const [busy, setBusy] = useState(false)
   const requestLock = useRef(false)
   const [guess, setGuess] = useState('')
+  const [outOfStock,setOutOfStock]=useState(false)
   const [suggestions,setSuggestions]=useState([])
   const [status, setStatus] = useState('active') // active | correct | revealed
   const [lastTimeMs, setLastTimeMs] = useState(0)
@@ -55,7 +57,7 @@ export default function GuessGame({ onScoreSaved }) {
       .then((catalog) => {
         if (controller.signal.aborted) return
         if (!catalog.length) {
-          setCatalogError('No songs are available yet. Please try again later.')
+          setOutOfStock(true)
           return
         }
         setSongs(catalog)
@@ -66,7 +68,7 @@ export default function GuessGame({ onScoreSaved }) {
       .catch(() => {
         if (!controller.signal.aborted) setCatalogError('Could not load songs. Please try again.')
       })
-    return () => controller.abort()
+  return () => controller.abort()
   }, [catalogRequest, afterYear])
 
   useEffect(() => {
@@ -78,7 +80,7 @@ export default function GuessGame({ onScoreSaved }) {
   useEffect(() => {
     if (!song || status !== 'active' || queueRef.current.length >= 5) return
     const controller = new AbortController()
-    songRequest('queue', {afterYear, exclude:[song.id,...queueRef.current.map(s=>s.id),...unavailableRef.current]}, controller.signal)
+    songRequest('queue', {afterYear,limit:5-queueRef.current.length, exclude:[song.id,...queueRef.current.map(s=>s.id),...unavailableRef.current]}, controller.signal)
       .then(items => { if (!controller.signal.aborted) {
         const used=new Set([song.youtubeId,...queueRef.current.map(s=>s.youtubeId)])
         queueRef.current=[...queueRef.current,...items.filter(s=>!used.has(s.youtubeId))].slice(0,5)
@@ -89,7 +91,7 @@ export default function GuessGame({ onScoreSaved }) {
   async function takeNextSong() {
     if (!queueRef.current.length) queueRef.current = await songRequest('queue', {afterYear,exclude:[songRef.current?.id,...unavailableRef.current]})
     const next=queueRef.current.shift()
-    if (!next) throw new Error('No songs available for this year filter.')
+    if (!next)return null
     return next
   }
 
@@ -108,7 +110,7 @@ export default function GuessGame({ onScoreSaved }) {
   async function handleUnplayable(videoId) {
     if (status!=='active'||songRef.current?.youtubeId!==videoId||requestLock.current) return
     unavailableRef.current.add(songRef.current.id)
-    await nextRound()
+    await nextRound(true)
     setLoadError(true);setPlaybackStatus('Clip unavailable. Press Tune to try the next song.')
   }
 
@@ -129,7 +131,7 @@ export default function GuessGame({ onScoreSaved }) {
 
   function tuneYear(year) {
     if(requestLock.current || year === afterYear)return
-    playerRef.current?.stop();setFullSongId(null);setAfterYear(year);setSongs([]);setSong(null);queueRef.current=[]
+    playerRef.current?.stop();setFullSongId(null);setAfterYear(year);setOutOfStock(false);setSongs([]);setSong(null);queueRef.current=[]
     setGuess('');setStatus('active');setLoadError(false);setPlaybackStatus('Press Tune to play the clip.');setDifficulty(DIFFICULTIES[0])
   }
 
@@ -143,12 +145,13 @@ export default function GuessGame({ onScoreSaved }) {
   async function nextRound(skip = false) {
     if(requestLock.current)return
     requestLock.current=true;setBusy(true);setFullSongId(null);playerRef.current?.stop()
-    try{if(skip)await songRequest(song.id+'/skip');const next=await takeNextSong();setSong(next);setGuess('');setStatus('active');setLoadError(false);setPlaybackStatus('Press Tune to play the clip.');setDifficulty(DIFFICULTIES[0])}
+    try{if(skip)await songRequest(song.id+'/skip');const next=await takeNextSong();if(!next){setSong(null);setOutOfStock(true);return}setSong(next);setGuess('');setStatus('active');setLoadError(false);setPlaybackStatus('Press Tune to play the clip.');setDifficulty(DIFFICULTIES[0])}
     catch(e){setPlaybackStatus(e.message);setCatalogError(e.message)}finally{requestLock.current=false;setBusy(false)}
   }
 
   const nameSet = !!progress.playerName
 
+  if(outOfStock)return <StockFinished game="song"/>
   return (
     <>
       <Radio

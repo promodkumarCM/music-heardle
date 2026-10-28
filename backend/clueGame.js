@@ -1,9 +1,10 @@
+import {drawStock} from './stock.js'
 import { Router } from 'express'
 import { randomUUID } from 'node:crypto'
 import { pool } from './db.js'
 import { matchMovie } from './movieMatching.js'
 const router = Router()
-const rounds = new Map()
+const rounds = new Map(), stocks = new Map()
 const parse = value => typeof value === 'string' ? JSON.parse(value) : value
 const snapshot = round => ({ token: round.token, puzzleId: round.id, clues: round.clues.slice(0, round.count), availablePoints: (6-round.count)*20, status: round.status, ...(round.status !== 'active' ? {movie: round.movie, points: round.points} : {}) })
 router.post('/start', async (req,res) => {
@@ -16,7 +17,13 @@ router.post('/start', async (req,res) => {
     const list=candidates.length?candidates:valid
     if(!list.length) return res.status(503).json({error:'No movie puzzles available yet.'})
     const [other] = await pool.query('SELECT DISTINCT movie FROM songs')
-    const row=list[Math.floor(Math.random()*list.length)]
+    const session=typeof req.body?.session==='string'?req.body.session.slice(0,100):null
+    for(const [key,value] of stocks)if(value.expires<Date.now())stocks.delete(key)
+    if(session&&!stocks.has(session)&&stocks.size>=5000)return res.status(503).json({error:'Please try again shortly.'})
+    const stock=(session&&stocks.get(session))||{};stock.expires=Date.now()+7200000
+    const row=drawStock(valid,stock)
+    if(session)stocks.set(session,stock)
+    if(!row)return res.json({status:'exhausted',clues:[],availablePoints:0,points:0})
     const catalog=[...valid,...other.filter(s=>!valid.some(v=>v.movie===s.movie)).map(s=>({...s,aliases:[]}))]
     const round={...row,token:randomUUID(),count:1,status:'active',points:0,catalog,expires:Date.now()+2*60*60*1000}
     rounds.set(round.token,round)

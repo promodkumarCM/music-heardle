@@ -1,5 +1,23 @@
 # Malayalam Music Club
 
+## Fresh stock and actor photo collections
+
+Actor Admin accepts up to 20 photos per actor (8 MB each). Save the actor to apply
+the collection to all their characters. Each round chooses a random photo,
+avoiding the last photo for that actor when another is available. Existing single
+photos remain usable. Run backend/migrate-characters.js with the backend environment
+to add the nullable actor_image_urls column before deploying the updated API.
+
+Game rounds use shuffled, non-repeating stock. Movie and character clues are
+separated when alternatives remain; when only one movie remains, consecutive
+clues from it are unavoidable. Stock ends instead of automatically restarting.
+The finished screen invites players to contribute clues or support with porotta.
+Room stock is tracked per game, including across game switches; starting a new
+room starts a new playthrough. Solo pictures/dialogues use their loaded set.
+Solo songs and Five Clues track stock per browser-tab session on the API for up
+to two hours of inactivity. API restarts clear in-memory stock histories.
+
+
 ## Character Files — Cast Dossier
 
 Admin groups Character Files by actor. Enter the actor and upload a shared photo

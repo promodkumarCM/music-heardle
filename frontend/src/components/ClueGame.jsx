@@ -1,3 +1,4 @@
+import StockFinished from './StockFinished'
 import FilmClues from './FilmClues'
 import GameModes from './GameModes'
 import { useEffect, useRef, useState } from 'react'
@@ -80,6 +81,7 @@ export default function ClueGame() {
     const interval=setInterval(tick,200)
     return ()=>clearInterval(interval)
   },[timerSeconds,active,expired,error,busy,round?.token,round?.clues.length])
+  if(round?.status==='exhausted')return <main className="cinema-home"><div className="dialogue-shell"><GameModes game="clues"/><StockFinished game="clues"/></div></main>
   return <main className="cinema-home clue-page"><div className="dialogue-shell">
     <header className="dialogue-nav"><a href="#">← All games</a><span>PADAM / GAME 04</span></header>
     <div className="dialogue-heading"><p className="cinema-eyebrow">THE FIVE-CLUE MYSTERY</p><h1>Five clues.<br/><em>One movie.</em></h1><p>The sooner it clicks, the more points you earn.</p></div>

@@ -17,7 +17,7 @@ test('actor batches share metadata, validate every pair, protect IDs and roll ba
  const server=app.listen(0,'127.0.0.1');await new Promise(resolve=>server.once('listening',resolve))
  const base=`http://127.0.0.1:${server.address().port}/admin`
  async function post(path,body,token){const response=await fetch(base+path,{method:'POST',headers:{'Content-Type':'application/json',...(token?{Authorization:`Bearer ${token}`}:{})},body:JSON.stringify(body)});return {status:response.status,data:await response.json()}}
- const batch={actor_name:'Test Actor',actor_image_url:'/picture-clues/actor.png',entries:[{character_name:'First Character',character_english:'First',movie:'First Movie',aliases:[]},{character_name:'Second Character',movie:'Second Movie',aliases:['Other Title']}]}
+ const batch={actor_name:'Test Actor',actor_image_url:'/picture-clues/actor.png',actor_image_urls:['/picture-clues/actor.png','/picture-clues/actor2.png'],entries:[{character_name:'First Character',character_english:'First',movie:'First Movie',aliases:[]},{character_name:'Second Character',movie:'Second Movie',aliases:['Other Title']}]}
  try{
   assert.equal((await post('/characters/batch',batch)).status,401)
   const {data:{token}}=await post('/login',{username:'admin',password:'admin'})
@@ -26,7 +26,7 @@ test('actor batches share metadata, validate every pair, protect IDs and roll ba
   const result=await post('/characters/batch',batch,token)
   assert.equal(result.status,201);assert.equal(result.data.ids.length,2);assert.equal(commits,1)
   const inserts=queries.filter(row=>row.sql.startsWith('INSERT'));assert.equal(inserts.length,2)
-  for(const row of inserts){assert.ok(row.params.includes('Test Actor'));assert.ok(row.params.includes('/picture-clues/actor.png'))}
+  for(const row of inserts){assert.ok(row.params.includes('Test Actor'));assert.ok(row.params.includes('/picture-clues/actor.png'));assert.ok(row.params.includes(JSON.stringify(batch.actor_image_urls)))}
   assert.equal((await post('/characters/batch',{...batch,entries:[batch.entries[0],batch.entries[0]]},token)).status,400)
   existing=[{id:1}];queries=[]
   const update=await post('/characters/batch',{...batch,original_actor:'Test Actor',entries:[{...batch.entries[0],id:1},batch.entries[1]]},token)

@@ -39,7 +39,9 @@ test('room API supports all games, host scoring, creator participation, and scor
     r=(await post(`/rooms/${code}/action`,{action:'guess',guess:'Movie',version:r.version},creatorToken)).data
     assert.equal(r.teams[0].score,100);assert.equal(r.phase,'settled')
     r=(await post(`/rooms/${code}/action`,{action:'next',version:r.version},playerToken)).data
-    assert.equal(r.phase,'open');assert.equal(r.teams[0].score,100)
+    assert.equal(r.phase,'exhausted');assert.equal(r.teams[0].score,100)
+    r=(await post(`/rooms/${code}/action`,{action:'game',version:r.version,game:'dialogue'},creatorToken)).data
+    assert.equal(r.game,'dialogue');assert.equal(r.phase,'open');assert.equal(r.teams[0].score,100)
     const {status,data:solo}=await post('/rooms',{mode:'solo',game:'lyrics',difficulty:'medium'})
     assert.equal(status,201);assert.equal(solo.phase,'answering');assert.equal(solo.answer,undefined)
     assert.equal((await post('/rooms',{mode:'host',game:'pictures',teams:['Same','same']})).status,400)

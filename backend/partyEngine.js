@@ -66,7 +66,7 @@ export function partyAction(room, player, body, now=Date.now()) {
     if(!Number.isInteger(body.team)||!room.teams[body.team])fail('Choose a team.',400)
     settle(room,true,body.team);room.notice=room.teams[body.team].name+' wins the answer.'
   } else if(a==='reveal') {
-    if(room.mode==='buzzer'||!creator||room.phase==='lobby'||room.phase==='settled')fail('Reveal is not available.')
+    if(room.mode==='buzzer'||!creator||['lobby','settled','exhausted'].includes(room.phase))fail('Reveal is not available.')
     settle(room,false,player.team)
   } else if(a==='continue') {
     if(room.phase!=='settled'||room.game!=='lyrics')fail('Finish the current word first.')
@@ -89,7 +89,7 @@ export function partyView(room,player,now=Date.now()) {
   const host=room.mode==='host'
   const finished=room.phase==='settled'
   const answer=room.game==='lyrics'?blanks(room).find(w=>w.id===room.active)?.text:room.answer
-  const content=room.phase==='lobby'?null:room.game==='lyrics'
+  const content=['lobby','exhausted'].includes(room.phase)?null:room.game==='lyrics'
     ? room.content.map(s=>s.map(w=>w.id===undefined?w:{id:w.id,text:room.settled[w.id]?w.text:null}))
     :room.game==='clues'?room.content.slice(0,room.clue):room.game==='characters'
       ? {name:room.content.name,english:room.content.english,role:room.content.role,actorImage:room.content.actorImage||'',...(room.actorRevealed||finished?{actor:room.content.actor}:{})}
@@ -99,7 +99,7 @@ export function partyView(room,player,now=Date.now()) {
     content,dialogueEnglish:room.game==='dialogue'&&room.phase!=='lobby'?room.dialogueEnglish:undefined,mobileImage:room.mobileImage,active:room.active,settled:room.settled,blocked:room.blocked,
     winner:room.winner,deadline:room.deadline,serverNow:now,notice:room.notice,clue:room.clue,skipVotes:room.skipVotes||[],
     teams:room.teams.map(({name,score})=>({name,score})),players:room.players.map(({id,name,team})=>({id,name,team})),
-    complete:room.game!=='lyrics'||Object.keys(room.settled).length===10,
+    complete:room.phase==='exhausted'||room.game!=='lyrics'||Object.keys(room.settled).length===10,
     ...(room.game==='characters'?{actorRevealed:!!room.actorRevealed,actorHintAvailable:!room.actorRevealed&&!!room.content.actor,availablePoints:characterPoints(room)}:{}),
     ...(host||finished?{answer}:{}),
   }

@@ -1,8 +1,9 @@
+import {drawStock,stockKey} from './stock.js'
 import {Router} from 'express'
-import {randomUUID,randomInt} from 'node:crypto'
+import {randomUUID} from 'node:crypto'
 import {pool} from './db.js'
 import {normalizeMovie} from './movieMatching.js'
-const router=Router(),rounds=new Map(),limits=new Map()
+const router=Router(),rounds=new Map(),limits=new Map(),stocks=new Map()
 const durations={9:1,7:3,5:5,3:8,1:12}
 router.use((req,res,next)=>{res.set('Cache-Control','no-store');const now=Date.now(),key=req.ip;let rate=limits.get(key);if(!rate||now-rate.start>60000){rate={start:now,n:0};limits.set(key,rate)}if(++rate.n>120)return res.status(429).json({error:'Too many requests. Please wait a minute.'});next()})
 const view=r=>({id:r.token,youtubeId:r.youtube_id,status:r.status,...(r.status!=='active'?{title:r.title,movie:r.movie,points:r.points,timeMs:r.timeMs,scoreSaved:r.scoreSaved}: {})})
@@ -13,9 +14,18 @@ router.post('/queue',async(req,res)=>{
  try{
   const [rows]=await pool.query('SELECT id,title,movie,youtube_id FROM songs WHERE (? = 0 OR release_year > ?)',[year,year])
   const excluded=new Set((Array.isArray(req.body.exclude)?req.body.exclude.slice(0,30):[]).map(t=>rounds.get(t)?.id))
-  let available=rows.filter(r=>!excluded.has(r.id));if(!available.length)available=rows
-  const result=[]
-  while(available.length&&result.length<6){const row=available.splice(randomInt(available.length),1)[0];const r={...row,afterYear:year,token:randomUUID(),status:'active',points:0,timeMs:0,started:null,weight:9,expires:Date.now()+7200000,scoreSaved:false};rounds.set(r.token,r);result.push(view(r))}
+  const session=typeof req.body.session==='string'?req.body.session.slice(0,100):null
+  if(session&&!stocks.has(session)&&stocks.size>=5000)return res.status(503).json({error:'Please try again shortly.'})
+  const stock=(session&&stocks.get(session))||{used:new Set()}
+  for(const row of rows)if(excluded.has(row.id))stock.used.add(stockKey(row))
+  stock.expires=Date.now()+7200000
+  if(session)stocks.set(session,stock)
+  const limit=Number.isInteger(req.body.limit)&&req.body.limit>=1&&req.body.limit<=6?req.body.limit:6
+  stock.tokens??=[]
+  const excludedTokens=new Set(Array.isArray(req.body.exclude)?req.body.exclude:[])
+  const pending=stock.tokens.map(token=>rounds.get(token)).filter(round=>round&&round.status==='active'&&!round.started&&!excludedTokens.has(round.token))
+  const result=pending.slice(0,limit).map(view)
+  while(result.length<limit){const row=drawStock(rows,stock);if(!row)break;const r={...row,afterYear:year,token:randomUUID(),status:'active',points:0,timeMs:0,started:null,weight:9,expires:Date.now()+7200000,scoreSaved:false};rounds.set(r.token,r);stock.tokens.push(r.token);result.push(view(r))}
   res.json(result)
  }catch{res.status(503).json({error:'Could not load songs.'})}
 })
@@ -56,5 +66,5 @@ router.post('/:token/:action',async(req,res)=>{
  }
  r.status=status;res.json(view(r))
 })
-setInterval(()=>{const now=Date.now();for(const [key,r] of rounds)if(r.expires<now)rounds.delete(key);for(const [key,r] of limits)if(now-r.start>60000)limits.delete(key)},60000).unref()
+setInterval(()=>{const now=Date.now();for(const [key,r] of rounds)if(r.expires<now)rounds.delete(key);for(const [key,r] of limits)if(now-r.start>60000)limits.delete(key);for(const [key,r] of stocks)if(r.expires<now)stocks.delete(key)},60000).unref()
 export default router

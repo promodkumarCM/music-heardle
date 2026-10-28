@@ -1,10 +1,11 @@
+import {createHash} from 'node:crypto'
 import {Router} from 'express'
 import {pool} from './db.js'
 import {matchMovie} from './movieMatching.js'
 const router=Router()
 router.use((req,res,next)=>{res.set('Cache-Control','no-store');next()})
 router.get('/',async(req,res)=>{
- try{const [rows]=await pool.query('SELECT id,image_url,mobile_image_url FROM picture_puzzles ORDER BY id');res.json(rows)}
+ try{const [rows]=await pool.query('SELECT id,movie,image_url,mobile_image_url FROM picture_puzzles ORDER BY id');res.json(rows.map(({movie,...row})=>({...row,group:createHash('sha256').update(String(movie||row.id)).digest('hex')})))}
  catch{res.status(503).json({error:'Could not load picture clues.'})}
 })
 router.post('/:id/guess',async(req,res)=>{

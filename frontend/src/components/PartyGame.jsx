@@ -1,3 +1,4 @@
+import StockFinished from './StockFinished'
 import LyricsAnswerResult from './LyricsAnswerResult'
 import LyricsPlayLayout from './LyricsPlayLayout'
 import {useEffect,useRef,useState} from 'react'
@@ -108,7 +109,7 @@ export default function PartyGame({mode='buzzer',game:gameProp,backdrop}) {
     </dialog>
     {room&&!preflight&&<>
       <div className="party-scores">{room.teams.map((team,i)=><div key={i} className={room.winner?.team===i?'winning':''}><span>{team.name}{mode==='buzzer'&&room.team===i?' (you)':''}</span><strong>{team.score} pts</strong></div>)}</div>
-      {phase!=='lobby'&&<>
+      {phase==='exhausted'?<><StockFinished game={game}/>{room.creator&&mode!=='solo'&&<form className="party-switch" onSubmit={e=>{e.preventDefault();act('game',{game:nextGame})}}><label>Switch game · keep scores<select value={nextGame} onChange={e=>setNextGame(e.target.value)}>{Object.entries(games).map(([key,title])=><option key={key} value={key}>{title}</option>)}</select></label><button disabled={busy||nextGame===game}>Switch game</button></form>}</>:phase!=='lobby'&&<>
         <LyricsPlayLayout enabled={game==='lyrics'} activeKey={`${room.round}:${room.active}`}>
         <BuzzerStage game={game} room={room} busy={busy} act={act} automaticWords={mode==='buzzer'}/>
         <section className="party-answer-panel clue-case">
