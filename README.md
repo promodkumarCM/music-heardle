@@ -14,11 +14,10 @@ The sixth game first shows a film's **character name**, and players identify
 the movie. Its paper casting-file theme uses a character-name label and bilingual
 name controls. Solo, Host and Buzzer use the shared setup, room lifecycle, answer
 matching, scores and buzzer timer. There is no difficulty selection for this game.
-Every round starts with just the character for 100 points. **Reveal actor**, below
-the character on the main screen, displays the optional actor photo (or name when
-no usable photo is available) and lowers the round to 60 points. In Buzzer mode,
-only the creator reveals this shared hint while buzzers are open. The actor name
-and photo URL stay server-side until hinted or settled. Reveals reset each round.
+Every round shows the character and saved actor photo for 100 points.
+**Reveal actor name**, below the photo, optionally reveals the name and lowers
+the round to 60 points. In Buzzer mode,
+only the creator reveals this shared hint while buzzers are open. The actor name stays server-side until hinted or settled. Reveals reset each round.
 Revealing the movie earns zero.
 The movie answer stays server-side until settlement, except for the host's
 answer check. Players can contribute suggestions for admin review.

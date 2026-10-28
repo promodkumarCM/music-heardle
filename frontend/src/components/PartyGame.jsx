@@ -96,7 +96,7 @@ export default function PartyGame({mode='buzzer',game:gameProp,backdrop}) {
           {game==='lyrics'&&<label>Difficulty<select value={difficulty} onChange={e=>setDifficulty(e.target.value)}><option value="easy">Easy</option><option value="medium">Medium</option><option value="hard">Hard</option></select></label>}
           {mode==='buzzer'&&<label>Answer timer (seconds)<input required type="number" min={5} max={120} value={seconds} onChange={e=>setSeconds(Number(e.target.value))}/></label>}
         </>}
-        {game==='characters'&&<p>Character name first. Reveal the actor on the game screen if you need a hint: the round then awards 60 points instead of 100.</p>}<p>{mode==='buzzer'?'Each player competes individually. The room creator plays too. Answers and points are checked automatically.':mode==='host'?'Teams answer aloud. Award points to the first correct team, or reveal for no points.':game==='lyrics'?'Complete 10 missing words. Each correct answer earns 10 points.':''}</p>
+        {game==='characters'&&<p>Character name and actor photo are shown. Reveal the actor’s name if you need a hint: the round then awards 60 points instead of 100.</p>}<p>{mode==='buzzer'?'Each player competes individually. The room creator plays too. Answers and points are checked automatically.':mode==='host'?'Teams answer aloud. Award points to the first correct team, or reveal for no points.':game==='lyrics'?'Complete 10 missing words. Each correct answer earns 10 points.':''}</p>
         <button disabled={busy}>{busy?'Loading…':mode==='buzzer'?(tab==='join'?'Join room':'Create room & join'):'Start game'}</button>
       </form>
     </section>}
