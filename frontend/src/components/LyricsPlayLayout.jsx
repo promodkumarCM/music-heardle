@@ -1,7 +1,7 @@
 import {useEffect,useRef} from 'react'
 import './LyricsPlayLayout.css'
 
-export default function LyricsPlayLayout({enabled=true,activeKey,children}) {
+export default function LyricsPlayLayout({enabled=true,activeKey,fitViewport=false,readingLabel='Scroll song lyrics',answerLabel='Selected word answer',children}) {
  const root=useRef(null)
  useEffect(()=>{
   if(!enabled)return
@@ -10,8 +10,8 @@ export default function LyricsPlayLayout({enabled=true,activeKey,children}) {
    if(!root.current)return
    // Size the stacked mobile workspace to the visible area, including when
    // the software keyboard opens. Neither pane overlays the other.
-   root.current.style.setProperty('--play-height',`${Math.max(220,(viewport?.height||window.innerHeight)-16)}px`)
-   if(window.matchMedia('(max-width:760px)').matches&&root.current.contains(document.activeElement)) {
+   root.current.style.setProperty('--play-height',`${Math.max(160,(viewport?.height||window.innerHeight)-16)}px`)
+   if((fitViewport||window.matchMedia('(max-width:760px)').matches)&&root.current.contains(document.activeElement)) {
     root.current.scrollIntoView({block:'start',behavior:'instant'})
     root.current.querySelector('.active-blank')?.scrollIntoView({block:'nearest',behavior:'instant'})
    }
@@ -20,17 +20,17 @@ export default function LyricsPlayLayout({enabled=true,activeKey,children}) {
   window.addEventListener('resize',update)
   update()
   return()=>{viewport?.removeEventListener('resize',update);window.removeEventListener('resize',update)}
- },[enabled])
+ },[enabled,fitViewport])
  useEffect(()=>{
   if(!enabled)return
   const timer=setTimeout(()=>{
    const mobile=window.matchMedia('(max-width:760px)').matches
    const behavior=window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'
-   if(mobile)root.current?.scrollIntoView({block:'start',behavior:'instant'})
+   if(mobile||fitViewport)root.current?.scrollIntoView({block:'start',behavior:'instant'})
    root.current?.querySelector('.active-blank')?.scrollIntoView({block:mobile?'nearest':'center',behavior})
   },100)
   return()=>clearTimeout(timer)
- },[enabled,activeKey])
+ },[enabled,activeKey,fitViewport])
  if(!enabled)return <>{children}</>
- return <div ref={root} className="lyrics-play-layout"><div className="lyrics-reading-pane" tabIndex={0} role="region" aria-label="Scroll song lyrics">{children[0]}</div><aside className="lyrics-answer-dock" aria-label="Selected word answer">{children[1]}</aside></div>
+ return <div ref={root} className={'lyrics-play-layout'+(fitViewport?' character-play-layout':'')}><div className="lyrics-reading-pane" tabIndex={0} role="region" aria-label={readingLabel}>{children[0]}</div><aside className="lyrics-answer-dock" aria-label={answerLabel}>{children[1]}</aside></div>
 }

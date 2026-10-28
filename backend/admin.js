@@ -7,7 +7,7 @@ import {randomBytes,scryptSync,timingSafeEqual} from 'node:crypto'
 import {pool} from './db.js'
 const router=express.Router(), sessions=new Map(), attempts=new Map()
 const username=process.env.ADMIN_USERNAME||'admin', passwordHash=scryptSync(process.env.ADMIN_PASSWORD||'admin','padam-admin',32)
-const definitions={characters:{table:'character_puzzles',fields:['movie','actor_name','actor_image_url','actor_image_urls','character_name','character_english','role','aliases','source_url']},pictures:{table:'picture_puzzles',fields:['movie','aliases','image_url','mobile_image_url']},songs:{table:'songs',fields:['title','movie','youtube_id','release_year']},dialogues:{table:'dialogues',fields:['movie','dialogue','dialogue_english','aliases','source_url','dialogue_variants']},clues:{table:'movie_puzzles',fields:['movie','aliases','clues']},lyrics:{table:'lyric_songs',fields:['title','sections']}}
+const definitions={characters:{table:'character_puzzles',fields:['movie','actor_name','actor_image_url','actor_image_urls','hide_actor_until_reveal','character_name','character_english','role','aliases','source_url']},pictures:{table:'picture_puzzles',fields:['movie','aliases','image_url','mobile_image_url']},songs:{table:'songs',fields:['title','movie','youtube_id','release_year']},dialogues:{table:'dialogues',fields:['movie','dialogue','dialogue_english','aliases','source_url','dialogue_variants']},clues:{table:'movie_puzzles',fields:['movie','aliases','clues']},lyrics:{table:'lyric_songs',fields:['title','sections']}}
 const parse=value=>typeof value==='string'?JSON.parse(value):value
 router.use((req,res,next)=>{res.set('Cache-Control','no-store');next()})
 router.post('/login',(req,res)=>{
@@ -33,7 +33,8 @@ function validate(kind,input){
  }
  const d=definitions[kind],out={}
  for(const field of d.fields){const value=['mobile_image_url','dialogue_english','character_english','actor_image_url'].includes(field)?(input[field]??''):input[field]
-  if(field==='actor_image_urls'){out[field]=JSON.stringify(value)}
+  if(field==='hide_actor_until_reveal'){const flag=input[field]??0;if(![true,false,0,1].includes(flag))throw Error('Choose whether to hide the actor until reveal.');out[field]=Number(flag)}
+  else if(field==='actor_image_urls'){out[field]=JSON.stringify(value)}
   else if(field==='dialogue_variants'){out[field]=JSON.stringify(value)}
   else if(['aliases','clues','sections'].includes(field)){
    if(!Array.isArray(value)||value.length>100||value.some(s=>typeof s!=='string'||!s.trim()||s.length>20000))throw Error(`${field}: enter a valid list of text values.`)

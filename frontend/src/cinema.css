@@ -593,7 +593,7 @@ html { scrollbar-gutter:stable; }
 .character-file::before { content:'CAST DEPARTMENT'; display:block; width:155px; margin:-43px 0 22px -25px; padding:7px 12px; background:#cbb58b; border:1px solid #b6a17b; border-bottom:0; border-radius:6px 6px 0 0; font:10px/1.4 monospace; letter-spacing:2px; }
 .character-file header,.character-file footer { display:flex; justify-content:space-between; gap:12px; font:11px/1.5 monospace; letter-spacing:2px; border-bottom:1px solid #8c775c66; padding-bottom:14px; }
 .character-role { display:table; margin:24px auto 12px; padding:5px 12px; border:2px solid #8b4438; color:#8b4438; transform:rotate(-3deg); font:700 13px/1.5 monospace; letter-spacing:3px; }
-.character-file-name { display:flex; align-items:center; justify-content:center; min-height:170px; padding:20px 10px; text-align:center; }
+.character-file-name { display:flex; align-items:center; justify-content:center; min-height:60px; padding:12px 6px; text-align:center; }
 .character-file-name .dialogue-language-text { color:#332d23; text-shadow:none; font-size:clamp(24px,3vw,36px); }
 .character-file footer { justify-content:center; border-bottom:0; border-top:1px solid #8c775c66; padding:14px 0 0; font-size:10px; }
 .character-actor { margin:0 0 24px; text-align:center; }
@@ -610,7 +610,67 @@ html { scrollbar-gutter:stable; }
 .character-file-mini>strong { display:block; border:2px solid #8b4438; color:#8b4438; margin:10px 0; font:700 11px/1.5 monospace; }
 .character-silhouette { width:45px; height:45px; border-radius:50%; background:#3b3c32; margin:10px auto 25px; position:relative; }
 .character-silhouette::after { content:''; position:absolute; width:75px; height:30px; top:36px; left:-15px; border-radius:40px 40px 0 0; background:#3b3c32; }
-@media(max-width:600px) { .character-file { padding:18px; }.character-file::before { margin-left:-19px;margin-top:-37px; }.character-file header { font-size:9px; letter-spacing:1px; }.character-file-name { min-height:140px; }.character-file-mini { padding:10px; } }
+@media(max-width:600px) { .character-file { padding:18px; }.character-file::before { margin-left:-19px;margin-top:-37px; }.character-file header { font-size:9px; letter-spacing:1px; }.character-file-mini { padding:10px; } }
+.lyrics-reading-pane .character-file { margin:24px 0 16px; padding:18px; }
+.lyrics-reading-pane .character-file::before { margin:-37px 0 12px -19px; }
+.lyrics-reading-pane .character-role { margin:14px auto 8px; font-size:11px; letter-spacing:2px; }
+.lyrics-reading-pane .character-file-name .dialogue-language-text { font-size:clamp(22px,2.4vw,30px); }
+.lyrics-reading-pane .character-actor { margin-bottom:12px; }
+.lyrics-reading-pane .character-actor-photo { width:120px; height:140px; margin:8px auto 12px; }
+.lyrics-reading-pane .character-hint { margin-bottom:12px; }
+.lyrics-answer-dock .party-answer-panel { margin:0; padding:16px; border:0; }
+.lyrics-answer-dock .party-guess { flex-wrap:wrap; margin:12px 0; }
+.lyrics-answer-dock .party-guess label { min-width:0; }
+.character-play-layout { height:var(--play-height,calc(100dvh - 16px)); min-height:0; scroll-margin-top:8px; align-items:stretch; }
+.character-play-layout .lyrics-reading-pane { min-height:0; overflow:auto; overscroll-behavior:contain; }
+.character-play-layout .lyrics-answer-dock { position:static; align-self:start; max-height:100%; }
+.character-play-layout .party-answer-panel h2 { font-size:18px; margin-bottom:8px; }
+.character-play-layout .party-guess { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:end; }
+.character-play-layout .party-guess input { font-size:16px; }
+@media(max-width:760px) {
+ .character-play-layout { grid-template-rows:minmax(0,1fr) auto; }
+ .character-play-layout .lyrics-answer-dock { max-height:70%; }
+ .lyrics-answer-dock .party-answer-panel { padding:10px 12px; }
+ .lyrics-answer-dock .party-guess { flex-direction:row; align-items:end; gap:8px; margin:8px 0; }
+ .lyrics-reading-pane .character-file-name { min-height:40px; padding:8px 4px; }
+ .lyrics-reading-pane .character-actor-photo { width:100px; height:110px; }
+}
+/* A centered dossier and answer form share the same width. */
+.character-play-layout { display:grid; grid-template-columns:minmax(0,1fr); grid-template-rows:auto auto; height:auto; max-width:680px; width:100%; margin:0 auto; gap:10px; }
+.character-play-layout .lyrics-reading-pane { height:auto; overflow:visible; }
+.character-play-layout .lyrics-answer-dock { width:auto; max-height:none; overflow:visible; border:0; box-shadow:none; background:transparent; }
+.character-play-layout .party-answer-panel { padding:12px 0; }
+.character-play-layout .party-answer-panel p { margin:6px 0; }
+.character-play-layout .character-file { display:block; margin:0 0 10px; padding:20px 24px 14px; border-radius:10px; box-sizing:border-box; }
+.character-play-layout .character-file::before { display:none; }
+.character-play-layout .character-file header { padding-bottom:10px; font-size:9px; letter-spacing:1px; }
+.character-file-body { display:flex; align-items:center; justify-content:center; gap:32px; padding:20px 0; }
+.character-file-copy { flex:1; min-width:0; display:flex; flex-direction:column; align-items:flex-start; gap:12px; }
+.character-play-layout .character-role { margin:0; transform:none; font-size:10px; line-height:1.4; letter-spacing:1.5px; padding:5px 8px; }
+.character-play-layout .character-file-name { min-height:0; padding:0; justify-content:flex-start; text-align:left; }
+.character-play-layout .dialogue-language-content { gap:6px; }
+.character-play-layout .character-file-name .dialogue-language-text { font-size:clamp(24px,2.6vw,32px); line-height:1.5; }
+.character-play-layout .character-portrait { flex:0 0 auto; margin:0; }
+.character-play-layout .character-actor-photo { box-sizing:border-box; width:124px; height:152px; border-width:4px; margin:0; }
+.character-play-layout p.character-actor { text-align:left; margin:0; }
+.character-play-layout .character-actor span { font-size:9px; margin-bottom:3px; }
+.character-play-layout .character-actor strong { font-size:18px; }
+.character-play-layout .character-hint { text-align:left; margin:0; }
+.character-play-layout .character-hint button { padding:7px 10px; font-size:12px; }
+.character-play-layout .character-file footer { padding-top:10px; font-size:9px; letter-spacing:1px; }
+.character-play-layout .dialogue-language { margin:0; }
+.character-play-layout .dialogue-language button { min-height:30px; padding:4px 9px; font-size:11px; }
+.character-bottom-menu { max-width:680px; margin:12px auto 0; }
+.actor-character-pair .character-reveal-toggle { grid-column:1/-1; }
+.character-reveal-toggle>span { display:flex; align-items:center; gap:10px; }
+.admin-editor .character-reveal-toggle input { width:auto; margin:0; accent-color:#dfc18a; }
+.character-reveal-toggle small { color:#c6baa2; line-height:1.5; }
+@media(max-width:600px) {
+ .character-play-layout .character-file { padding:14px 16px 12px; }
+ .character-file-body { gap:16px; padding:16px 0; }
+ .character-play-layout .character-actor-photo { width:90px; height:114px; }
+ .character-play-layout .character-file-name .dialogue-language-text { font-size:22px; }
+}
 .support-trigger { padding:8px 16px; border:1px solid #ae8b50; border-radius:24px; background:#dfc18a; color:#243126; font:600 13px/1.5 system-ui,sans-serif; cursor:pointer; }
 .support-trigger span { color:#8e4539; margin-right:5px; }
 .support-dialog { position:fixed; box-sizing:border-box; width:min(440px,calc(100% - 32px)); max-height:90dvh; padding:30px 24px; border:1px solid #ad925d; border-radius:16px; background:#202a22; color:#f1e4c8; text-align:center; overflow-y:auto; }

@@ -45,10 +45,14 @@ The sixth game first shows a film's **character name**, and players identify
 the movie. Its paper casting-file theme uses a character-name label and bilingual
 name controls. Solo, Host and Buzzer use the shared setup, room lifecycle, answer
 matching, scores and buzzer timer. There is no difficulty selection for this game.
-Every round shows the character and saved actor photo for 100 points.
+Every round shows the character for 100 points. By default, the actor name and photo are also visible.
+In Admin, each character/movie pair has a **Hide actor until reveal** toggle
+(`hide_actor_until_reveal`, default 0). When enabled, the API withholds the name
+and photo until **Reveal actor name**, reducing the round to 60 points.
+Run `node --env-file=.env migrate-characters.js` from `backend` to add this column.
 **Reveal actor name**, below the photo, optionally reveals the name and lowers
 the round to 60 points. In Buzzer mode,
-only the creator reveals this shared hint while buzzers are open. The actor name stays server-side until hinted or settled. Reveals reset each round.
+only the creator reveals this shared hint while buzzers are open. For characters with the toggle enabled, the actor name stays server-side until hinted or settled, and the photo stays hidden until the actor hint is used. Reveals reset each round.
 Revealing the movie earns zero.
 The movie answer stays server-side until settlement, except for the host's
 answer check. Players can contribute suggestions for admin review.

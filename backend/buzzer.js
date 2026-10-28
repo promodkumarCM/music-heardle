@@ -69,13 +69,13 @@ function next(room){
  if(room.game==='buzzer')room.content='Listen to your host’s question, then buzz when the buzzer opens.'
  room.answer=room.game==='song'?`${row.title} — ${row.movie}`:row.movie
  room.mobileImage=room.game==='pictures'?row.mobile_image_url:null;
- room.dialogueEnglish=room.game==='dialogue'?(row.dialogue_english||''):'';room.active=null;room.settled={};room.blocked=[];room.winner=null;room.deadline=null;room.undo=null;room.clue=1;room.phase='closed';room.round++;room.notice=''
+ room.dialogueLines=room.game==='dialogue'?row.dialogue_lines:undefined;room.dialogueEnglish=room.game==='dialogue'?(row.dialogue_english||''):'';room.active=null;room.settled={};room.blocked=[];room.winner=null;room.deadline=null;room.undo=null;room.clue=1;room.phase='closed';room.round++;room.notice=''
 }
 function view(room,host,player){
  expireAnswer(room)
  const answer=room.game==='lyrics'?room.content.flat().find(w=>w.id===room.active)?.text:room.answer
  const content=room.game==='lyrics'?room.content.map(s=>s.map(w=>w.id===undefined?w:{id:w.id,text:room.settled[w.id]?w.text:null})):room.game==='clues'?room.content.slice(0,room.clue):room.game==='song'?(host?room.content:null):room.content
- return {code:room.code,host,game:room.game,afterYear:room.afterYear||0,phase:room.phase,version:room.version,round:room.round,locked:room.locked,limit:room.limit,seconds:room.seconds,teams:room.teams.map(({name,score,invite})=>({name,score,...(host?{invite}:{})})),players:room.players.map(({id,name,team})=>({id,name,team})),me:player?.id,team:player?.team,mobileImage:room.mobileImage||null,dialogueEnglish:room.game==='dialogue'?room.dialogueEnglish:undefined,content,active:room.active,settled:room.settled,blocked:room.blocked,winner:room.winner,deadline:room.deadline,serverNow:Date.now(),notice:room.notice,clue:room.clue,canUndo:host&&!!room.undo,...(host||room.phase==='settled'?{answer}:{})}
+ return {code:room.code,host,game:room.game,afterYear:room.afterYear||0,phase:room.phase,version:room.version,round:room.round,locked:room.locked,limit:room.limit,seconds:room.seconds,teams:room.teams.map(({name,score,invite})=>({name,score,...(host?{invite}:{})})),players:room.players.map(({id,name,team})=>({id,name,team})),me:player?.id,team:player?.team,mobileImage:room.mobileImage||null,dialogueLines:room.game==='dialogue'&&room.phase!=='lobby'?room.dialogueLines:undefined,dialogueEnglish:room.game==='dialogue'?room.dialogueEnglish:undefined,content,active:room.active,settled:room.settled,blocked:room.blocked,winner:room.winner,deadline:room.deadline,serverNow:Date.now(),notice:room.notice,clue:room.clue,canUndo:host&&!!room.undo,...(host||room.phase==='settled'?{answer}:{})}
 }
 const wrap=fn=>async(req,res)=>{try{await fn(req,res)}catch(e){res.status(e.status||503).json({error:e.status?e.message:'Room service unavailable.'})}}
 router.use((req,res,next)=>{res.set('Cache-Control','no-store');next()})

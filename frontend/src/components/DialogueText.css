@@ -7,3 +7,20 @@
 .dialogue-language-text[lang="en"] { font-style:italic; }
 .dialogue-language-text[lang="ml"] { font-family:'Kartika','Noto Serif Malayalam','Nirmala UI',serif; line-height:1.7; }
 .dialogue-language-content { display:flex; flex-direction:column; gap:18px; }
+.dialogue-conversation { display:flex; flex-direction:column; gap:22px; width:100%; min-width:0; padding:8px 0; text-align:left; }
+.dialogue-turn { display:flex; flex-direction:column; gap:7px; max-width:85%; min-width:0; }
+.dialogue-speaker-1 { align-self:flex-start; align-items:flex-start; }
+.dialogue-speaker-2 { align-self:flex-end; align-items:flex-end; }
+.dialogue-speaker-label { color:#cbbd9d; font:10px/1.5 monospace; letter-spacing:1.5px; text-transform:uppercase; }
+.dialogue-bubble { display:flex; flex-direction:column; gap:10px; padding:16px 20px; border-radius:18px; background:#344335; color:#f4ead6; font:20px/1.9 'Nirmala UI','Kartika',sans-serif; overflow-wrap:anywhere; white-space:pre-wrap; text-shadow:none; }
+.dialogue-speaker-1 .dialogue-bubble { border-bottom-left-radius:4px; }
+.dialogue-speaker-2 .dialogue-bubble { border-bottom-right-radius:4px; background:#dfc18a; color:#293429; }
+.dialogue-bubble [lang="en"] { font:italic 18px/1.7 Georgia,serif; }
+.dialogue-entry-editor { display:grid; gap:12px; }
+.dialogue-entry-editor .dialogue-conversation-toggle { display:flex; align-items:center; gap:8px; }
+.admin-editor .dialogue-conversation-toggle input { width:auto; margin:0; accent-color:#dfc18a; }
+.dialogue-line-editor { padding:14px; border:1px solid #a58b5d66; border-radius:8px; display:grid; gap:10px; }
+@media(max-width:600px) {
+ .dialogue-turn { max-width:94%; }
+ .dialogue-bubble { padding:12px 14px; font-size:18px; }
+}

@@ -22,6 +22,10 @@ test('dialogue admin saves both languages and accepts omitted English',async()=>
   const pairs=[{dialogue:row.dialogue,dialogue_english:row.dialogue_english},{dialogue:'മറ്റൊരു സംഭാഷണം',dialogue_english:'Another dialogue'}]
   assert.equal((await request('/dialogues/9','PUT',{...row,dialogue_variants:pairs})).status,200)
   assert.deepEqual(JSON.parse(queries.at(-1).params[5]),pairs)
+  const lines=[{speaker:1,dialogue:'ആദ്യ ചോദ്യം',dialogue_english:'Question'},{speaker:2,dialogue:'മറുപടി',dialogue_english:'Reply'}]
+  assert.equal((await request('/dialogues/9','PUT',{...row,dialogue_variants:[{dialogue_lines:lines}]})).status,200)
+  assert.deepEqual(JSON.parse(queries.at(-1).params[5])[0].dialogue_lines,lines)
+  assert.equal(queries.at(-1).params[1],'ആദ്യ ചോദ്യം\nമറുപടി')
   assert.equal((await request('/dialogues/9','PUT',{...row,dialogue_variants:[]})).status,400)
   const {dialogue_english,...legacy}=row
   assert.equal((await request('/dialogues/9','PUT',legacy)).status,200)

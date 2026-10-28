@@ -10,7 +10,7 @@ import {fail,partyAction,partyView,expireParty,chooseWord,beginQuestion} from '.
 const router=express.Router(),rooms=new Map()
 const parse=x=>typeof x==='string'?JSON.parse(x):x
 async function catalog(game) {
-  const queries={characters:'SELECT id,movie,actor_name,actor_image_url,actor_image_urls,character_name,character_english,role,aliases FROM character_puzzles',pictures:'SELECT id,movie,image_url,mobile_image_url FROM picture_puzzles',lyrics:'SELECT id,title,sections FROM lyric_songs',dialogue:'SELECT id,movie,dialogue,dialogue_english,dialogue_variants FROM dialogues',clues:'SELECT id,movie,clues FROM movie_puzzles',song:'SELECT id,title,movie,youtube_id FROM songs'}
+  const queries={characters:'SELECT id,movie,actor_name,actor_image_url,actor_image_urls,hide_actor_until_reveal,character_name,character_english,role,aliases FROM character_puzzles',pictures:'SELECT id,movie,image_url,mobile_image_url FROM picture_puzzles',lyrics:'SELECT id,title,sections FROM lyric_songs',dialogue:'SELECT id,movie,dialogue,dialogue_english,dialogue_variants FROM dialogues',clues:'SELECT id,movie,clues FROM movie_puzzles',song:'SELECT id,title,movie,youtube_id FROM songs'}
   if(!Object.hasOwn(queries,game))fail('Choose a game.',400)
   let rows
   try{[rows]=await pool.query(queries[game])}catch(error){if(game==='characters'&&error.code==='ER_NO_SUCH_TABLE')fail('Character Files is not set up yet. Ask the admin to finish setting up this game.',503);throw error}
@@ -24,11 +24,11 @@ function next(room) {
   room.stocks[room.game]??={}
   const row=drawStock(room.catalog,room.stocks[room.game])
   if(!row){room.phase='exhausted';room.notice='All clues in this set have been used.';return}
-  room.content=room.game==='characters'?{actor:row.actor_name||'',actorImage:randomActorPhoto(row,room.actorPhotos?.[row.actor_name]),name:row.character_name,english:row.character_english||'',role:row.role}:room.game==='lyrics'?puzzle(parse(row.sections),room.difficulty):room.game==='pictures'?row.image_url:room.game==='clues'?parse(row.clues):room.game==='dialogue'?row.dialogue:row.youtube_id
+  room.content=room.game==='characters'?{hideActorUntilReveal:Number(row.hide_actor_until_reveal)>0,actor:row.actor_name||'',actorImage:randomActorPhoto(row,room.actorPhotos?.[row.actor_name]),name:row.character_name,english:row.character_english||'',role:row.role}:room.game==='lyrics'?puzzle(parse(row.sections),room.difficulty):room.game==='pictures'?row.image_url:room.game==='clues'?parse(row.clues):room.game==='dialogue'?row.dialogue:row.youtube_id
   if(room.game==='characters'){room.actorPhotos??={};room.actorPhotos[row.actor_name]=room.content.actorImage}
   room.answer=room.game==='song'?`${row.title} — ${row.movie}`:row.movie
   room.target=room.game==='song'?row.title:row.movie
-  room.mobileImage=row.mobile_image_url||null;room.dialogueEnglish=room.game==='dialogue'?(row.dialogue_english||''):'';room.active=null;room.settled={};room.clue=1;room.notice='';room.round++
+  room.mobileImage=row.mobile_image_url||null;room.dialogueLines=room.game==='dialogue'?row.dialogue_lines:undefined;room.dialogueEnglish=room.game==='dialogue'?(row.dialogue_english||''):'';room.active=null;room.settled={};room.clue=1;room.notice='';room.round++
   if(room.game==='lyrics')chooseWord(room)
   beginQuestion(room)
 }

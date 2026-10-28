@@ -74,7 +74,7 @@ export function partyAction(room, player, body, now=Date.now()) {
     chooseWord(room);if(room.active===null)fail('All ten words are finished. Start the next song.')
     beginQuestion(room)
   } else if(a==='actor') {
-    if(room.game!=='characters'||!creator||room.actorRevealed||!room.content.actor||!['closed','open','answering'].includes(room.phase)||room.mode==='buzzer'&&room.phase!=='open')fail('The actor hint is not available.')
+    if(room.game!=='characters'||!creator||!room.content.hideActorUntilReveal||room.actorRevealed||!room.content.actor||!['closed','open','answering'].includes(room.phase)||room.mode==='buzzer'&&room.phase!=='open')fail('The actor hint is not available.')
     room.actorRevealed=true;room.notice='Actor name revealed. This round is now worth 60 points for everyone.'
   } else if(a==='clue') {
     if(room.game!=='clues'||room.clue>=5||!['open','closed','answering'].includes(room.phase)||room.mode==='buzzer'&&room.phase!=='open')fail('Cannot open another clue now.')
@@ -92,15 +92,15 @@ export function partyView(room,player,now=Date.now()) {
   const content=['lobby','exhausted'].includes(room.phase)?null:room.game==='lyrics'
     ? room.content.map(s=>s.map(w=>w.id===undefined?w:{id:w.id,text:room.settled[w.id]?w.text:null}))
     :room.game==='clues'?room.content.slice(0,room.clue):room.game==='characters'
-      ? {name:room.content.name,english:room.content.english,role:room.content.role,actorImage:room.content.actorImage||'',...(room.actorRevealed||finished?{actor:room.content.actor}:{})}
+      ? {name:room.content.name,english:room.content.english,role:room.content.role,actorImage:!room.content.hideActorUntilReveal||room.actorRevealed?room.content.actorImage||'':'',...(!room.content.hideActorUntilReveal||room.actorRevealed||finished?{actor:room.content.actor}:{})}
       :room.content
   return {code:room.code,mode:room.mode,game:room.game,difficulty:room.difficulty,host,creator:player.id===room.creator,
     me:player.id,team:player.team,phase:room.phase,round:room.round,version:room.version,seconds:room.seconds,
-    content,dialogueEnglish:room.game==='dialogue'&&room.phase!=='lobby'?room.dialogueEnglish:undefined,mobileImage:room.mobileImage,active:room.active,settled:room.settled,blocked:room.blocked,
+    content,dialogueLines:room.game==='dialogue'&&!['lobby','exhausted'].includes(room.phase)?room.dialogueLines:undefined,dialogueEnglish:room.game==='dialogue'&&room.phase!=='lobby'?room.dialogueEnglish:undefined,mobileImage:room.mobileImage,active:room.active,settled:room.settled,blocked:room.blocked,
     winner:room.winner,deadline:room.deadline,serverNow:now,notice:room.notice,clue:room.clue,skipVotes:room.skipVotes||[],
     teams:room.teams.map(({name,score})=>({name,score})),players:room.players.map(({id,name,team})=>({id,name,team})),
     complete:room.phase==='exhausted'||room.game!=='lyrics'||Object.keys(room.settled).length===10,
-    ...(room.game==='characters'?{actorRevealed:!!room.actorRevealed,actorHintAvailable:!room.actorRevealed&&!!room.content.actor,availablePoints:characterPoints(room)}:{}),
+    ...(room.game==='characters'?{actorRevealed:!!room.actorRevealed,actorHintAvailable:!!room.content.hideActorUntilReveal&&!room.actorRevealed&&!!room.content.actor,availablePoints:characterPoints(room)}:{}),
     ...(host||finished?{answer}:{}),
   }
 }

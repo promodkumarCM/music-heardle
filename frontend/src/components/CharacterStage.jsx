@@ -6,6 +6,18 @@ export default function CharacterStage({content,round=1,compact=false,points=100
  useEffect(()=>setPhotoFailed(false),[round,content?.actorImage])
  if(compact)return <div className="character-file-mini"><span>CAST DOSSIER / 006</span><div className="character-silhouette"/><strong>CHARACTER FILE</strong><small>CHARACTER + PHOTO · WHICH MOVIE?</small></div>
  const photo=content?.actorImage?.startsWith('/uploads/')?BASE.replace(/\/$/,'')+content.actorImage:content?.actorImage
- const card=text=><section className="character-file" aria-label="Character clue"><header><span>PADAM / CAST DOSSIER</span><span>FILE {String(round).padStart(2,'0')}</span></header><div className="character-role">CHARACTER NAME</div><div className="character-file-name">{text}</div>{photo&&!photoFailed?<div className="character-actor"><span>ACTOR CLUE</span><img className="character-actor-photo" src={photo} alt="Actor clue — identify the movie" onError={()=>setPhotoFailed(true)}/></div>:null}{content?.actor?<p className="character-actor"><span>PLAYED BY</span><strong>{content.actor}</strong></p>:null}{hintAvailable&&<div className="character-hint">{canReveal?<button type="button" disabled={hintDisabled} onClick={onReveal}>Reveal actor name · 60 points</button>:<p>The room creator can reveal the actor’s name for everyone.</p>}</div>}<footer>IDENTIFY THE MOVIE · {points} POINTS</footer></section>
+ const card=text=><section className="character-file" aria-label="Character clue">
+  <header><span>PADAM / CAST DOSSIER</span><span>FILE {String(round).padStart(2,'0')}</span></header>
+  <div className="character-file-body">
+   <div className="character-file-copy">
+    <div className="character-role">CHARACTER NAME</div>
+    <div className="character-file-name">{text}</div>
+    {content?.actor&&<p className="character-actor"><span>PLAYED BY</span><strong>{content.actor}</strong></p>}
+    {hintAvailable&&<div className="character-hint">{canReveal?<button type="button" disabled={hintDisabled} onClick={onReveal}>Reveal actor name · 60 points</button>:<p>The room creator can reveal the actor’s name for everyone.</p>}</div>}
+   </div>
+   {photo&&!photoFailed&&<div className="character-actor character-portrait"><img className="character-actor-photo" src={photo} alt="Actor clue — identify the movie" onError={()=>setPhotoFailed(true)}/></div>}
+  </div>
+  <footer>IDENTIFY THE MOVIE · {points} POINTS</footer>
+ </section>
  return content?<DialogueText text={content.name} english={content.english}>{card}</DialogueText>:card('Your next character awaits.')
 }

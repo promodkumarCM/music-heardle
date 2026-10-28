@@ -84,7 +84,8 @@ export default function PartyGame({mode='buzzer',game:gameProp,backdrop}) {
   return <>{preflight&&backdrop}<main className={`cinema-home party-page ${preflight?'party-preflight':''} ${game==='lyrics'?'lyrics-page':''}`}><div className="dialogue-shell">
     {!preflight&&<><header className="dialogue-nav"><a href="#">← All games</a><span>PADAM / {labels[mode].toUpperCase()}</span></header>
     <div className="dialogue-heading"><p className="cinema-eyebrow">THE FILM PLAYHOUSE</p><h1>{games[game]}</h1><p>{mode==='host'?'One screen. Your teams. You keep score.':mode==='buzzer'?'Everyone plays. First to buzz gets the answer.':'Play at your own pace.'}</p></div>
-    <GameModes game={game} context={<span>{labels[mode]} · Round {room.round}{game==='characters'?' · '+room.availablePoints+' points':''}{game==='lyrics'?` · ${room.difficulty} · 10 hidden words`:''}</span>} actions={<button type="button" className="game-menu-action game-leave-action" disabled={busy} onClick={leave}>Leave game</button>}/></>}
+</>}
+    {game!=='characters'&&!preflight&&<GameModes game={game} context={<span>{labels[mode]} · Round {room.round}{game==='characters'?' · '+room.availablePoints+' points':''}{game==='lyrics'?` · ${room.difficulty} · 10 hidden words`:''}</span>} actions={<button type="button" className="game-menu-action game-leave-action" disabled={busy} onClick={leave}>Leave game</button>}/>}
     <dialog ref={setupDialog} className="buzzer-setup-dialog party-setup-dialog" aria-label={`${labels[mode]} setup`} onCancel={()=>{location.hash='#'}}>
       <div className="buzzer-dialog-heading"><h2>{games[game]} · {labels[mode]}</h2><a className="popup-close" href="#" aria-label="Close setup">×</a></div>
     {!session&&<section className="party-setup clue-case" aria-label={`${labels[mode]} setup`}>
@@ -110,7 +111,7 @@ export default function PartyGame({mode='buzzer',game:gameProp,backdrop}) {
     {room&&!preflight&&<>
       <div className="party-scores">{room.teams.map((team,i)=><div key={i} className={room.winner?.team===i?'winning':''}><span>{team.name}{mode==='buzzer'&&room.team===i?' (you)':''}</span><strong>{team.score} pts</strong></div>)}</div>
       {phase==='exhausted'?<><StockFinished game={game}/>{room.creator&&mode!=='solo'&&<form className="party-switch" onSubmit={e=>{e.preventDefault();act('game',{game:nextGame})}}><label>Switch game · keep scores<select value={nextGame} onChange={e=>setNextGame(e.target.value)}>{Object.entries(games).map(([key,title])=><option key={key} value={key}>{title}</option>)}</select></label><button disabled={busy||nextGame===game}>Switch game</button></form>}</>:phase!=='lobby'&&<>
-        <LyricsPlayLayout enabled={game==='lyrics'} activeKey={`${room.round}:${room.active}`}>
+        <LyricsPlayLayout fitViewport={game==='characters'} enabled={game==='lyrics'||game==='characters'} readingLabel={game==='characters'?'Character clue':undefined} answerLabel={game==='characters'?'Movie answer and round controls':undefined} activeKey={`${room.round}:${room.active}`}>
         <BuzzerStage game={game} room={room} busy={busy} act={act} automaticWords={mode==='buzzer'}/>
         <section className="party-answer-panel clue-case">
           <h2 role="status">{game==='lyrics'?`Word ${(room.active??0)+1} of 10`:status}</h2>
@@ -132,6 +133,7 @@ export default function PartyGame({mode='buzzer',game:gameProp,backdrop}) {
         </LyricsPlayLayout>
       </>}
     </>}
+    {game==='characters'&&room&&!preflight&&<div className="character-bottom-menu"><GameModes game={game} context={<span>{labels[mode]} · Round {room.round}{game==='characters'?' · '+room.availablePoints+' points':''}{game==='lyrics'?` · ${room.difficulty} · 10 hidden words`:''}</span>} actions={<button type="button" className="game-menu-action game-leave-action" disabled={busy} onClick={leave}>Leave game</button>}/></div>}
     {error&&!preflight&&<p role="alert" className="dialogue-feedback">{error}</p>}
   </div></main></>
 }
