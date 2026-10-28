@@ -569,6 +569,12 @@ html { scrollbar-gutter:stable; }
 .actor-character-pair label { margin:0; }
 .actor-character-pair>button { grid-column:1/-1; justify-self:start; }
 .actor-editor-actions { display:flex; flex-wrap:wrap; gap:10px; }
+.actor-character-pair>.actor-editor-actions { grid-column:1/-1; }
+.actor-pairs-table td,.actor-pairs-table th { font-size:12px; line-height:1.6; }
+.actor-pairs-table .admin-row-selected { background:#3b4834; }
+.actor-pairs-table .admin-entry-actions { min-width:120px; }
+.actor-workspace .admin-table-scroll { max-height:440px; overflow:auto; }
+.actor-pairs-table thead { position:sticky; top:0; z-index:1; background:#242c23; }
 .actor-workspace .admin-editor input,.actor-workspace .admin-editor textarea { padding:7px 9px; font-size:14px; }
 @media(max-width:600px) { .actor-character-pair { grid-template-columns:minmax(0,1fr); } }
 .contribution-widget { margin:8px auto 20px; max-width:650px; font-size:13px; }

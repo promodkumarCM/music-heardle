@@ -3,9 +3,10 @@
 ## Character Files — Cast Dossier
 
 Admin groups Character Files by actor. Enter the actor and upload a shared photo
-once, then use **Add character and movie** for each character/movie pair. Select
-an actor on the left to edit their existing pairs or add more. **Save actor and
-characters** saves the batch atomically; invalid or duplicate pairs save nothing.
+once, then use **Add character and movie** for each character/movie pair. Saved
+pairs appear in a table with **Edit** and **Delete**. Edit loads the selected row
+into one set of text boxes; **Save character changes** updates it. Actor details
+can be saved separately. Changes save atomically; invalid or duplicate pairs save nothing.
 Each pair remains a separate game clue, using the same actor photo. Existing
 catalog entries are grouped automatically, with no database migration required.
 
