@@ -661,3 +661,10 @@ button.support-pay:disabled { opacity:.6; cursor:not-allowed; }
 .admin-dialogue-pair { min-width:0; margin:14px 0; padding:16px; border:1px solid #a58b5d66; border-radius:10px; background:#172219; }
 .admin-dialogue-pair legend { color:#dfc18a; padding:0 6px; font-weight:600; }
 .admin-page .admin-dialogue-pair button { background:#352b23; color:#e5cbb0; }
+
+.home-contribute { display:flex; align-items:center; justify-content:space-between; gap:24px; margin:32px 0; padding:26px; border:1px solid #ad925d66; border-radius:14px; background:#243026; }
+.home-contribute h3 { margin:8px 0; color:#f1e4c8; font:24px/1.35 Georgia,serif; }
+.home-contribute p { max-width:640px; margin:0; color:#c6c8b7; font:14px/1.7 system-ui,sans-serif; }
+.home-contribute-button { white-space:nowrap; padding:13px 20px; border:1px solid #b99a60; border-radius:9px; background:#dfc18a; color:#19251d; font:600 14px/1.5 system-ui,sans-serif; cursor:pointer; }
+.contribution-form select { display:block; width:100%; margin:8px 0 16px; padding:10px; border:1px solid #a58b5d; border-radius:6px; background:#172219; color:#efe4cd; font:14px/1.5 system-ui,sans-serif; }
+@media(max-width:640px) { .home-contribute { flex-direction:column; align-items:flex-start; padding:20px; } }
