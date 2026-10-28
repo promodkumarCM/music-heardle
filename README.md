@@ -20,6 +20,19 @@ to two hours of inactivity. API restarts clear in-memory stock histories.
 
 ## Character Files — Cast Dossier
 
+The fourteen-actor filmography catalog is in `backend/data/character-filmographies.json`,
+with source URLs and an excluded-record list. It covers Mohanlal, Mammootty,
+Dileep, Jayaram, Kunchacko Boban, Prithviraj Sukumaran, Asif Ali, Suresh Gopi,
+Fahadh Faasil, Dulquer Salmaan, Nivin Pauly, Tovino Thomas, Naslen, and Basil Joseph
+across languages.
+Character names use the source's English transliterations. Unreleased or uncertain
+projects and missing character names are excluded; the source is community maintained.
+From `backend`, preview with `node --env-file=.env import-character-filmographies.js`,
+then append with `node --env-file=.env import-character-filmographies.js --apply`.
+The importer preserves existing pairs and photos, records conflicting actors,
+backs up existing rows under `output/character-import`, and commits atomically.
+Rerunning skips imported pairs. Source snapshots were retrieved on 28 October 2026.
+
 Admin groups Character Files by actor. Enter the actor and upload a shared photo
 once, then use **Add character and movie** for each character/movie pair. Saved
 pairs appear in a table with **Edit** and **Delete**. Edit loads the selected row
