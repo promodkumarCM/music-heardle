@@ -16,11 +16,11 @@ test('character catalog validates roles and supports private solo, host, and buz
  try{
   assert.equal((await send('/admin/characters',entry)).status,401)
   const {data:login}=await send('/admin/login',{username:'admin',password:'admin'})
-  assert.equal((await send('/admin/characters',{...entry,role:'actor'},login.token)).status,400)
   assert.equal((await send('/admin/characters',{...entry,actor_name:''},login.token)).status,400)
   assert.equal((await send('/admin/characters',{...entry,actor_image_url:'javascript:alert(1)'},login.token)).status,400)
   assert.equal((await send('/admin/characters',{...entry,actor_image_url:''},login.token)).status,201)
-  assert.equal((await send('/admin/characters',entry,login.token)).status,201)
+  const {role,source_url,...simpleEntry}=entry
+  assert.equal((await send('/admin/characters',simpleEntry,login.token)).status,201)
   assert.equal((await send('/admin/characters/1',{...entry,role:'hero'},login.token,'PUT')).status,200)
   const {data:solo,status}=await send('/party-game/rooms',{game:'characters',mode:'solo'})
   assert.equal(status,201);assert.equal(solo.answer,undefined);assert.equal(solo.content.name,'The Shadow');assert.equal(solo.content.actor,undefined);assert.equal(solo.content.actorImage,undefined);assert.equal(solo.content.role,'villain');assert.equal(solo.content.movie,undefined)

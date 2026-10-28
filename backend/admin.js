@@ -24,6 +24,7 @@ router.get('/contributions',async(req,res)=>{try{const [rows]=await pool.query("
 router.post('/contributions/:id/resolve',async(req,res)=>{try{const [result]=await pool.query("UPDATE contributions SET status='resolved',reviewed_at=CURRENT_TIMESTAMP WHERE id=? AND kind='bug' AND status='pending'",[req.params.id]);if(!result.affectedRows)return res.status(409).json({error:'Bug report already closed or missing.'});res.json({ok:true})}catch{res.status(503).json({error:'Could not close bug report.'})}})
 router.post('/contributions/:id/reject',async(req,res)=>{try{const [result]=await pool.query("UPDATE contributions SET status='rejected',reviewed_at=CURRENT_TIMESTAMP WHERE id=? AND status='pending'",[req.params.id]);if(!result.affectedRows)return res.status(409).json({error:'Contribution already reviewed or missing.'});res.json({ok:true})}catch{res.status(503).json({error:'Could not reject contribution.'})}})
 function validate(kind,input){
+ if(kind==='characters')input={...input,role:'character',source_url:''}
  if(kind==='dialogues'){
   const pairs=validateDialogueVariants(input.dialogue_variants??[{dialogue:input.dialogue,dialogue_english:input.dialogue_english}])
   input={...input,...pairs[0],dialogue_variants:pairs}
@@ -45,7 +46,6 @@ function validate(kind,input){
   else{if(typeof value!=='string'||(!['source_url','mobile_image_url','dialogue_english','character_english','actor_image_url'].includes(field)&&!value.trim())||value.length>(['dialogue','dialogue_english'].includes(field)?10000:['source_url','image_url','mobile_image_url','actor_image_url'].includes(field)?600:255))throw Error(`Enter a valid ${field}.`);out[field]=value.trim()}
  }
  if(out.actor_image_url&&!/^(https?:\/\/|\/uploads\/picture-clues\/|\/picture-clues\/)/i.test(out.actor_image_url))throw Error('Use a valid actor image URL or /picture-clues/ path.')
- if(kind==='characters'&&!['hero','villain'].includes(out.role))throw Error('Role must be hero or villain.')
  if(kind==='songs'&&!/^[A-Za-z0-9_-]{11}$/.test(out.youtube_id))throw Error('YouTube ID must contain 11 characters.')
  if(out.source_url&&!/^https?:\/\//i.test(out.source_url))throw Error('Source URL must begin with https:// or http://.')
  if(out.mobile_image_url&&!/^(https?:\/\/|\/uploads\/picture-clues\/|\/picture-clues\/)/i.test(out.mobile_image_url))throw Error('Use an image URL or /picture-clues/ path.')
