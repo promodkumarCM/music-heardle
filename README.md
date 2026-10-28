@@ -18,8 +18,11 @@ answer check. Players can contribute suggestions for admin review.
 Before using it with an existing database, run from `backend`:
 `node --env-file=.env migrate-characters.js`. This creates the catalog and adds the actor-name and optional photo columns to existing installations without
 changing existing entries. Add verified content through **Admin → Character Files**:
-movie, actor name, optional actor photo URL, character name, optional English name, hero/villain role, movie aliases and
-an optional source URL. Multiple characters can belong to the same movie.
+movie, actor name, optional actor photo upload, character name, optional English name, hero/villain role, movie aliases and
+an optional source URL. Multiple characters can belong to the same movie. Actor photos accept PNG, JPEG or
+WebP files up to 8 MB, show a preview, and use the existing persistent image-upload
+storage. Save the entry after uploading. Removing a photo from an entry does not
+delete the underlying stored file.
 
 The footer groups **Buy me 2 porotta** and **Report a bug**. Both open popups.
 The support popup offers food-themed amounts and a custom amount. Until verified
