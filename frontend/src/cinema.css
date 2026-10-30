@@ -662,6 +662,10 @@ html { scrollbar-gutter:stable; }
 .character-play-layout .dialogue-language button { min-height:30px; padding:4px 9px; font-size:11px; }
 .character-bottom-menu { max-width:680px; margin:12px auto 0; }
 .actor-character-pair .character-reveal-toggle { grid-column:1/-1; }
+.picture-movie-gallery { display:flex; flex-wrap:wrap; gap:12px; margin-top:16px; }
+.picture-movie-gallery>button { display:grid; gap:6px; padding:8px; text-align:center; }
+.picture-movie-gallery>button[aria-pressed="true"] { outline:2px solid #dfc18a; outline-offset:2px; }
+.picture-movie-gallery img { width:120px; height:90px; object-fit:contain; background:#121512; }
 .character-reveal-toggle>span { display:flex; align-items:center; gap:10px; }
 .admin-editor .character-reveal-toggle input { width:auto; margin:0; accent-color:#dfc18a; }
 .character-reveal-toggle small { color:#c6baa2; line-height:1.5; }
