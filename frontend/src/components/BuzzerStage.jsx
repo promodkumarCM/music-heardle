@@ -20,7 +20,7 @@ export default function BuzzerStage({game,room,busy,act,automaticWords=false}){
  useEffect(()=>{if(game==='song'&&ready&&room?.content)player.current?.prepare(room.content)},[game,ready,room?.content])
  const live=room&&room.phase!=='lobby'
  if(game==='characters')return <CharacterStage content={live?room.content:null} round={room?.round} points={room?.availablePoints??100} hintAvailable={live&&room.actorHintAvailable&&room.phase!=='settled'} canReveal={room?.creator} hintDisabled={busy||room?.mode==='buzzer'&&room.phase!=='open'} onReveal={()=>act('actor')}/>
- if(game==='pictures')return <PictureStage image={live?room.content:null} mobileImage={room?.mobileImage} round={room?.round}/>
+ if(game==='pictures')return <PictureStage image={live?room.content:null} round={room?.round}/>
  if(game==='song')return <>
   <Radio yearTuner={<YearTuner disabled={!room||busy||!['lobby','settled'].includes(room.phase)} years={[0,1990,1995,2000,2005,2010,2015,2020,2025]} value={room?.afterYear||0} onChange={year=>{if(room&&!busy&&['lobby','settled'].includes(room.phase))act('year',{afterYear:year})}} />} onPlay={()=>player.current?.playSnippet(room.content,0,duration,volume)} ready={ready&&preparedVideoId===room?.content} disabled={!live||!ready||preparedVideoId!==room?.content||busy||room.phase==='answering'} seconds={duration} volume={volume} onVolumeChange={v=>{setVolume(v);player.current?.setVolume(v)}}
    tunerContent={<div className="buzzer-radio-display"><span className="cinema-eyebrow">MUSIC ROUND</span><p>{!live?'Invite your teams to start.':room.phase==='settled'?room.answer:message}</p><small>Listen to the clip, then answer.</small></div>}>
