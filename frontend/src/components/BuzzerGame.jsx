@@ -6,7 +6,7 @@ const games={pictures:'Picture Clues',buzzer:'Standalone Buzzer',lyrics:'Missing
 export default function BuzzerGame(){
  const params=new URLSearchParams(location.hash.split('?')[1]||'')
  const [session,setSession]=useState(()=>{try{const s=JSON.parse(sessionStorage.getItem('buzzer-room'));return params.get('room')?(s?.code===params.get('room')?s:null):params.get('game')&&s?.game!==params.get('game')?null:s}catch{return null}})
- const [room,setRoom]=useState(null),[error,setError]=useState(''),[busy,setBusy]=useState(false),[teamCount,setTeamCount]=useState(3),[limit,setLimit]=useState(4),[seconds,setSeconds]=useState(10),[code,setCode]=useState(params.get('room')||''),[name,setName]=useState(''),[invite,setInvite]=useState(params.get('invite')||''),[peek,setPeek]=useState(false),[remaining,setRemaining]=useState(0),[copied,setCopied]=useState('')
+ const [room,setRoom]=useState(null),[error,setError]=useState(''),[busy,setBusy]=useState(false),[teamCount,setTeamCount]=useState(3),[limit,setLimit]=useState(4),[seconds,setSeconds]=useState('20'),[code,setCode]=useState(params.get('room')||''),[name,setName]=useState(''),[invite,setInvite]=useState(params.get('invite')||''),[peek,setPeek]=useState(false),[remaining,setRemaining]=useState(0),[copied,setCopied]=useState('')
  const game=Object.hasOwn(games,params.get('game'))?params.get('game'):'buzzer'
  const [setupOpen,setSetupOpen]=useState(true),[setupTab,setSetupTab]=useState(params.get('room')?'join':'host'),[lobbyOpen,setLobbyOpen]=useState(true)
  const dialogRef=useRef(null),lobbyDialogRef=useRef(null),previousPhase=useRef(null)
@@ -22,7 +22,7 @@ export default function BuzzerGame(){
  useEffect(()=>{const update=()=>setRemaining(Math.max(0,Math.ceil(((room?.deadline||0)-Date.now()-offset.current)/1000)));update();const t=setInterval(update,100);return()=>clearInterval(t)},[room?.deadline])
  useEffect(()=>setPeek(false),[room?.active,room?.round,room?.phase])
  async function run(fn){if(lock.current)return;lock.current=true;generation.current++;setBusy(true);setError('');try{await fn()}catch(e){setError(e.message)}finally{lock.current=false;setBusy(false)}}
- function enter(join){run(async()=>{const d=await request(join?`rooms/${code.trim().toUpperCase()}/join`:'rooms',join?{name,invite}:{game,teams:names,limit,seconds},null);setLobbyOpen(true);setSession({code:d.code,token:d.token,game:d.game});receive(d)})}
+ function enter(join){run(async()=>{const d=await request(join?`rooms/${code.trim().toUpperCase()}/join`:'rooms',join?{name,invite}:{game,teams:names,limit,seconds:Number(seconds)},null);setLobbyOpen(true);setSession({code:d.code,token:d.token,game:d.game});receive(d)})}
  function act(action,extra={}){run(async()=>receive(await request(`rooms/${room.code}/action`,{action,version:room.version,...extra})))}
  function leave(){generation.current++;setSession(null);setRoom(null);setError('');setSetupOpen(true);setLobbyOpen(true)}
  function link(token){return `${location.origin}${location.pathname}#buzzer-game?room=${room.code}${token?`&invite=${token}`:''}`}
@@ -45,7 +45,7 @@ export default function BuzzerGame(){
  <div className="buzzer-dialog-heading"><h2>{games[selected]} · Buzzer</h2><button aria-label="Close setup" onClick={()=>setSetupOpen(false)}>×</button></div>
  <div className="buzzer-setup-tabs"><button aria-pressed={setupTab==='host'} onClick={()=>setSetupTab('host')}>Host a room</button><button aria-pressed={setupTab==='join'} onClick={()=>setSetupTab('join')}>Join a room</button></div>
  {setupTab==='host'?<form onSubmit={e=>{e.preventDefault();enter(false)}}>
- <div className="buzzer-setup-fields"><label>Teams<select value={teamCount} onChange={e=>setTeamCount(Number(e.target.value))}>{[2,3,4,5,6,7,8].map(n=><option key={n}>{n}</option>)}</select></label><label>Players per team<input type="number" required min="1" max="20" value={limit} onChange={e=>setLimit(Number(e.target.value))}/></label><label>Answer timer (seconds)<input type="number" required min="5" max="120" value={seconds} onChange={e=>setSeconds(Number(e.target.value))}/></label></div>
+ <div className="buzzer-setup-fields"><label>Teams<select value={teamCount} onChange={e=>setTeamCount(Number(e.target.value))}>{[2,3,4,5,6,7,8].map(n=><option key={n}>{n}</option>)}</select></label><label>Players per team<input type="number" required min="1" max="20" value={limit} onChange={e=>setLimit(Number(e.target.value))}/></label><label>Answer timer (seconds)<input type="number" required min="5" max="120" value={seconds} onChange={e=>setSeconds(e.target.value)}/></label></div>
  <p>{names.join(' · ')}</p><button disabled={busy}>Create lobby →</button></form>:<form onSubmit={e=>{e.preventDefault();enter(true)}}><label>Room code<input required maxLength={6} pattern="[a-fA-F0-9]{6}" value={code} onChange={e=>{setCode(e.target.value);setInvite('')}}/></label><label>Your name<input autoComplete="nickname" required maxLength={30} value={name} onChange={e=>setName(e.target.value)}/></label>{invite&&<p>Your invitation assigns your team automatically.</p>}<button disabled={busy}>Join room →</button></form>}
  {error&&<p role="alert">{error}</p>}
  </dialog></>}

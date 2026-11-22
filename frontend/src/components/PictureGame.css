@@ -92,3 +92,12 @@ body:has(.picture-page) { background:#0f1010; }
  .picture-page .dialogue-input-row input { flex:1; width:0; padding:12px; }
  .picture-page .dialogue-input-row button { padding:10px 14px; }
 }
+
+.picture-page .picture-theatre {
+  width:min(100%, max(320px, 95svh));
+  padding:0;
+  background:none;
+}
+.picture-page .picture-screen { border-radius:8px; }
+.picture-page .dialogue-answer { margin-top:0; }
+.party-round > .picture-theatre { margin:8px auto 0; }

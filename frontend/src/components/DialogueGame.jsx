@@ -86,9 +86,6 @@ export default function DialogueGame() {
   return (
     <main className="cinema-home dialogue-page">
       <div className="dialogue-shell">
-        <header className="dialogue-nav"><a href="#">← All games</a><span>PADAM / GAME 03</span></header>
-        <div className="dialogue-heading"><p className="cinema-eyebrow">THE DIALOGUE ROUND</p><h1>Guess the Movie</h1><p>One dialogue. One unforgettable film.</p></div>
- <GameModes game="dialogue" />
         <DialogueText lines={clue?.dialogue_lines} text={clue?.dialogue} english={clue?.dialogue_english}>
          {content=><Clapperboard round={round+1} targetRef={targetRef} feedback={<RoundFeedback feedback={feedback}/>} footer={solved+' SOLVED · NAME THE MOVIE'}>
           {loading ? <span role="status">Setting the scene…</span> : clue?content: 'No dialogue loaded.'}
@@ -101,6 +98,11 @@ export default function DialogueGame() {
           {error && <div className="dialogue-feedback" role="alert">{error}{!clue && <button onClick={() => setRetry(value => value + 1)}>Retry</button>}</div>}
         </section>
         <footer className="dialogue-endnote">No clock. No rush. Just your love of cinema.</footer>
+        <div className="game-page-menu">
+          <header className="dialogue-nav"><a href="#">← All games</a><span>PADAM / GAME 03</span></header>
+          <div className="dialogue-heading"><p className="cinema-eyebrow">THE DIALOGUE ROUND</p><h1>Guess the Movie</h1><p>One dialogue. One unforgettable film.</p></div>
+          <GameModes game="dialogue" />
+        </div>
       </div>
     </main>
   )

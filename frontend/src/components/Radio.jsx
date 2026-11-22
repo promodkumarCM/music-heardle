@@ -17,12 +17,6 @@ export default function Radio({ onPlay, disabled, ready, seconds, volume, onVolu
           ))}
         </div>
       )}
-      <div className="radio-grille">
-        <div className="radio-speaker" />
-        <span className="radio-brand">Padam<span>MELODY CLUB</span></span>
-        {yearTuner}
-        {children}
-      </div>
       <div className="radio-console">
         <div className="radio-control">
           <button className="radio-knob radio-play" onClick={onPlay} disabled={disabled} aria-label={`Play ${seconds} second clip`} title="Play clip">{ready ? '▶' : '…'}</button>
@@ -38,6 +32,12 @@ export default function Radio({ onPlay, disabled, ready, seconds, volume, onVolu
           <input type="range" min="0" max="100" value={volume} style={{ '--volume-level': `${volume}%` }} onChange={(e) => onVolumeChange(Number(e.target.value))} aria-label="Volume" />
           <span>VOL · {volume}%</span>
         </label>
+      </div>
+      <div className="radio-grille">
+        <div className="radio-speaker" />
+        <span className="radio-brand">Padam<span>MELODY CLUB</span></span>
+        {yearTuner}
+        {children}
       </div>
     </section>
   )

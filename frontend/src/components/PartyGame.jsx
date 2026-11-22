@@ -6,6 +6,7 @@ import GameModes from './GameModes'
 import useTitleSuggestions from '../lib/useTitleSuggestions'
 import BuzzerStage from './BuzzerStage'
 import LyricsAnswerForm from './LyricsAnswerForm'
+import {clearPartySession,findPartySession,readPartySession,savePartySession} from '../lib/partySession'
 
 const BASE=import.meta.env.VITE_API_URL||`${location.protocol}//${location.hostname}:4000`
 const games={characters:'Character Files',pictures:'Picture Clues',song:'Guess the Song',dialogue:'Guess the Movie',clues:'Five Clues',lyrics:'Missing Lyrics'}
@@ -13,13 +14,10 @@ const labels={host:'Host',buzzer:'Buzzer',solo:'Solo'}
 export default function PartyGame({mode='buzzer',game:gameProp,backdrop}) {
   const params=new URLSearchParams(location.hash.split('?')[1]||'')
   const initialGame=gameProp||params.get('game')||'pictures'
-  const [session,setSession]=useState(()=>{try{
-    const saved=JSON.parse(sessionStorage.getItem(`party-${mode}`))
-    return saved&&(params.get('room')?saved.code===params.get('room'):(saved.entryGame||saved.game)===initialGame)?saved:null
-  }catch{return null}})
+  const [session,setSession]=useState(()=>findPartySession(mode,initialGame,params.get('room')))
   const [room,setRoom]=useState(null),[busy,setBusy]=useState(false),[error,setError]=useState('')
   const [tab,setTab]=useState(params.get('room')?'join':'create'),[code,setCode]=useState(params.get('room')||''),[name,setName]=useState('')
-  const [teamNames,setTeamNames]=useState(['Team A','Team B']),[seconds,setSeconds]=useState(15),[difficulty,setDifficulty]=useState('easy')
+  const [teamNames,setTeamNames]=useState(['Team A','Team B']),[seconds,setSeconds]=useState('20'),[difficulty,setDifficulty]=useState('easy')
   const [lastLyricAnswer,setLastLyricAnswer]=useState('')
   const [guess,setGuess]=useState(''),[remaining,setRemaining]=useState(0),[copied,setCopied]=useState(''),[nextGame,setNextGame]=useState(initialGame)
   const lock=useRef(false),generation=useRef(0),offset=useRef(0),setupDialog=useRef(null)
@@ -34,7 +32,6 @@ export default function PartyGame({mode='buzzer',game:gameProp,backdrop}) {
     if(!response.ok)throw Object.assign(new Error(data.error||'Connection failed.'),{status:response.status})
     return data
   }
-  useEffect(()=>{if(session)sessionStorage.setItem(`party-${mode}`,JSON.stringify(session));else sessionStorage.removeItem(`party-${mode}`)},[session,mode])
   useEffect(()=>{
     if(!session)return
     let alive=true,inflight=false
@@ -42,7 +39,15 @@ export default function PartyGame({mode='buzzer',game:gameProp,backdrop}) {
       if(inflight||lock.current)return
       inflight=true;const version=generation.current
       try{const data=await request(`rooms/${session.code}`,null,session);if(alive&&version===generation.current)receive(data)}
-      catch(e){if(alive){setError(e.message);if(e.status===403||e.status===404){generation.current++;setSession(null);setRoom(null)}}}
+      catch(e){
+        if(alive&&version===generation.current){
+          setError(e.message)
+          if(e.status===403||e.status===404){
+            clearPartySession(mode,session)
+            generation.current++;setSession(null);setRoom(null)
+          }
+        }
+      }
       finally{inflight=false}
     }
     poll();const timer=setInterval(poll,mode==='buzzer'?400:1500)
@@ -61,8 +66,16 @@ export default function PartyGame({mode='buzzer',game:gameProp,backdrop}) {
     try{await fn()}catch(e){setError(e.message)}finally{lock.current=false;setBusy(false)}
   }
   function enter(join=false){run(async()=>{
-    const data=await request(join?`rooms/${code.trim().toUpperCase()}/join`:'rooms',join?{name}:{mode,game:initialGame,teams:teamNames,seconds,difficulty,name:mode==='buzzer'?name:mode==='host'?'Host':'You'},null)
-    setSession({code:data.code,token:data.token,game:data.game,entryGame:initialGame});receive(data)
+    const roomCode=code.trim().toUpperCase()
+    const saved=join?readPartySession(mode):null
+    if(saved?.code===roomCode){
+      setSession(saved)
+      return
+    }
+    const data=await request(join?`rooms/${roomCode}/join`:'rooms',join?{name}:{mode,game:initialGame,teams:teamNames,seconds:Number(seconds),difficulty,name:mode==='buzzer'?name:mode==='host'?'Host':'You'},null)
+    const nextSession={code:data.code,token:data.token,game:data.game,entryGame:initialGame}
+    savePartySession(mode,nextSession)
+    setSession(nextSession);receive(data)
   })}
   function act(action,extra={}){run(async()=>{
     let data=await request(`rooms/${room.code}/action`,{action,version:room.version,...extra})
@@ -72,9 +85,13 @@ export default function PartyGame({mode='buzzer',game:gameProp,backdrop}) {
       if(!data.complete)data=await request(`rooms/${room.code}/action`,{action:'continue',version:data.version})
     }
     receive(data)
-    if(action==='game')setSession(s=>({...s,game:data.game}))
+    if(action==='game'&&readPartySession(mode)?.token===session.token){
+      const nextSession={...session,game:data.game}
+      savePartySession(mode,nextSession)
+      setSession(nextSession)
+    }
   })}
-  function leave(){generation.current++;setSession(null);setRoom(null);setError('');setCopied('')}
+  function leave(){clearPartySession(mode,session);generation.current++;setSession(null);setRoom(null);setError('');setCopied('')}
   const joinLink=room?`${location.origin}${location.pathname}#buzzer-game?game=${game}&room=${room.code}`:''
   async function copyLink(){try{await navigator.clipboard.writeText(joinLink);setCopied('Copied')}catch{setCopied('Copy the link from the field below.')}}
   const canAnswer=mode==='solo'||room?.winner?.id===room?.me
@@ -82,10 +99,6 @@ export default function PartyGame({mode='buzzer',game:gameProp,backdrop}) {
   const settled=phase==='settled'
   const status=phase==='open'?'Buzzers open — first to buzz answers.':phase==='answering'&&mode==='buzzer'?`${room.winner.name} buzzed first` :settled?'Answer revealed':mode==='host'?'Listen to your teams, then award the answer.':'Your turn'
   return <>{preflight&&backdrop}<main className={`cinema-home party-page ${preflight?'party-preflight':''} ${game==='lyrics'?'lyrics-page':''}`}><div className="dialogue-shell">
-    {!preflight&&<><header className="dialogue-nav"><a href="#">← All games</a><span>PADAM / {labels[mode].toUpperCase()}</span></header>
-    <div className="dialogue-heading"><p className="cinema-eyebrow">THE FILM PLAYHOUSE</p><h1>{games[game]}</h1><p>{mode==='host'?'One screen. Your teams. You keep score.':mode==='buzzer'?'Everyone plays. First to buzz gets the answer.':'Play at your own pace.'}</p></div>
-</>}
-    {game!=='characters'&&!preflight&&<GameModes game={game} context={<span>{labels[mode]} · Round {room.round}{game==='characters'?' · '+room.availablePoints+' points':''}{game==='lyrics'?` · ${room.difficulty} · 10 hidden words`:''}</span>} actions={<button type="button" className="game-menu-action game-leave-action" disabled={busy} onClick={leave}>Leave game</button>}/>}
     <dialog ref={setupDialog} className="buzzer-setup-dialog party-setup-dialog" aria-label={`${labels[mode]} setup`} onCancel={()=>{location.hash='#'}}>
       <div className="buzzer-dialog-heading"><h2>{games[game]} · {labels[mode]}</h2><a className="popup-close" href="#" aria-label="Close setup">×</a></div>
     {!session&&<section className="party-setup clue-case" aria-label={`${labels[mode]} setup`}>
@@ -96,21 +109,21 @@ export default function PartyGame({mode='buzzer',game:gameProp,backdrop}) {
         {!(mode==='buzzer'&&tab==='join')&&<>
           {mode==='host'&&<><label>Number of teams<select value={teamNames.length} onChange={e=>setTeamNames(names=>Array.from({length:Number(e.target.value)},(_,i)=>names[i]||`Team ${String.fromCharCode(65+i)}`))}>{[2,3,4,5,6,7,8].map(n=><option key={n}>{n}</option>)}</select></label><div className="party-team-fields">{teamNames.map((team,i)=><label key={i}>Team {i+1}<input required maxLength={30} value={team} onChange={e=>setTeamNames(names=>names.map((n,j)=>j===i?e.target.value:n))}/></label>)}</div></>}
           {game==='lyrics'&&<label>Difficulty<select value={difficulty} onChange={e=>setDifficulty(e.target.value)}><option value="easy">Easy</option><option value="medium">Medium</option><option value="hard">Hard</option></select></label>}
-          {mode==='buzzer'&&<label>Answer timer (seconds)<input required type="number" min={5} max={120} value={seconds} onChange={e=>setSeconds(Number(e.target.value))}/></label>}
+          {mode==='buzzer'&&<label>Answer timer (seconds)<input required type="number" min={5} max={120} value={seconds} onChange={e=>setSeconds(e.target.value)}/></label>}
         </>}
         {game==='characters'&&<p>Character name and actor photo are shown. Reveal the actor’s name if you need a hint: the round then awards 60 points instead of 100.</p>}<p>{mode==='buzzer'?'Each player competes individually. The room creator plays too. Answers and points are checked automatically.':mode==='host'?'Teams answer aloud. Award points to the first correct team, or reveal for no points.':game==='lyrics'?'Complete 10 missing words. Each correct answer earns 10 points.':''}</p>
         <button disabled={busy}>{busy?'Loading…':mode==='buzzer'?(tab==='join'?'Join room':'Create room & join'):'Start game'}</button>
       </form>
     </section>}
-    {session&&!room&&<p>Connecting… <button onClick={leave}>Back to setup</button></p>}
+    {session&&!room&&<p>Connecting… <button onClick={()=>{location.hash='#'}}>All games</button></p>}
       {room&&phase==='lobby'&&<section className="party-setup clue-case">
-        {mode==='buzzer'?<><h2>Room {room.code}</h2><p>Share this code or link. Everyone joins as a player, including you.</p><button onClick={copyLink}>Copy invite link</button><input aria-label="Room invite link" readOnly value={joinLink}/><p role="status">{copied}</p><ul>{room.players.map(p=><li key={p.id}>{p.name}{p.id===room.me?' (you)':''}</li>)}</ul>{room.creator?<button disabled={busy||room.players.length<2} onClick={()=>act('start')}>Start game · {room.players.length} players</button>:<p>Waiting for the room creator to start.</p>}</>:<><h2>Ready to play</h2><button disabled={busy} onClick={()=>act('start')}>Start game</button></>}
+        {mode==='buzzer'?<><h2>Room {room.code}</h2><p>Share this code or link. Everyone joins as a player, including you.</p><div className="party-invite-actions"><button onClick={copyLink}>Copy invite link</button><a href={`https://wa.me/?text=${encodeURIComponent(joinLink)}`} target="_blank" rel="noopener noreferrer">Share on WhatsApp</a></div><input aria-label="Room invite link" readOnly value={joinLink}/><p role="status">{copied}</p><ul>{room.players.map(p=><li key={p.id}>{p.name}{p.id===room.me?' (you)':''}</li>)}</ul>{room.creator?<button disabled={busy||room.players.length<2} onClick={()=>act('start')}>Start game · {room.players.length} players</button>:<p>Waiting for the room creator to start.</p>}</>:<><h2>Ready to play</h2><button disabled={busy} onClick={()=>act('start')}>Start game</button></>}
       </section>}
     {error&&preflight&&<p role="alert">{error}</p>}
     </dialog>
     {room&&!preflight&&<>
-      <div className="party-scores">{room.teams.map((team,i)=><div key={i} className={room.winner?.team===i?'winning':''}><span>{team.name}{mode==='buzzer'&&room.team===i?' (you)':''}</span><strong>{team.score} pts</strong></div>)}</div>
       {phase==='exhausted'?<><StockFinished game={game}/>{room.creator&&mode!=='solo'&&<form className="party-switch" onSubmit={e=>{e.preventDefault();act('game',{game:nextGame})}}><label>Switch game · keep scores<select value={nextGame} onChange={e=>setNextGame(e.target.value)}>{Object.entries(games).map(([key,title])=><option key={key} value={key}>{title}</option>)}</select></label><button disabled={busy||nextGame===game}>Switch game</button></form>}</>:phase!=='lobby'&&<>
+        <div className="party-round">
         <LyricsPlayLayout fitViewport={game==='characters'} enabled={game==='lyrics'||game==='characters'} readingLabel={game==='characters'?'Character clue':undefined} answerLabel={game==='characters'?'Movie answer and round controls':undefined} activeKey={`${room.round}:${room.active}`}>
         <BuzzerStage game={game} room={room} busy={busy} act={act} automaticWords={mode==='buzzer'}/>
         <section className="party-answer-panel clue-case">
@@ -119,7 +132,7 @@ export default function PartyGame({mode='buzzer',game:gameProp,backdrop}) {
           {phase==='answering'&&mode==='buzzer'&&<p role="timer">{remaining} seconds remaining</p>}
           {game==='lyrics'&&<LyricsAnswerResult result={lastLyricAnswer}/>}
           {room.notice&&<p aria-live="polite">{room.notice}</p>}
-          {mode==='buzzer'&&!settled&&<button className="team-buzzer" disabled={busy||phase!=='open'||room.blocked.includes(room.team)} onClick={()=>act('buzz')}>BUZZ</button>}
+          {mode==='buzzer'&&phase==='open'&&<button className="team-buzzer" disabled={busy||phase!=='open'||room.blocked.includes(room.team)} onClick={()=>act('buzz')}>BUZZ</button>}
           {mode==='buzzer'&&room.blocked.includes(room.team)&&!settled&&<p>Your attempt is used. Other players can still buzz.</p>}
           {mode==='buzzer'&&phase==='open'&&<button disabled={busy||room.skipVotes.includes(room.me)} onClick={()=>act('skip')}>{room.skipVotes.includes(room.me)?'Skip vote recorded':'Vote to skip round'} · {room.skipVotes.length}/{Math.floor(room.players.length/2)+1}</button>}
           {phase==='answering'&&canAnswer&&mode!=='host'&&(game==='lyrics'?<LyricsAnswerForm resetKey={`${room.round}:${room.active}`} label={`Word ${(room.active??0)+1}`} submitLabel="Check" disabled={busy} onSubmit={answer=>act('guess',{guess:answer})}/>:<form className="party-guess" onSubmit={e=>{e.preventDefault();act('guess',{guess})}}><label>{game==='song'?'Song name':'Movie name'}<input list="party-title-suggestions" autoFocus required autoComplete="off" maxLength={255} value={guess} onChange={e=>setGuess(e.target.value)}/></label><datalist id="party-title-suggestions">{suggestions.map(title=><option key={title} value={title}/>)}</datalist><button disabled={busy||!guess.trim()}>Submit answer</button></form>)}
@@ -131,9 +144,15 @@ export default function PartyGame({mode='buzzer',game:gameProp,backdrop}) {
           </>}
         </section>
         </LyricsPlayLayout>
+        </div>
       </>}
     </>}
-    {game==='characters'&&room&&!preflight&&<div className="character-bottom-menu"><GameModes game={game} context={<span>{labels[mode]} · Round {room.round}{game==='characters'?' · '+room.availablePoints+' points':''}{game==='lyrics'?` · ${room.difficulty} · 10 hidden words`:''}</span>} actions={<button type="button" className="game-menu-action game-leave-action" disabled={busy} onClick={leave}>Leave game</button>}/></div>}
     {error&&!preflight&&<p role="alert" className="dialogue-feedback">{error}</p>}
+    {room&&!preflight&&<div className="game-page-menu">
+      <div className="party-scores">{room.teams.map((team,i)=><div key={i} className={room.winner?.team===i?'winning':''}><span>{team.name}{mode==='buzzer'&&room.team===i?' (you)':''}</span><strong>{team.score} pts</strong></div>)}</div>
+      <header className="dialogue-nav"><a href="#">← All games</a><span>PADAM / {labels[mode].toUpperCase()}</span></header>
+      <div className="dialogue-heading"><p className="cinema-eyebrow">THE FILM PLAYHOUSE</p><h1>{games[game]}</h1><p>{mode==='host'?'One screen. Your teams. You keep score.':mode==='buzzer'?'Everyone plays. First to buzz gets the answer.':'Play at your own pace.'}</p></div>
+      <GameModes game={game} context={<span>{labels[mode]} · Round {room.round}{game==='characters'?' · '+room.availablePoints+' points':''}{game==='lyrics'?` · ${room.difficulty} · 10 hidden words`:''}</span>} actions={<button type="button" className="game-menu-action game-leave-action" disabled={busy} onClick={leave}>Leave game</button>}/>
+    </div>}
   </div></main></>
 }

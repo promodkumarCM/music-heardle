@@ -500,7 +500,9 @@ html { scrollbar-gutter:stable; }
 .party-setup form { display:grid;gap:16px; }
 .party-page label { display:grid;gap:7px;font-size:14px; }
 .party-page input,.party-page select { box-sizing:border-box;width:100%;min-width:0;max-width:100%;padding:11px 12px;border:1px solid #a58b5d;border-radius:8px;background:#19241c;color:#efe4cd;font:15px system-ui,sans-serif; }
-.party-page button { padding:11px 16px;border:1px solid #a58b5d;border-radius:8px;background:#dfc18a;color:#283429;cursor:pointer;font-size:14px; }
+.party-invite-actions { display:flex;flex-wrap:wrap;gap:8px; }
+.party-invite-actions a { display:inline-flex;align-items:center;text-decoration:none; }
+.party-page button,.party-invite-actions a { padding:11px 16px;border:1px solid #a58b5d;border-radius:8px;background:#dfc18a;color:#283429;cursor:pointer;font-size:14px; }
 .party-page button:disabled { cursor:default;opacity:.55; }
 .party-page .lyrics-blank:disabled { opacity:1;color:#62481e;cursor:default; }
 .party-page .active-blank { outline:2px solid #a56e25;outline-offset:3px; }
@@ -733,3 +735,63 @@ button.support-pay:disabled { opacity:.6; cursor:not-allowed; }
 .home-contribute-button { white-space:nowrap; padding:13px 20px; border:1px solid #b99a60; border-radius:9px; background:#dfc18a; color:#19251d; font:600 14px/1.5 system-ui,sans-serif; cursor:pointer; }
 .contribution-form select { display:block; width:100%; margin:8px 0 16px; padding:10px; border:1px solid #a58b5d; border-radius:6px; background:#172219; color:#efe4cd; font:14px/1.5 system-ui,sans-serif; }
 @media(max-width:640px) { .home-contribute { flex-direction:column; align-items:flex-start; padding:20px; } }
+
+/* Keep the round and its answer controls above the page navigation. */
+.game-page-menu { margin-top:24px; }
+.game-page-menu .dialogue-nav { padding-block:12px; }
+.game-page-menu .dialogue-heading { padding-block:12px; }
+.party-page .game-page-menu .party-scores { margin:0 0 12px; }
+.party-round { padding-top:8px; }
+.party-round > .party-answer-panel { margin:8px 0 0; padding:14px; }
+.party-round > .party-answer-panel h2 { font-size:20px; margin-bottom:8px; }
+.party-round > .party-answer-panel p { margin:6px 0; }
+.party-round > .party-answer-panel .team-buzzer { width:112px; height:64px; margin:8px auto; }
+.dialogue-page .dialogue-shell > .clapperboard,
+.party-round > .clapperboard { margin:18px 0 8px; }
+.dialogue-page .dialogue-shell > .clapperboard .clapper-body blockquote,
+.party-round > .clapperboard .clapper-body blockquote {
+  box-sizing:border-box;
+  min-height:0;
+  padding-block:16px;
+}
+.dialogue-page .dialogue-shell > .dialogue-answer { padding-top:12px; min-height:0; }
+.clue-page .dialogue-shell > .dialogue-answer { min-height:0; }
+.song-game-page:has(.wood-radio) { padding-top:12px; }
+.song-game-page .back-to-cinema { margin-top:20px; }
+
+@media (min-width:761px) {
+  .party-round:has(> .party-answer-panel) {
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(245px,0.65fr);
+    gap:16px;
+    align-items:start;
+  }
+}
+
+@media (max-width:760px) {
+  .party-round > .picture-theatre {
+    width:min(100%, max(280px, 68svh));
+    padding:0;
+    background:none;
+  }
+  .party-round > .radio { margin-block:0 8px; }
+  .dialogue-page .dialogue-shell > .clapperboard .clapper-body blockquote,
+  .party-round > .clapperboard .clapper-body blockquote {
+    display:block;
+    max-height:46svh;
+    overflow:auto;
+  }
+}
+
+.cinema-resume-rooms { display:flex; flex-wrap:wrap; gap:8px; margin-block:16px; }
+.cinema-resume-rooms a {
+  display:inline-flex;
+  align-items:center;
+  min-height:44px;
+  padding-inline:14px;
+  border-radius:8px;
+  background:#dfc18a;
+  color:#283429;
+  font-weight:600;
+  text-decoration:none;
+}

@@ -150,3 +150,12 @@ body:has(.app .wood-radio)::before {
 @media(max-width:480px) {
   .app .wood-radio .radio-console > .radio-control { grid-template-rows:37px 29px auto; }
 }
+
+.wood-radio .radio-console,.wood-radio .radio-console:has(.radio-tuner-search) {
+  margin-top:0;
+  border-radius:16px 16px 2px 2px;
+}
+.wood-radio .radio-grille,.wood-radio .radio-grille:has(.radio-year-tuner) {
+  margin-top:12px;
+  border-radius:3px 3px 24px 24px;
+}
