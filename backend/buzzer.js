@@ -59,7 +59,7 @@ export function action(room,host,player,body,now=Date.now()){
 }
 async function catalog(game){
  if(game==='buzzer')return [{id:0}]
- const queries={pictures:'SELECT id,movie,image_url,mobile_image_url FROM picture_puzzles',lyrics:'SELECT id,title,sections FROM lyric_songs',dialogue:'SELECT id,movie,dialogue,dialogue_english,dialogue_variants FROM dialogues',clues:'SELECT id,movie,clues FROM movie_puzzles',song:'SELECT id,title,movie,youtube_id,release_year FROM songs'}
+ const queries={pictures:'SELECT id,movie,image_url,mobile_image_url FROM picture_puzzles WHERE image_url <> \'\'',lyrics:'SELECT id,title,sections FROM lyric_songs',dialogue:'SELECT id,movie,dialogue,dialogue_english,dialogue_variants FROM dialogues',clues:'SELECT id,movie,clues FROM movie_puzzles',song:'SELECT id,title,movie,youtube_id,release_year FROM songs'}
  if(!Object.hasOwn(queries,game))fail('Choose a game.',400)
  const [rows]=await pool.query(queries[game]);if(!rows.length)fail('This catalog is empty.',503);return game==='dialogue'?expandDialogues(rows):rows
 }

@@ -735,6 +735,8 @@ html { scrollbar-gutter:stable; }
 .character-bottom-menu { max-width:680px; margin:12px auto 0; }
 .actor-character-pair .character-reveal-toggle { grid-column:1/-1; }
 .picture-movie-gallery { display:flex; flex-wrap:wrap; gap:12px; margin-top:16px; }
+dialog.admin-confirm { inset:0; margin:auto; transform:none; box-sizing:border-box; height:fit-content; max-height:90dvh; overflow:auto; color:#f2e6cc; }
+dialog.admin-confirm::backdrop { background:#000a; }
 .picture-movie-gallery>div { display:grid; gap:8px; }
 .picture-movie-gallery>div>button { display:grid; gap:6px; padding:8px; text-align:center; }
 .picture-movie-gallery button[aria-pressed="true"] { outline:2px solid #dfc18a; outline-offset:2px; }
