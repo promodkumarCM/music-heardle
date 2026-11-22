@@ -95,6 +95,8 @@ export default function PartyGame({mode='buzzer',game:gameProp,backdrop}) {
   const joinLink=room?`${location.origin}${location.pathname}#buzzer-game?game=${game}&room=${room.code}`:''
   async function copyLink(){try{await navigator.clipboard.writeText(joinLink);setCopied('Copied')}catch{setCopied('Copy the link from the field below.')}}
   const canAnswer=mode==='solo'||room?.winner?.id===room?.me
+  const buzzerLocked=mode==='buzzer'&&phase==='answering'&&!canAnswer
+  const attemptUsed=mode==='buzzer'&&room?.blocked.includes(room.team)
   const suggestions=useTitleSuggestions(guess,game,phase==='answering'&&canAnswer&&mode!=='host',`${room?.round}:${room?.active}`)
   const settled=phase==='settled'
   const status=phase==='open'?'Buzzers open — first to buzz answers.':phase==='answering'&&mode==='buzzer'?`${room.winner.name} buzzed first` :settled?'Answer revealed':mode==='host'?'Listen to your teams, then award the answer.':'Your turn'
@@ -129,11 +131,17 @@ export default function PartyGame({mode='buzzer',game:gameProp,backdrop}) {
         <section className="party-answer-panel clue-case">
           <h2 role="status">{game==='lyrics'?`Word ${(room.active??0)+1} of 10`:status}</h2>
           {game==='lyrics'&&mode==='buzzer'&&<p>{status}</p>}
-          {phase==='answering'&&mode==='buzzer'&&<p role="timer">{remaining} seconds remaining</p>}
+          {phase==='answering'&&mode==='buzzer'&&canAnswer&&<p role="timer">{remaining} seconds remaining</p>}
           {game==='lyrics'&&<LyricsAnswerResult result={lastLyricAnswer}/>}
           {room.notice&&<p aria-live="polite">{room.notice}</p>}
-          {mode==='buzzer'&&phase==='open'&&<button className="team-buzzer" disabled={busy||phase!=='open'||room.blocked.includes(room.team)} onClick={()=>act('buzz')}>BUZZ</button>}
-          {mode==='buzzer'&&room.blocked.includes(room.team)&&!settled&&<p>Your attempt is used. Other players can still buzz.</p>}
+          {mode==='buzzer'&&(phase==='open'||buzzerLocked)&&<div className="party-buzzer-controls">
+            {buzzerLocked&&<p className="party-buzzer-countdown" role="timer" id="party-buzzer-countdown">Answer window <strong>{remaining}s</strong></p>}
+            <button type="button" className={buzzerLocked&&!attemptUsed?'team-buzzer team-buzzer-locked':'team-buzzer'} disabled={busy||buzzerLocked||attemptUsed} aria-describedby={buzzerLocked?'party-buzzer-countdown':undefined} onClick={()=>act('buzz')}>
+              <span className="team-buzzer-light" aria-hidden="true"/>
+              <span>{attemptUsed?'Attempt used':buzzerLocked?'Buzzer unavailable':'Buzz in'}</span>
+            </button>
+          </div>}
+          {attemptUsed&&!settled&&<p>Your attempt is used. Other players can still buzz.</p>}
           {mode==='buzzer'&&phase==='open'&&<button disabled={busy||room.skipVotes.includes(room.me)} onClick={()=>act('skip')}>{room.skipVotes.includes(room.me)?'Skip vote recorded':'Vote to skip round'} · {room.skipVotes.length}/{Math.floor(room.players.length/2)+1}</button>}
           {phase==='answering'&&canAnswer&&mode!=='host'&&(game==='lyrics'?<LyricsAnswerForm resetKey={`${room.round}:${room.active}`} label={`Word ${(room.active??0)+1}`} submitLabel="Check" disabled={busy} onSubmit={answer=>act('guess',{guess:answer})}/>:<form className="party-guess" onSubmit={e=>{e.preventDefault();act('guess',{guess})}}><label>{game==='song'?'Song name':'Movie name'}<input list="party-title-suggestions" autoFocus required autoComplete="off" maxLength={255} value={guess} onChange={e=>setGuess(e.target.value)}/></label><datalist id="party-title-suggestions">{suggestions.map(title=><option key={title} value={title}/>)}</datalist><button disabled={busy||!guess.trim()}>Submit answer</button></form>)}
           {mode==='host'&&!settled&&<><div className="lyrics-controls">{room.teams.map((team,i)=><button key={i} disabled={busy} onClick={()=>act('mark',{team:i})}>{team.name} · +{game==='lyrics'?10:game==='clues'?120-room.clue*20:game==='characters'?room.availablePoints:100}</button>)}<button disabled={busy} onClick={()=>act('reveal')}>Nobody · Reveal</button></div><details><summary>Check answer</summary><p>{room.answer}</p></details></>}

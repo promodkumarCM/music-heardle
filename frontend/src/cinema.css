@@ -515,7 +515,77 @@ html { scrollbar-gutter:stable; }
 .party-answer-panel p,.party-setup p { font-size:14px;line-height:1.65; }
 .party-guess { display:flex;align-items:end;gap:12px;margin:18px 0;max-width:600px; }
 .party-guess label { flex:1; }
-.party-answer-panel .team-buzzer { display:block;margin:18px auto;width:160px;height:100px;background:#b94130;color:#fff4df;font-size:24px;font-weight:700;border-radius:50%; }
+.party-answer-panel .party-buzzer-countdown {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  margin:10px auto 0;
+  color:#f3dec0;
+}
+.party-buzzer-countdown strong {
+  font-size:20px;
+  font-variant-numeric:tabular-nums;
+  color:#ffe1a0;
+}
+.party-answer-panel .party-buzzer-countdown + .team-buzzer { margin-top:6px; }
+/* The raised cap and pilot light make the buzzer the primary round action. */
+.party-answer-panel .team-buzzer {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  width:min(100%, 280px);
+  min-height:66px;
+  margin:14px auto 18px;
+  padding:12px 18px;
+  border:2px solid #ecb497;
+  border-radius:14px;
+  background:linear-gradient(180deg,#b93c33,#8d252b);
+  box-shadow:inset 0 2px 1px #fff3,0 5px 0 #471d1c,0 8px 13px #0006;
+  color:#fff6e7;
+  font:700 22px/1.2 system-ui,sans-serif;
+  touch-action:manipulation;
+}
+.team-buzzer-light {
+  flex:0 0 10px;
+  height:10px;
+  border-radius:50%;
+  background:#ffe1a0;
+  box-shadow:0 0 8px #ffbc61a6;
+}
+.party-answer-panel .team-buzzer:focus-visible {
+  outline:3px solid #ffe1a0;
+  outline-offset:4px;
+}
+@media (hover:hover) {
+  .party-answer-panel .team-buzzer:enabled:hover {
+    background:linear-gradient(180deg,#c84539,#9b2b2e);
+  }
+}
+.party-answer-panel .team-buzzer:enabled:active {
+  transform:translateY(4px);
+  box-shadow:inset 0 2px 4px #0004,0 1px 0 #471d1c;
+}
+.party-answer-panel .team-buzzer:disabled {
+  opacity:1;
+  border-color:#776b60;
+  background:#373332;
+  color:#e3d7cd;
+  box-shadow:none;
+}
+.party-answer-panel .team-buzzer:disabled .team-buzzer-light {
+  background:#8a8078;
+  box-shadow:none;
+}
+.party-answer-panel .team-buzzer-locked:disabled {
+  border-color:#c68b40;
+  background:linear-gradient(180deg,#6e461c,#4f3217);
+  color:#ffebc3;
+}
+.party-answer-panel .team-buzzer-locked:disabled .team-buzzer-light {
+  background:#ffbb58;
+}
 .party-revealed-answer { color:#dfc18a;font-size:22px!important; }
 .party-switch { display:flex;align-items:end;gap:12px;margin-top:24px;padding-top:20px;border-top:1px solid #a58b5d55; }
 .party-switch label { flex:1;max-width:360px; }
@@ -745,7 +815,6 @@ button.support-pay:disabled { opacity:.6; cursor:not-allowed; }
 .party-round > .party-answer-panel { margin:8px 0 0; padding:14px; }
 .party-round > .party-answer-panel h2 { font-size:20px; margin-bottom:8px; }
 .party-round > .party-answer-panel p { margin:6px 0; }
-.party-round > .party-answer-panel .team-buzzer { width:112px; height:64px; margin:8px auto; }
 .dialogue-page .dialogue-shell > .clapperboard,
 .party-round > .clapperboard { margin:18px 0 8px; }
 .dialogue-page .dialogue-shell > .clapperboard .clapper-body blockquote,
