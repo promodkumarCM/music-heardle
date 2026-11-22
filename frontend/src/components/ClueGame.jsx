@@ -83,9 +83,6 @@ export default function ClueGame() {
   },[timerSeconds,active,expired,error,busy,round?.token,round?.clues.length])
   if(round?.status==='exhausted')return <main className="cinema-home"><div className="dialogue-shell"><GameModes game="clues"/><StockFinished game="clues"/></div></main>
   return <main className="cinema-home clue-page"><div className="dialogue-shell">
-    <header className="dialogue-nav"><a href="#">← All games</a><span>PADAM / GAME 04</span></header>
-    <div className="dialogue-heading"><p className="cinema-eyebrow">THE FIVE-CLUE MYSTERY</p><h1>Five clues.<br/><em>One movie.</em></h1><p>The sooner it clicks, the more points you earn.</p></div>
- <GameModes game="clues" />
     {!round&&<><button className="buzzer-setup-launch" onClick={()=>setSetupOpen(true)}>Set up game</button><dialog ref={setupDialog} className="buzzer-setup-dialog clue-timer-dialog" aria-labelledby="clue-setup-title" onCancel={()=>setSetupOpen(false)} onClose={()=>setSetupOpen(false)}>
       <div className="buzzer-dialog-heading"><h2 id="clue-setup-title">Before the first clue</h2><button aria-label="Close timer setup" disabled={busy} onClick={()=>setSetupOpen(false)}>×</button></div>
       <form onSubmit={e=>{e.preventDefault();if(timerChoice==='custom'&&!validCustom)return;setTimerSeconds(timerChoice==='custom'?Number(customSeconds):Number(timerChoice));act('start')}}>
@@ -102,6 +99,12 @@ export default function ClueGame() {
       {error&&<p role="alert">{error}</p>}
     </dialog></>}
     <FilmClues targetRef={targetRef} clues={round?.clues||[]} roundKey={round?.token} busy={busy} feedback={<RoundFeedback feedback={feedback}/>} />
+    <section className="dialogue-answer" aria-label="Movie answer">
+      {active&&!expired?<form autoComplete="off" onSubmit={e=>{e.preventDefault();act('guess')}}><label htmlFor="clue-guess">Which movie connects the clues?</label><div className="dialogue-input-row"><input id="clue-guess" list="clue-movie-suggestions" value={guess} onChange={e=>setGuess(e.target.value)} maxLength={255} autoComplete="off" placeholder="Type the movie name…" disabled={busy}/><datalist id="clue-movie-suggestions">{suggestions.map(title=><option key={title} value={title}/>)}</datalist><button disabled={busy||!guess.trim()}>Check answer →</button></div><div className="clue-actions"><button type="button" disabled={busy} onClick={()=>act('skip')}>Skip movie →</button><span>Type at least 2 characters for movie suggestions. Small spelling mistakes are accepted.</span></div></form>:round&&!expired?<div className="dialogue-result" role="status"><p className="cinema-eyebrow">{round.status==='correct'?`CASE CLOSED · +${round.points} POINTS`:'THE ANSWER WAS'}</p><h2>{round.movie}</h2><button disabled={busy} onClick={()=>act('start')}>Next movie →</button></div>:null}
+      {message&&<p className="dialogue-feedback" role="status">{message}</p>}
+      {error&&<p className="dialogue-feedback" role="alert">{error}</p>}
+      {expired&&!busy&&<button onClick={()=>act('start')}>{expired?'Start a new movie':'Retry'}</button>}
+    </section>
     {active&&!expired&&<div className="clue-board-controls">
       <span>{timerSeconds?timerSeconds+'s per clue':'Timer off'}</span>
       {round.clues.length<5?<button disabled={busy} onClick={()=>act('next')}>Next clue · {round.availablePoints-20} pts →</button>:<button disabled={busy} onClick={()=>act('reveal')}>Reveal movie →</button>}
@@ -112,11 +115,11 @@ export default function ClueGame() {
       <div className="clue-clock-track"><div style={{width:Math.min(100,remaining/timerSeconds*100)+'%'}} /></div>
     </div>}
     <div className="clue-score"><span>THIS VISIT <strong>{score} pts</strong></span><span>{active?'UP FOR GRABS':'ROUND SCORE'} <strong>{active?round.availablePoints:round?.points||0} pts</strong></span></div>
-    <section className="dialogue-answer" aria-label="Movie answer">
-      {active&&!expired?<form autoComplete="off" onSubmit={e=>{e.preventDefault();act('guess')}}><label htmlFor="clue-guess">Which movie connects the clues?</label><div className="dialogue-input-row"><input id="clue-guess" list="clue-movie-suggestions" value={guess} onChange={e=>setGuess(e.target.value)} maxLength={255} autoComplete="off" placeholder="Type the movie name…" disabled={busy}/><datalist id="clue-movie-suggestions">{suggestions.map(title=><option key={title} value={title}/>)}</datalist><button disabled={busy||!guess.trim()}>Check answer →</button></div><div className="clue-actions"><button type="button" disabled={busy} onClick={()=>act('skip')}>Skip movie →</button><span>Type at least 2 characters for movie suggestions. Small spelling mistakes are accepted.</span></div></form>:round&&!expired?<div className="dialogue-result" role="status"><p className="cinema-eyebrow">{round.status==='correct'?`CASE CLOSED · +${round.points} POINTS`:'THE ANSWER WAS'}</p><h2>{round.movie}</h2><button disabled={busy} onClick={()=>act('start')}>Next movie →</button></div>:null}
-      {message&&<p className="dialogue-feedback" role="status">{message}</p>}
-      {error&&<p className="dialogue-feedback" role="alert">{error}</p>}
-      {expired&&!busy&&<button onClick={()=>act('start')}>{expired?'Start a new movie':'Retry'}</button>}
-    </section><footer className="dialogue-endnote">100 → 80 → 60 → 40 → 20 points · Reveal unlocks after clue five.</footer>
+    <footer className="dialogue-endnote">100 → 80 → 60 → 40 → 20 points · Reveal unlocks after clue five.</footer>
+    <div className="game-page-menu">
+      <header className="dialogue-nav"><a href="#">← All games</a><span>PADAM / GAME 04</span></header>
+      <div className="dialogue-heading"><p className="cinema-eyebrow">THE FIVE-CLUE MYSTERY</p><h1>Five clues.<br/><em>One movie.</em></h1><p>The sooner it clicks, the more points you earn.</p></div>
+      <GameModes game="clues" />
+    </div>
   </div></main>
 }

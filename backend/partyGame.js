@@ -10,7 +10,7 @@ import {fail,partyAction,partyView,expireParty,chooseWord,beginQuestion} from '.
 const router=express.Router(),rooms=new Map()
 const parse=x=>typeof x==='string'?JSON.parse(x):x
 async function catalog(game) {
-  const queries={characters:'SELECT id,movie,actor_name,actor_image_url,actor_image_urls,hide_actor_until_reveal,character_name,character_english,role,aliases FROM character_puzzles',pictures:'SELECT id,movie,image_url,mobile_image_url FROM picture_puzzles',lyrics:'SELECT id,title,sections FROM lyric_songs',dialogue:'SELECT id,movie,dialogue,dialogue_english,dialogue_variants FROM dialogues',clues:'SELECT id,movie,clues FROM movie_puzzles',song:'SELECT id,title,movie,youtube_id FROM songs'}
+  const queries={characters:'SELECT id,movie,actor_name,actor_image_url,actor_image_urls,hide_actor_until_reveal,character_name,character_english,role,aliases FROM character_puzzles',pictures:'SELECT id,movie,image_url,mobile_image_url FROM picture_puzzles WHERE image_url <> \'\'',lyrics:'SELECT id,title,sections FROM lyric_songs',dialogue:'SELECT id,movie,dialogue,dialogue_english,dialogue_variants FROM dialogues',clues:'SELECT id,movie,clues FROM movie_puzzles',song:'SELECT id,title,movie,youtube_id FROM songs'}
   if(!Object.hasOwn(queries,game))fail('Choose a game.',400)
   let rows
   try{[rows]=await pool.query(queries[game])}catch(error){if(game==='characters'&&error.code==='ER_NO_SUCH_TABLE')fail('Character Files is not set up yet. Ask the admin to finish setting up this game.',503);throw error}

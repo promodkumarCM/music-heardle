@@ -16,8 +16,13 @@ import Leaderboard from './components/Leaderboard'
 import './cinema.css'
 import './components/ModePopup.css'
 import {savedPlayMode,rememberPlayMode,playModeHref} from './lib/playMode'
+import {partyResumeHref,readPartySession} from './lib/partySession'
 
 function CinemaHome() {
+  const rooms=['buzzer','host'].flatMap(mode=>{
+    const session=readPartySession(mode)
+    return session?[{mode,session}]:[]
+  })
   return (
     <main className="cinema-home">
       <div className="cinema-shell">
@@ -25,6 +30,11 @@ function CinemaHome() {
           <a className="cinema-logo" href="#"><span aria-hidden="true">✦</span> PADAM<span className="logo-caption">THE FILM PLAYHOUSE</span></a>
           <span className="cinema-header-note">Made for the love of Malayalam cinema.</span>
         </header>
+        {rooms.length>0&&<nav className="cinema-resume-rooms" aria-label="Resume a game">
+          {rooms.map(({mode,session})=><a key={mode} href={partyResumeHref(mode,session)}>
+            {mode==='buzzer'?'Resume buzzer room':'Resume host game'} · {session.code}
+          </a>)}
+        </nav>}
         <section className="cinema-games" id="now-showing" aria-labelledby="showing-title">
           <div className="showing-heading"><h2 id="showing-title">Now showing</h2><span>ONE TICKET. ENDLESS NOSTALGIA.</span></div>
           <div className="cinema-game-grid">
@@ -110,10 +120,10 @@ export default function App() {
   if(game==='lyrics')return <PartyGame key="solo-lyrics" mode="solo" game="lyrics" backdrop={<CinemaHome/>}/>
   if(game==='clues')return <ClueGame/>
   if(game==='dialogue')return <DialogueGame/>
-  return <main className="app">
+  return <main className="app song-game-page">
+    <GuessGame onScoreSaved={()=>setScoreVersion(value=>value+1)}/>
     <a className="back-to-cinema" href="#">← All games <span>PADAM</span></a>
     <GameModes game="song"/>
-    <GuessGame onScoreSaved={()=>setScoreVersion(value=>value+1)}/>
     <Leaderboard refreshKey={scoreVersion}/>
   </main>
 }

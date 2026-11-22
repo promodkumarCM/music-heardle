@@ -72,6 +72,11 @@ router.post('/contributions/:id/approve',async(req,res)=>{
   await connection.commit();res.status(201).json({id:result.insertId})
  }catch(error){if(connection)await connection.rollback();res.status(error.code==='ER_DUP_ENTRY'?409:503).json({error:error.code==='ER_DUP_ENTRY'?'This movie already exists. Edit its existing catalog entry instead.':'Could not approve contribution.'})}finally{connection?.release()}
 })
+router.delete('/pictures/:id/image',async(req,res)=>{
+ const id=Number(req.params.id)
+ if(!Number.isSafeInteger(id)||id<1)return res.status(400).json({error:'Invalid ID.'})
+ try{const [result]=await pool.query("UPDATE picture_puzzles SET image_url='',mobile_image_url='' WHERE id=?",[id]);if(!result.affectedRows)return res.status(404).json({error:'Entry not found.'});res.json({ok:true})}catch{res.status(503).json({error:'Could not remove image.'})}
+})
 router.post('/characters/batch',characterBatch(pool,validate,definitions.characters.fields))
 router.use('/:kind',(req,res,next)=>{if(!Object.hasOwn(definitions,req.params.kind))return res.status(404).json({error:'Unknown catalog.'});const d=definitions[req.params.kind];req.definition=d;req.kind=req.params.kind;next()})
 router.get('/:kind',async(req,res)=>{try{const d=req.definition;const [rows]=await pool.query(`SELECT id, ${d.fields.join(',')} FROM ${d.table} ORDER BY id DESC`);res.json(rows.map(row=>{for(const f of ['aliases','clues','sections','dialogue_variants','actor_image_urls'])if(row[f]!==undefined)row[f]=parse(row[f]);return row}))}catch{res.status(503).json({error:'Could not load catalog.'})}})

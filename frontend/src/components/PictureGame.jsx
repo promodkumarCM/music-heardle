@@ -72,9 +72,6 @@ export default function PictureGame() {
   return (
     <main className="cinema-home picture-page">
       <div className="dialogue-shell">
-        <header className="dialogue-nav"><a href="#">← All games</a><span>PADAM / GAME 02</span></header>
-        <div className="dialogue-heading"><p className="cinema-eyebrow">THE PICTURE CLUE</p><h1>One picture.<br /><em>Which movie?</em></h1><p>Look closely. Name the film.</p></div>
- <GameModes game="pictures" />
         <PictureStage image={clue?.image_url} loading={loading} round={round} targetRef={targetRef} feedback={feedback}/>
         <section className="dialogue-answer" aria-label="Your answer">
           {result ? <div className="dialogue-result" role="status"><span className="cinema-eyebrow">{result.correct ? '✦ THAT’S A WRAP. YOU GOT IT!' : 'THE FILM BEHIND THE LINE'}</span><h2>{result.movie}</h2><button onClick={next}>{round + 1 === clues.length ? 'Finish this set' : 'Next picture'} <span aria-hidden="true">→</span></button></div>
@@ -83,6 +80,11 @@ export default function PictureGame() {
           {error && <div className="dialogue-feedback" role="alert">{error}{!clue && <button onClick={() => setRetry(value => value + 1)}>Retry</button>}</div>}
         </section>
         <footer className="dialogue-endnote">No clock. No rush. Just your love of cinema.</footer>
+        <div className="game-page-menu">
+          <header className="dialogue-nav"><a href="#">← All games</a><span>PADAM / GAME 02</span></header>
+          <div className="dialogue-heading"><p className="cinema-eyebrow">THE PICTURE CLUE</p><h1>One picture.<br /><em>Which movie?</em></h1><p>Look closely. Name the film.</p></div>
+          <GameModes game="pictures" />
+        </div>
       </div>
     </main>
   )
