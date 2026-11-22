@@ -1,0 +1,98 @@
+/* Vintage amber-phosphor karaoke monitor on a dim club stage. */
+body:has(.app .karaoke-theme) {
+  min-height: 100dvh;
+  color: #e8dcc2;
+  background-color: #14100c;
+  background-image:
+    radial-gradient(ellipse at 50% 18%, #c98d4a22, transparent 58%),
+    radial-gradient(ellipse at 15% 85%, #7a3d2a1a, transparent 50%),
+    radial-gradient(ellipse at 85% 85%, #7a3d2a1a, transparent 50%),
+    linear-gradient(180deg, #1c1611 0%, #161210 55%, #100d0a 100%);
+  background-attachment: fixed;
+}
+.app:has(.karaoke-theme) { max-width: 720px; }
+.app:has(.karaoke-theme) .back-to-cinema { color: #cbb48a; }
+.app:has(.karaoke-theme) .back-to-cinema span { color: #93805e; }
+.app:has(.karaoke-theme) .game-modes { background: #1a1512; border-color: #7d5b36; }
+.app:has(.karaoke-theme) .leaderboard { background: linear-gradient(125deg, #241d16, #1a140f); color: #e8dcc2; border-color: #7d5b3647; }
+.app:has(.karaoke-theme) .leaderboard h2, .app:has(.karaoke-theme) .chart-player strong, .app:has(.karaoke-theme) .chart-time { color: #e8dcc2; }
+.app:has(.karaoke-theme) .chart-subtitle, .app:has(.karaoke-theme) .chart-footer, .app:has(.karaoke-theme) .chart-empty, .app:has(.karaoke-theme) .leaderboard label { color: #ab9c82; }
+.app:has(.karaoke-theme) .chart-columns, .app:has(.karaoke-theme) .chart-eyebrow, .app:has(.karaoke-theme) .chart-rank { color: #d6a35c; }
+
+.karaoke-theme .dialogue-nav a { color: #d8c498; }
+.karaoke-theme .dialogue-heading h1 { color: #f1e4c8; }
+.karaoke-theme .dialogue-heading h1 em { color: #e0a855; }
+.karaoke-theme .cinema-eyebrow, .karaoke-theme .cinema-eyebrow > span { color: #e0a855; }
+
+/* Two mic-stand cards for the setup screen. */
+.karaoke-theme .lyrics-setup .clue-case {
+  position: relative;
+  background: linear-gradient(160deg, #241c15, #19130e);
+  border: 1px solid #7d5b3655;
+  border-top: 3px solid #c98d4a66;
+  box-shadow: inset 0 1px 0 #ffd9971a, 0 10px 24px #0007;
+}
+.karaoke-theme .lyrics-setup .clue-case::before {
+  content: '';
+  position: absolute; top: -9px; left: 24px;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffe7b8, #e0a855 55%, #7a5323);
+  box-shadow: 0 0 10px 2px #e0a85566;
+}
+.karaoke-theme .lyrics-setup h2 { color: #f1e4c8; }
+.karaoke-theme .lyrics-page button { background: linear-gradient(#e7c07c, #c9954f); color: #241a0d; border-color: #8a6530; }
+.karaoke-theme .lyrics-page input { background: #100d0a; color: #f1e4c8; border-color: #7d5b36; }
+
+/* The screen itself: a CRT bezel with scanlines and a glowing amber display. */
+.karaoke-theme .lyrics-sheet {
+  margin: 10px 0 24px;
+  padding: 28px 26px 22px;
+  border-radius: 10px;
+  border: 10px solid #26211c;
+  background:
+    repeating-linear-gradient(180deg, #00000000 0 3px, #0000001f 4px),
+    radial-gradient(ellipse at 50% 0%, #2a1f12 0%, #0f0c08 70%);
+  box-shadow:
+    inset 0 0 50px #000c,
+    inset 0 2px 0 #46392688,
+    0 0 0 1px #4a3b26,
+    0 16px 40px -14px #000a,
+    0 0 70px 4px #c98d4a14;
+}
+.karaoke-theme .lyrics-sheet::before {
+  content: '';
+  position: absolute; top: -34px; left: 50%; transform: translateX(-50%);
+  width: 70%; height: 30px; pointer-events: none;
+  background: radial-gradient(ellipse, #e0a85540, transparent 70%);
+}
+.karaoke-theme .lyrics-stanza {
+  font-family: 'Courier New', monospace;
+  color: #f4d9a0;
+  text-shadow: 0 0 6px #e0a85580, 0 0 1px #fff4d9;
+  letter-spacing: .3px;
+}
+.karaoke-theme .lyrics-blank {
+  color: #ffd98a;
+  border-bottom: 1px solid #e0a85580;
+  text-shadow: 0 0 8px #ffbf5c;
+  animation: karaoke-pulse 1.6s ease-in-out infinite;
+}
+.karaoke-theme .lyrics-blank.settled { color: #c8e3ad; text-shadow: 0 0 6px #9fd16f80; animation: none; }
+.karaoke-theme .lyrics-reveal-word {
+  background: #ffd98a14; border-color: #e0a85588; color: #ffd98a;
+  text-shadow: 0 0 6px #ffbf5c80;
+}
+@keyframes karaoke-pulse { 0%,100% { opacity: 1; } 50% { opacity: .55; } }
+
+.karaoke-theme .lyrics-room-bar, .karaoke-theme .clue-score { color: #e8dcc2; }
+.karaoke-theme .lyrics-winner-prompt {
+  border-color: #c98d4a; background: #1e170f;
+  box-shadow: 0 10px 30px #0008, 0 0 24px #c98d4a22;
+}
+.karaoke-theme .lyrics-winner-prompt h2 { color: #f1e4c8; }
+.karaoke-theme .lyrics-winner-prompt p { color: #e3bf86; }
+.karaoke-theme .dialogue-endnote { color: #8f8166; border-color: #7d5b3630; }
+
+@media (max-width: 480px) {
+  .karaoke-theme .lyrics-sheet { padding: 18px 14px 16px; border-width: 7px; }
+}

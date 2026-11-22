@@ -296,6 +296,11 @@ input, select { color: #44392e; background: #faf7f0; border: 1px solid #dfd4c5; 
 
 /* Listener chart: warm paper, engraved labels, and aligned score rows. */
 .leaderboard { padding: 23px; border-radius: 18px; border: 1px solid #dfcfb6; background: linear-gradient(135deg, #fffcf5, #f6eedf); box-shadow: inset 0 1px 0 #fff, 0 8px 22px #70532c0c; }
+.chart-toggle { display: flex; align-items: center; justify-content: space-between; width: 100%; margin: 0; padding: 0; background: none; border: 0; font: inherit; cursor: pointer; }
+.chart-toggle span:first-child { font: 18px Georgia, serif; color: #54412e; }
+.chart-chevron { font-size: 18px; line-height: 1; color: #a08764; transition: transform 0.2s ease; }
+.chart-chevron.is-open { transform: rotate(180deg); }
+.leaderboard .chart-heading { margin-top: 18px; }
 .chart-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .chart-eyebrow { font-size: 8px; font-weight: 700; letter-spacing: 2px; color: #a08764; margin: 0 0 9px; }
 .leaderboard h2 { font-size: clamp(21px, 5vw, 26px); margin: 0; color: #54412e; line-height: 1.15; }
